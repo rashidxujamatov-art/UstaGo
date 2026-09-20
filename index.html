@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UstaGo — Mobil Marketplace Prototipi (To'liq Bosqichlar)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="device-container">
+    <!-- Mobile Status Bar -->
+    <div class="status-bar dark" id="statusBar">
+      <span id="currentTime">22:48</span>
+      <div class="status-icons">
+        <span>📶</span>
+        <span>📡</span>
+        <span>🔋 98%</span>
+      </div>
+    </div>
+
+    <!-- Screens Wrapper -->
+    <div class="screens-wrapper">
+
+      <!-- EKRAN 1: Splash Screen -->
+      <div class="screen active" id="screen-splash" style="background: linear-gradient(180deg, #1E3A8A 0%, #0F172A 100%); justify-content: center; align-items: center; text-align: center; color: white;">
+        <div style="width: 88px; height: 88px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-radius: 26px; display: flex; align-items: center; justify-content: center; font-size: 44px; margin-bottom: 20px; box-shadow: 0 12px 36px rgba(16, 185, 129, 0.4);">
+          ⚡
+        </div>
+        <h1 style="font-size: 30px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px;">UstaGo</h1>
+        <p style="font-size: 14px; opacity: 0.8; margin-bottom: 40px;">Xizmatlar va Ishlar Platformasi</p>
+        <button class="btn-primary" onclick="navigateTo('screen-language')" style="max-width: 230px; background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.25);">
+          Boshlash ➔
+        </button>
+      </div>
+
+      <!-- EKRAN 2: Til Tanlash -->
+      <div class="screen" id="screen-language">
+        <div class="screen-header">
+          <div class="back-btn" onclick="navigateTo('screen-splash')">←</div>
+          <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">1 / 5 Bosqich</span>
+        </div>
+        <h2 class="screen-title">Ilova tilini tanlang</h2>
+        <p class="screen-subtitle">O'zingizga qulay va mos tilni belgilang</p>
+
+        <div class="selection-card selected" onclick="selectLanguage(this, 'O\'zbekcha')">
+          <div class="card-icon">🇺🇿</div>
+          <div class="card-content">
+            <h3>O'zbekcha (Lotin)</h3>
+            <p>Ilova o'zbek tilida ishlaydi</p>
+          </div>
+        </div>
+
+        <div class="selection-card" onclick="selectLanguage(this, 'Русский')">
+          <div class="card-icon">🇷🇺</div>
+          <div class="card-content">
+            <h3>Русский</h3>
+            <p>Приложение на русском языке</p>
+          </div>
+        </div>
+
+        <div class="selection-card" onclick="selectLanguage(this, 'English')">
+          <div class="card-icon">🇬🇧</div>
+          <div class="card-content">
+            <h3>English</h3>
+            <p>App in English language</p>
+          </div>
+        </div>
+
+        <div style="margin-top: auto;">
+          <button class="btn-primary" onclick="navigateTo('screen-role')">
+            Davom etish ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- EKRAN 3: Foydalanuvchi Turi -->
+      <div class="screen" id="screen-role">
+        <div class="screen-header">
+          <div class="back-btn" onclick="navigateTo('screen-language')">←</div>
+          <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">2 / 5 Bosqich</span>
+        </div>
+        <h2 class="screen-title">Rolingizni tanlang</h2>
+        <p class="screen-subtitle">Siz UstaGo'dan qanday foydalanmoqchisiz?</p>
+
+        <div class="selection-card selected" id="role-client" onclick="selectRole('Buyurtmachi')">
+          <div class="card-icon" style="background: #D1FAE5; color: #10B981;">📋</div>
+          <div class="card-content">
+            <h3>Buyurtmachiman</h3>
+            <p>Ish yoki xizmat joylayman hamda eng yaxshi ustani tanlayman.</p>
+          </div>
+        </div>
+
+        <div class="selection-card" id="role-worker" onclick="selectRole('Bajaruvchi')">
+          <div class="card-icon" style="background: #DBEAFE; color: #3B82F6;">🧰</div>
+          <div class="card-content">
+            <h3>Bajaruvchiman (Ustaman)</h3>
+            <p>Mavjud ishlarga taklif beraman hamda daromad qilaman.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: auto;">
+          <button class="btn-primary" onclick="navigateTo('screen-register')">
+            Davom etish ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- EKRAN 4: Registratsiya -->
+      <div class="screen" id="screen-register">
+        <div class="screen-header">
+          <div class="back-btn" onclick="navigateTo('screen-role')">←</div>
+          <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">3 / 5 Bosqich</span>
+        </div>
+        <h2 class="screen-title">Ro'yxatdan o'tish</h2>
+        <p class="screen-subtitle">SMS tasdiqlash kodini yuboramiz</p>
+
+        <div class="input-group">
+          <label class="input-label">Telefon raqamingiz *</label>
+          <input type="tel" class="input-field" id="reg-phone" value="+998 90 123-45-67" placeholder="+998 (90) 000-00-00">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Email manzilingiz (Ixtiyoriy)</label>
+          <input type="email" class="input-field" id="reg-email" value="akmal@example.com" placeholder="nomi@mail.com">
+          <span class="error-text" id="email-error">To'g'ri email formatini kiritishingiz kerak</span>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 24px;">
+          <input type="checkbox" id="terms-check" checked style="width: 20px; height: 20px; accent-color: var(--accent);">
+          <label for="terms-check" style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+            Men <a href="#" style="color: var(--primary-light); font-weight: 600;">Foydalanish shartlari</a> va <a href="#" style="color: var(--primary-light); font-weight: 600;">Maxfiylik siyosati</a>ga roziman.
+          </label>
+        </div>
+
+        <div style="margin-top: auto;">
+          <button class="btn-primary" id="btn-submit-reg" onclick="submitRegistration()">
+            SMS kodni olish ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- EKRAN 5: SMS OTP -->
+      <div class="screen" id="screen-otp">
+        <div class="screen-header">
+          <div class="back-btn" onclick="navigateTo('screen-register')">←</div>
+          <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">4 / 5 Bosqich</span>
+        </div>
+        <h2 class="screen-title">SMS kodni kiriting</h2>
+        <p class="screen-subtitle">Kod <b id="display-phone">+998 90 123-45-67</b> raqamiga yuborildi <span style="color: var(--primary-light); cursor: pointer; text-decoration: underline;" onclick="navigateTo('screen-register')">(O'zgartirish)</span></p>
+
+        <div class="otp-container">
+          <input type="text" class="otp-box" maxlength="1" value="7">
+          <input type="text" class="otp-box" maxlength="1" value="7">
+          <input type="text" class="otp-box" maxlength="1" value="7">
+          <input type="text" class="otp-box" maxlength="1" value="7">
+        </div>
+
+        <div id="otp-error-msg" style="color: var(--error); font-size: 13px; text-align: center; display: none; margin-bottom: 12px; font-weight: 600;">
+          ❌ Kiritilgan SMS kod noto'g'ri. Qayta urinib ko'ring!
+        </div>
+
+        <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">
+          Qayta kod yuborish: <span id="timer-text" style="color: var(--accent-dark); font-weight: 700;">00:54</span>
+        </p>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button style="flex: 1; padding: 10px; background: #FEF2F2; color: var(--error); border: 1px solid #FCA5A5; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="simulateOtpError()">
+            ⚠️ Test: Error state
+          </button>
+          <button style="flex: 1; padding: 10px; background: #F0FDF4; color: var(--accent-dark); border: 1px solid #86EFAC; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="verifyOtp()">
+            ✅ Kodni tasdiqlash
+          </button>
+        </div>
+
+        <div style="margin-top: auto;">
+          <button class="btn-primary" onclick="verifyOtp()">
+            Tasdiqlash ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- EKRAN 6: Registratsiya Yakunlandi & Bonus -->
+      <div class="screen" id="screen-success" style="text-align: center;">
+        <div style="width: 76px; height: 76px; background: #D1FAE5; color: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; margin: 20px auto 16px auto; box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);">
+          ✓
+        </div>
+        <h2 class="screen-title" style="font-size: 26px;">Tabriklaymiz!</h2>
+        <p class="screen-subtitle">Siz muvaffaqiyatli ro'yxatdan o'tdingiz</p>
+
+        <div class="bonus-card">
+          <div class="bonus-badge">🎁 STARTER BONUS</div>
+          <div class="bonus-amount">10 000 SO'M</div>
+          <p style="font-size: 13px; opacity: 0.9;">Sizning hisobingizga starter bonus biriktirildi. Ilk xizmatlar uchun ishlatishingiz mumkin!</p>
+        </div>
+
+        <div style="margin-top: auto;">
+          <button class="btn-primary" onclick="enterMainApp()">
+            Asosiy ilovaga o'tish ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- EKRAN 7: Asosiy Marketplace Home -->
+      <div class="screen" id="screen-home" style="padding-bottom: 80px;">
+        <div class="feed-header">
+          <div class="user-profile-header" onclick="switchTab('profile')" style="cursor: pointer;">
+            <div class="avatar" id="header-avatar">AK</div>
+            <div>
+              <div style="font-size: 12px; color: var(--text-muted);" id="header-greeting">Salom, Akmal 👋</div>
+              <div style="font-size: 13px; font-weight: 700; color: var(--text-main);" id="current-role-label">📋 Buyurtmachi Rejimi</div>
+            </div>
+          </div>
+          <div class="wallet-badge" onclick="openTopUpModal()">
+            💳 <span id="top-wallet-amount">10 000</span> UZS
+          </div>
+        </div>
+
+        <!-- Role Hero Banner -->
+        <div id="home-hero-banner"></div>
+
+        <!-- Search Bar -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <input type="text" class="input-field" style="height: 48px; border-radius: 14px;" id="home-search-input" onkeyup="handleHomeSearch(this.value)" placeholder="🔍 Qanday xizmat yoki usta kerak?">
+          <button style="width: 48px; height: 48px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; font-size: 18px; cursor: pointer;" onclick="openFilterModal()">⚙️</button>
+        </div>
+
+        <!-- Dynamic Category Section Title -->
+        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;" id="home-category-title">
+          Qanday xizmat kerak? <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">(E'lon berish uchun bosing)</span>
+        </h3>
+
+        <!-- Dynamic Categories Grid -->
+        <div class="category-grid" id="home-category-grid"></div>
+
+        <!-- Job Feed List Section Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="font-size: 15px; font-weight: 700;" id="home-list-title">Mening e'lonlarim (Aktiv)</h3>
+          <span style="font-size: 12px; color: var(--primary-light); font-weight: 600; cursor: pointer;" onclick="switchTab('feed')">Barchasi ➔</span>
+        </div>
+
+        <!-- Dynamic Jobs Container -->
+        <div id="home-jobs-container"></div>
+
+      </div>
+
+      <!-- EKRAN 8: Ishlar / Feed View -->
+      <div class="screen" id="screen-feed" style="padding-bottom: 80px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h2 class="screen-title" style="margin: 0;">Ishlar va Topshiriqlar</h2>
+          <span class="wallet-badge" style="font-size: 11px;" onclick="openCreateModal()">+ Yangi</span>
+        </div>
+
+        <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 16px;">
+          <span class="chip-filter active" onclick="filterFeedCategory('Barchasi', this)">Barchasi</span>
+          <span class="chip-filter" onclick="filterFeedCategory('Ta\'mirlash', this)">🛠️ Ta'mirlash</span>
+          <span class="chip-filter" onclick="filterFeedCategory('IT & Dizayn', this)">💻 IT & Dizayn</span>
+          <span class="chip-filter" onclick="filterFeedCategory('Maishiy', this)">🧹 Maishiy</span>
+          <span class="chip-filter" onclick="filterFeedCategory('Avto', this)">🚗 Avto</span>
+          <span class="chip-filter" onclick="filterFeedCategory('Logistika', this)">🚚 Logistika</span>
+        </div>
+
+        <div id="feed-jobs-container"></div>
+      </div>
+
+      <!-- EKRAN 9: Chat View -->
+      <div class="screen" id="screen-chat" style="padding-bottom: 80px;">
+        <div class="screen-header" style="margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="avatar" style="width: 38px; height: 38px; font-size: 14px; background: #059669;">JU</div>
+            <div>
+              <div style="font-size: 14px; font-weight: 700;">Jamshid Usta <span style="color: #10B981; font-size: 12px;">✓ Verified</span></div>
+              <div style="font-size: 11px; color: var(--accent-dark);">🟢 Online • ⭐ 4.9 Reyting</div>
+            </div>
+          </div>
+          <button style="border: none; background: #F1F5F9; width: 36px; height: 36px; border-radius: 50%; font-size: 16px; cursor: pointer;" onclick="alert('📞 Jamshid Usta: +998 91 765-43-21')">📞</button>
+        </div>
+
+        <!-- Chat Messages Box -->
+        <div id="chat-messages-list" style="flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding: 8px 0;">
+          <div style="align-self: flex-start; max-width: 82%; background: white; padding: 12px 14px; border-radius: 16px 16px 16px 4px; border: 1px solid var(--border); font-size: 13px; line-height: 1.4;">
+            Assalomu alaykum! Santexnika e'loningizni ko'rdim. Bugun soat 15:00 da borib bera olaman.
+          </div>
+          
+          <div style="align-self: flex-end; max-width: 82%; background: var(--primary); color: white; padding: 12px 14px; border-radius: 16px 16px 4px 16px; font-size: 13px; line-height: 1.4;">
+            Vaalaykum assalom! Narxini 220 000 so'mga kelisha olamizmi?
+          </div>
+
+          <!-- Deal Negotiation Offer Box -->
+          <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 18px; padding: 16px; text-align: center; margin: 4px 0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
+            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">🤝 TAKLIF QILINGAN KELISHUV</div>
+            <div style="font-size: 24px; font-weight: 900; color: var(--accent-dark); margin: 4px 0;">220 000 UZS</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Usta Jamshid ushbu narxni qabul qildi</p>
+            <button class="btn-primary" style="height: 44px; font-size: 14px; background: var(--accent-dark);" onclick="openRatingModal()">
+              ✓ Ishni yakunlash va baholash
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div style="display: flex; gap: 8px; margin-top: auto; padding-top: 8px;">
+          <input type="text" class="input-field" id="chat-input-text" style="height: 48px; border-radius: 24px;" placeholder="Xabar yozing..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+          <button class="btn-primary" style="width: 48px; height: 48px; border-radius: 50%; font-size: 18px; padding: 0; flex-shrink: 0;" onclick="sendChatMessage()">🚀</button>
+        </div>
+      </div>
+
+      <!-- EKRAN 10: Profil & Wallet View -->
+      <div class="screen" id="screen-profile" style="padding-bottom: 80px;">
+        <h2 class="screen-title">Mening Profilim</h2>
+
+        <!-- Profile Card -->
+        <div style="background: white; border: 1px solid var(--border); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 16px; box-shadow: var(--shadow-sm);">
+          <div class="avatar" style="width: 58px; height: 58px; font-size: 22px; background: var(--primary);">AK</div>
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <h3 style="font-size: 18px; font-weight: 700;">Akmal Karimov</h3>
+              <span style="color: var(--accent-dark); font-size: 14px;">✓</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);" id="profile-phone-text">+998 90 123-45-67</p>
+            <div style="display: flex; gap: 8px; margin-top: 6px;">
+              <span style="background: #FEF3C7; color: #D97706; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;">⭐ 4.9 Reyting</span>
+              <span style="background: #E0F2FE; color: #0284C7; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;" id="profile-role-badge">Buyurtmachi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wallet Card -->
+        <div class="bonus-card" style="margin: 0 0 20px 0; text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 11px; opacity: 0.9; font-weight: 700;">HAMYON BALANSI</div>
+              <div style="font-size: 28px; font-weight: 900;" id="user-balance-text">10 000 UZS</div>
+              <div style="font-size: 11px; opacity: 0.85;">(Starter Bonus: 10 000 UZS)</div>
+            </div>
+            <button style="background: white; color: var(--accent-dark); border: none; padding: 10px 16px; border-radius: 14px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" onclick="openTopUpModal()">
+              + To'ldirish
+            </button>
+          </div>
+        </div>
+
+        <!-- Mode Switcher -->
+        <div style="background: #F1F5F9; border-radius: 16px; padding: 4px; display: flex; margin-bottom: 20px;">
+          <button id="btn-client-mode" style="flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; background: white; color: var(--primary); cursor: pointer;" onclick="toggleUserRole('Buyurtmachi')">📋 Buyurtmachi</button>
+          <button id="btn-worker-mode" style="flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 13px; font-weight: 600; background: transparent; color: var(--text-muted); cursor: pointer;" onclick="toggleUserRole('Bajaruvchi')">🧰 Bajaruvchi (Usta)</button>
+        </div>
+
+        <!-- Profile Settings Menu List -->
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="background: white; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="switchTab('feed')">
+            <span>📋 Mening e'lonlarim hamda buyurtmalarim</span>
+            <span style="color: var(--text-muted);">➔</span>
+          </div>
+          <div style="background: white; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="openVerificationModal()">
+            <span>🛡️ Shaxsni tasdiqlash (Verification)</span>
+            <span style="color: var(--accent-dark); font-size: 12px; font-weight: 700;">✓ Tasdiqlangan</span>
+          </div>
+          <div style="background: white; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="navigateTo('screen-language')">
+            <span>🌐 Ilova tili</span>
+            <span style="color: var(--text-muted); font-size: 13px;">O'zbekcha ➔</span>
+          </div>
+          <div style="background: white; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="alert('💬 Qo\'llab-quvvatlash markazi 24/7: @UstaGoSupportBot')">
+            <span>📞 Qo'llab-quvvatlash xizmati</span>
+            <span style="color: var(--text-muted);">➔</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav" id="bottomNav">
+      <div class="nav-item active" onclick="switchTab('home')">
+        <div class="nav-icon">🏠</div>
+        <span>Asosiy</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('feed')">
+        <div class="nav-icon">🔍</div>
+        <span>Ishlar</span>
+      </div>
+      <div class="nav-item" onclick="openCreateModal()">
+        <div class="nav-item-plus">+</div>
+        <span style="margin-top: 4px;">E'lon</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('chat')">
+        <div class="nav-icon">💬</div>
+        <span>Xabarlar</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('profile')">
+        <div class="nav-icon">👤</div>
+        <span>Profil</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL: Job Details & Bidding -->
+  <div class="modal-overlay" id="modal-job-detail">
+    <div class="modal-content">
+      <div class="modal-handle"></div>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+        <h3 style="font-size: 19px; font-weight: 700;" id="modal-title">Kvartiraga santexnik xizmati kerak</h3>
+        <span style="background: #E0F2FE; color: #0284C7; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 8px;" id="modal-status-badge">OPEN</span>
+      </div>
+      <div style="font-size: 22px; font-weight: 800; color: var(--accent-dark); margin-bottom: 12px;" id="modal-price">250 000 UZS</div>
+      <p style="font-size: 14px; color: var(--text-muted); line-height: 1.4; margin-bottom: 16px;" id="modal-desc">
+        Oshxona kranini almashtirish va quvurlarni tekshirish kerak.
+      </p>
+
+      <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 16px; font-size: 13px; line-height: 1.5;">
+        📍 <b>Joylashuv:</b> <span id="modal-location">Toshkent, Chilonzor 7-mavze</span><br>
+        👤 <b>Buyurtmachi:</b> <span id="modal-client">Akmal Karimov</span> (⭐ 4.9)
+      </div>
+
+      <!-- Bids / Offers List for this Job -->
+      <div style="margin-bottom: 16px;">
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">💬 Ustalar takliflari (3)</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <div class="avatar" style="width: 36px; height: 36px; font-size: 13px; background: #059669;">JU</div>
+              <div>
+                <div style="font-size: 13px; font-weight: 700;">Jamshid Usta ⭐ 4.9</div>
+                <div style="font-size: 11px; color: var(--text-muted);">"Bugun soat 15:00 da tayyorman"</div>
+              </div>
+            </div>
+            <button style="background: #10B981; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;" onclick="acceptOffer('Jamshid Usta')">
+              220 000 UZS ➔
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="modal-action-btn" onclick="handleJobModalAction()">
+        ⚡ Narx taklifini yuborish
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: Create Job -->
+  <div class="modal-overlay" id="modal-create-job">
+    <div class="modal-content">
+      <div class="modal-handle"></div>
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Yangi e'lon joylash</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Topshiriq mazmunini va taklif etiladigan budjetni kiriting</p>
+      
+      <div style="font-size: 13px; color: var(--primary-light); font-weight: 700; margin-bottom: 14px;">
+        Kategoriya: <span id="modal-create-job-cat">Ta'mirlash</span>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Topshiriq sarlavhasi *</label>
+        <input type="text" class="input-field" id="new-job-title" placeholder="Masalan: Elektrik rozetkani ta'mirlash">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Batafsil tavsif *</label>
+        <input type="text" class="input-field" id="new-job-desc" placeholder="Ish haqida qisqacha ma'lumot va talablar">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Budjet (UZS) *</label>
+        <input type="number" class="input-field" id="new-job-budget" placeholder="150000">
+      </div>
+
+      <button class="btn-primary" onclick="submitNewJob()">
+        E'lonni chop etish 🚀
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: Hamyonni To'ldirish (Top-Up Balance) -->
+  <div class="modal-overlay" id="modal-top-up">
+    <div class="modal-content">
+      <div class="modal-handle"></div>
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 6px;">Hamyon balansi to'ldirish</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">To'lov tizimini tanlang va summani kiriting</p>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
+        <div class="payment-method selected" onclick="selectPaymentMethod(this)">
+          <div style="font-size: 20px;">🔹</div>
+          <div style="font-size: 12px; font-weight: 700;">Click</div>
+        </div>
+        <div class="payment-method" onclick="selectPaymentMethod(this)">
+          <div style="font-size: 20px;">🟢</div>
+          <div style="font-size: 12px; font-weight: 700;">Payme</div>
+        </div>
+        <div class="payment-method" onclick="selectPaymentMethod(this)">
+          <div style="font-size: 20px;">💜</div>
+          <div style="font-size: 12px; font-weight: 700;">Uzum Pay</div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">To'lov summasi (UZS)</label>
+        <input type="number" class="input-field" id="topup-amount-input" value="50000" placeholder="50000">
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+        <span class="chip-filter" onclick="document.getElementById('topup-amount-input').value=50000">+50 000</span>
+        <span class="chip-filter" onclick="document.getElementById('topup-amount-input').value=100000">+100 000</span>
+        <span class="chip-filter" onclick="document.getElementById('topup-amount-input').value=200000">+200 000</span>
+      </div>
+
+      <button class="btn-primary" onclick="processTopUp()">
+        To'lovni amalga oshirish 💳
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: Rating & Review -->
+  <div class="modal-overlay" id="modal-rating">
+    <div class="modal-content" style="text-align: center;">
+      <div class="modal-handle"></div>
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 6px;">Xizmatni baholang</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Usta Jamshid bajargan ish sifatiga baho bering</p>
+      
+      <div style="font-size: 34px; letter-spacing: 8px; margin-bottom: 16px; cursor: pointer;">
+        ⭐⭐⭐⭐⭐
+      </div>
+
+      <div class="input-group" style="text-align: left;">
+        <label class="input-label">Izoh qoldiring</label>
+        <input type="text" class="input-field" value="Baraka topsinlar, juda tez va sifatli bajarib berdi!" placeholder="Fikringizni yozing...">
+      </div>
+
+      <button class="btn-primary" onclick="saveRating()">
+        Bahoni saqlash va yakunlash
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

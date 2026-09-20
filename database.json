@@ -1,0 +1,104 @@
+{
+  "users": [
+    {
+      "id": "usr_1",
+      "phone": "+998 90 123-45-67",
+      "email": "akmal@example.com",
+      "name": "Akmal Karimov",
+      "role": "Buyurtmachi",
+      "balance": 160000.0,
+      "rating": 4.9
+    },
+    {
+      "id": "usr_2",
+      "phone": "+998 91 765-43-21",
+      "email": "jamshid@usta.uz",
+      "name": "Jamshid (Usta)",
+      "role": "Bajaruvchi",
+      "balance": 50000,
+      "rating": 4.9
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat_1",
+      "name": "Ta'mirlash",
+      "icon": "🛠️"
+    },
+    {
+      "id": "cat_2",
+      "name": "Maishiy",
+      "icon": "🧹"
+    },
+    {
+      "id": "cat_3",
+      "name": "IT & Dizayn",
+      "icon": "💻"
+    },
+    {
+      "id": "cat_4",
+      "name": "Avto",
+      "icon": "🚗"
+    },
+    {
+      "id": "cat_5",
+      "name": "Logistika",
+      "icon": "🚚"
+    },
+    {
+      "id": "cat_6",
+      "name": "Ta'lim",
+      "icon": "📚"
+    },
+    {
+      "id": "cat_7",
+      "name": "Foto/Video",
+      "icon": "📷"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job_1",
+      "clientId": "usr_1",
+      "clientName": "Akmal Karimov",
+      "title": "Kvartiraga santexnik xizmati kerak",
+      "category": "Ta'mirlash",
+      "budget": 250000,
+      "location": "Toshkent, Chilonzor",
+      "description": "Oshxona kranini almashtirish va quvurlarni tekshirish kerak. Bajarish muddati bugun.",
+      "status": "OPEN",
+      "offersCount": 3,
+      "createdAt": "2026-09-20T22:00:00Z"
+    },
+    {
+      "id": "job_2",
+      "clientId": "usr_1",
+      "clientName": "Akmal Karimov",
+      "title": "Mobil ilova uchun UI/UX dizayn",
+      "category": "IT & Dizayn",
+      "budget": 1200000,
+      "location": "Masofadan (Remote)",
+      "description": "Figma dasturida 5 ta mobil ekran dizaynini yaratish kerak. Muddati 3 kun.",
+      "status": "OPEN",
+      "offersCount": 5,
+      "createdAt": "2026-09-20T21:00:00Z"
+    },
+    {
+      "id": "job_3",
+      "clientId": "usr_3",
+      "clientName": "Olimxon R.",
+      "title": "Elektrik: Rozetkalarni ta'mirlash",
+      "category": "Ta'mirlash",
+      "budget": 150000,
+      "location": "Toshkent, Yunusobod (3.1 km)",
+      "description": "Xonadonda 4 ta rozetka va lyustrani ulash lozim.",
+      "status": "OPEN",
+      "offersCount": 1,
+      "createdAt": "2026-09-20T20:00:00Z"
+    }
+  ],
+  "offers": [],
+  "chats": [],
+  "messages": [],
+  "reviews": []
+}

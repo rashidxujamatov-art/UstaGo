@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  ustago-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ustago_app
+    restart: always
+    ports:
+      - "4000:4000"
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - ESKIZ_EMAIL=info@ustago.uz
+      - ESKIZ_PASSWORD=secret_eskiz_password
+      - CLICK_SECRET_KEY=demo_click_secret
+      - CLICK_SERVICE_ID=12345
+      - PAYME_MERCHANT_ID=demo_payme_merchant
+      - JWT_SECRET=ustago_jwt_secret_key_2026
+    volumes:
+      - ./backend/data:/app/backend/data
