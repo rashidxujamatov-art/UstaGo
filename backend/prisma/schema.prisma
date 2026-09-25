@@ -2,7 +2,7 @@
 // - money columns are BIGINT in tiyin (1 so'm = 100 tiyin), percentages are bps;
 // - timestamps are TIMESTAMPTZ in UTC;
 // - tables and columns are snake_case, Prisma models are PascalCase/camelCase.
-// Tables are added stage by stage; stage 0 only has the settings store.
+// Tables are added stage by stage.
 
 generator client {
   provider            = "prisma-client"
@@ -26,4 +26,219 @@ model Setting {
   updatedBy String?  @map("updated_by") @db.Uuid
 
   @@map("settings")
+}
+
+enum Language {
+  uz
+  ru
+  en
+  tg
+}
+
+enum ThemeMode {
+  LIGHT
+  DARK
+  AUTO
+}
+
+enum Role {
+  CUSTOMER
+  EXECUTOR
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum StaffRole {
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum DocType {
+  ID_CARD
+  PASSPORT
+}
+
+enum ConsentType {
+  TERMS
+  PERSONAL_DATA
+  BIOMETRY
+  LOCATION
+}
+
+enum InviteCodeKind {
+  PLATFORM
+}
+
+/// An account. Created only after the phone number is confirmed by SMS; until MyID
+/// succeeds it has no `identity` and cannot use the marketplace (docs/01 §2).
+model User {
+  id              String     @id @default(uuid(7)) @db.Uuid
+  /// E.164, e.g. +998901234567.
+  phone           String     @unique
+  /// Stored lower-case.
+  email           String     @unique
+  passwordHash    String     @map("password_hash")
+  lang            Language   @default(uz)
+  theme           ThemeMode  @default(AUTO)
+  /// Null until the role is chosen on K4.
+  activeRole      Role?      @map("active_role")
+  status          UserStatus @default(ACTIVE)
+  referralCode    String     @unique @map("referral_code")
+  /// L1 of the referral chain. Null only for users who came with a platform code (§2).
+  referrerId      String?    @map("referrer_id") @db.Uuid
+  inviteCodeId    String?    @map("invite_code_id") @db.Uuid
+  phoneVerifiedAt DateTime   @map("phone_verified_at") @db.Timestamptz(3)
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  referrer        User?            @relation("Referrals", fields: [referrerId], references: [id], onDelete: Restrict)
+  referrals       User[]           @relation("Referrals")
+  inviteCode      InviteCode?      @relation(fields: [inviteCodeId], references: [id], onDelete: Restrict)
+  identity        Identity?
+  staff           StaffPermission?
+  executorProfile ExecutorProfile?
+  consents        Consent[]
+  devices         Device[]
+  sessions        Session[]
+
+  @@index([referrerId])
+  @@map("users")
+}
+
+/// Result of the MyID check. The face image is never stored (CLAUDE.md rule 9).
+model Identity {
+  userId     String   @id @map("user_id") @db.Uuid
+  /// HMAC-SHA256 of the PINFL: one person = one account.
+  pinflHash  String   @unique @map("pinfl_hash")
+  /// AES-256-GCM encrypted PINFL (iv | tag | ciphertext).
+  pinflEnc   Bytes    @map("pinfl_enc")
+  lastName   String   @map("last_name")
+  firstName  String   @map("first_name")
+  middleName String?  @map("middle_name")
+  birthDate  DateTime @map("birth_date") @db.Date
+  docType    DocType  @map("doc_type")
+  myidRef    String   @map("myid_ref")
+  verifiedAt DateTime @default(now()) @map("verified_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("identities")
+}
+
+model Consent {
+  id         String      @id @default(uuid(7)) @db.Uuid
+  userId     String      @map("user_id") @db.Uuid
+  type       ConsentType
+  version    String
+  acceptedAt DateTime    @default(now()) @map("accepted_at") @db.Timestamptz(3)
+  /// Client device id the consent was given on.
+  deviceId   String      @map("device_id")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@map("consents")
+}
+
+/// ADMIN / SUPER_ADMIN roles. Super admins are granted only through the CLI (§1).
+model StaffPermission {
+  userId      String    @id @map("user_id") @db.Uuid
+  role        StaffRole
+  permissions String[]  @default([])
+  grantedAt   DateTime  @default(now()) @map("granted_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("staff_permissions")
+}
+
+/// Created the first time the EXECUTOR role is activated; starts the free period (§8).
+model ExecutorProfile {
+  userId          String   @id @map("user_id") @db.Uuid
+  freePeriodStart DateTime @map("free_period_start") @db.Timestamptz(3)
+  freePeriodEnd   DateTime @map("free_period_end") @db.Timestamptz(3)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("executor_profiles")
+}
+
+/// Platform invite codes created by the super admin (or the CLI) for the first users
+/// and campaigns. Users who sign up with one have no L1 (§2).
+model InviteCode {
+  id        String         @id @default(uuid(7)) @db.Uuid
+  code      String         @unique
+  kind      InviteCodeKind @default(PLATFORM)
+  /// Null when created from the CLI.
+  createdBy String?        @map("created_by") @db.Uuid
+  /// Null = unlimited.
+  maxUses   Int?           @map("max_uses")
+  used      Int            @default(0)
+  expiresAt DateTime?      @map("expires_at") @db.Timestamptz(3)
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  users User[]
+
+  @@map("invite_codes")
+}
+
+/// A phone the user signed in from. A device becomes trusted after an SMS check;
+/// signing in from an untrusted device asks for an SMS code (§2).
+model Device {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  /// Random id generated by the app and kept in secure storage.
+  deviceId   String    @map("device_id")
+  name       String?
+  platform   String
+  trustedAt  DateTime? @map("trusted_at") @db.Timestamptz(3)
+  lastSeenAt DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(3)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions Session[]
+
+  @@unique([userId, deviceId])
+  @@map("devices")
+}
+
+/// Refresh-token session. Only a SHA-256 hash of the token is stored. Each refresh
+/// rotates the token; presenting a rotated token again revokes every session (§10).
+model Session {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  deviceRowId  String    @map("device_row_id") @db.Uuid
+  refreshHash  String    @unique @map("refresh_hash")
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(3)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUsedAt   DateTime  @default(now()) @map("last_used_at") @db.Timestamptz(3)
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz(3)
+  /// Set when the session was rotated; its token must never be used again.
+  replacedById String?   @map("replaced_by_id") @db.Uuid
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device Device @relation(fields: [deviceRowId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+/// Admin, super-admin and money actions (CLAUDE.md rule 10). Append-only.
+model AuditLog {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  /// Null for actions run by the system or the CLI.
+  actorId    String?  @map("actor_id") @db.Uuid
+  actorType  String   @map("actor_type")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  data       Json?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([entityType, entityId])
+  @@map("audit_logs")
 }

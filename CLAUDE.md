@@ -78,3 +78,5 @@ Eski prototip (Express + JSON fayl backend, Expo SDK 51 JavaScript ilova va web 
 - `npx prisma migrate dev` (`backend/` ichida) — migratsiyalar
 - `npm run db:seed -w backend` — sozlamalar seed’i (§12 standart qiymatlari, mavjudlarini o‘zgartirmaydi)
 - `npm run lint`, `npm run typecheck` — ikkala workspace uchun
+- `npm run test:e2e -w backend` — e2e testlar (`E2E_DATABASE_URL`, `E2E_REDIS_URL` kerak; jadvallarni tozalaydi — faqat test bazasida)
+- `npm run cli -w backend -- invite-code:create --max-uses 10` — platforma taklif kodi; `super-admin:grant --phone +998...` — super admin (odam avval ro‘yxatdan o‘tib, MyID’dan o‘tgan bo‘lishi kerak)

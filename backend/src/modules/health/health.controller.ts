@@ -1,5 +1,6 @@
 import { Controller, Get, HttpStatus, Inject, Res } from '@nestjs/common';
 import type { Response } from 'express';
+import { Public } from '../../common/auth/auth.decorators.js';
 import type { Redis } from 'ioredis';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { REDIS } from '../../infra/redis/redis.module.js';
@@ -11,6 +12,7 @@ export interface HealthReport {
   checks: { database: CheckStatus; redis: CheckStatus };
 }
 
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(
