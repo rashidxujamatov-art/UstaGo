@@ -50,16 +50,16 @@ GTM — O‘zbekiston uchun usta topish mobil ilovasi. Buyurtmachi ish joylaydi,
 
 ## Mavjud kod haqida
 
-Hozirgi `backend/` (Express + JSON fayl) va `mobile/` (Expo SDK 51, JavaScript) — **prototip**. Ulardan g‘oya sifatida foydalaning, lekin quyidagi xatolarni yangi kodga ko‘chirmang:
+Eski prototip (Express + JSON fayl backend, Expo SDK 51 JavaScript ilova va web versiya) 0-bosqichda `legacy/`ga ko‘chirildi va yangi kodga ulanmagan. Ulardan g‘oya sifatida foydalaning, lekin quyidagi xatolarni yangi kodga ko‘chirmang:
 
-- `backend/controllers/authController.js`: `7777` va `1234` kodlari har doim o‘tadi; JWT uchun default sir bor; OTP xotirada (`Map`) saqlanadi; kod 4 xonali (kerak: 6 xonali).
-- `backend/services/paymeMerchant.js`: Basic auth tekshirilmaydi; foydalanuvchi topilmasa `db.users[0]`ga pul yoziladi; pul `float`da.
-- `backend/services/clickMerchant.js`: imzo faqat production’da va `sign_string` kelgandagina tekshiriladi; noma’lum foydalanuvchi bo‘lsa `db.users[0]` ishlatiladi.
-- `backend/services/eskizSms.js`: Eskiz’ga kirish xato bo‘lsa, "demo token" bilan jimgina davom etadi.
+- `legacy/backend/controllers/authController.js`: `7777` va `1234` kodlari har doim o‘tadi; JWT uchun default sir bor; OTP xotirada (`Map`) saqlanadi; kod 4 xonali (kerak: 6 xonali).
+- `legacy/backend/services/paymeMerchant.js`: Basic auth tekshirilmaydi; foydalanuvchi topilmasa `db.users[0]`ga pul yoziladi; pul `float`da.
+- `legacy/backend/services/clickMerchant.js`: imzo faqat production’da va `sign_string` kelgandagina tekshiriladi; noma’lum foydalanuvchi bo‘lsa `db.users[0]` ishlatiladi.
+- `legacy/backend/services/eskizSms.js`: Eskiz’ga kirish xato bo‘lsa, "demo token" bilan jimgina davom etadi.
 - 10 000 so‘mlik "starter bonus" hammaga beriladi — noto‘g‘ri. Qoida: faqat ustaga, 25 000 so‘m demo, PINFL bo‘yicha bir marta.
 - `offers` (taklif, savdolashish) modeli talablarda yo‘q. Narxni buyurtmachi qo‘yadi, usta qabul qiladi.
-- `mobile/src/theme/colors.js` ranglari dizaynga mos emas — `docs/03-ekranlar-va-dizayn.md`dagi tokenlar ishlatilsin.
-- Ildizdagi `index.html`, `app.js`, `styles.css`, `server.js`, `server.py`, `db.js`, `database.json`, `vercel.json`, `package.json` — eski web prototip. Ularni `legacy/`ga ko‘chiring va yangi kodga ulamang.
+- `legacy/mobile/src/theme/colors.js` ranglari dizaynga mos emas — `docs/03-ekranlar-va-dizayn.md`dagi tokenlar ishlatilsin.
+- `legacy/` ildizidagi `index.html`, `app.js`, `styles.css`, `server.js`, `server.py`, `db.js`, `database.json`, `vercel.json` — eski web prototip, ishlatilmaydi.
 
 ## Ish tartibi
 
@@ -76,3 +76,5 @@ Hozirgi `backend/` (Express + JSON fayl) va `mobile/` (Expo SDK 51, JavaScript) 
 - `npm run start -w mobile` — Expo development build
 - `npm test -w backend` — testlar
 - `npx prisma migrate dev` (`backend/` ichida) — migratsiyalar
+- `npm run db:seed -w backend` — sozlamalar seed’i (§12 standart qiymatlari, mavjudlarini o‘zgartirmaydi)
+- `npm run lint`, `npm run typecheck` — ikkala workspace uchun

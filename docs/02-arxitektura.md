@@ -44,7 +44,9 @@ D:\UstaGo
 │  ├─ src/
 │  │  ├─ main.ts               # API kirish nuqtasi
 │  │  ├─ worker.ts             # BullMQ worker kirish nuqtasi
+│  │  ├─ config/               # .env validatsiyasi (zod), logger
 │  │  ├─ common/               # money, errors, guards, idempotency, i18n kodlari
+│  │  ├─ infra/                # prisma, redis, BullMQ ulanishlari
 │  │  └─ modules/              # §4dagi modullar
 │  ├─ prisma/                  # schema.prisma, migrations, seed.ts
 │  └─ test/                    # unit va e2e testlar
