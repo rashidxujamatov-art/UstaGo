@@ -1,0 +1,83 @@
+{
+  "brand": {
+    "tagline": "Usta toping yoki buyurtma oling",
+    "footer": "{appName} — {appNameExpansion} · {version}"
+  },
+  "common": {
+    "money": "{amount} so‘m",
+    "continue": "Davom etish",
+    "cancel": "Bekor qilish",
+    "back": "Orqaga"
+  },
+  "language": {
+    "autonym": "O‘zbekcha",
+    "title": "Tilni tanlang",
+    "names": {
+      "uz": "O‘zbek tili",
+      "ru": "Rus tili",
+      "en": "Ingliz tili",
+      "tg": "Tojik tili"
+    }
+  },
+  "appearance": {
+    "title": "Ko‘rinish",
+    "light": "Kunduzgi",
+    "dark": "Tungi",
+    "auto": "Avto"
+  },
+  "role": {
+    "customer": "Buyurtmachi",
+    "executor": "Bajaruvchi (usta)"
+  },
+  "menu": {
+    "currentRole": "Joriy rol",
+    "switchToCustomer": "Buyurtmachiga o‘tish",
+    "switchToExecutor": "Bajaruvchiga o‘tish",
+    "myJobs": "Mening ishlarim",
+    "wallet": "Hamyon",
+    "referral": "Referal dasturi",
+    "settings": "Sozlamalar",
+    "language": "Til",
+    "nightMode": "Tungi rejim",
+    "help": "Yordam",
+    "logout": "Chiqish"
+  },
+  "auth": {
+    "haveAccount": "Hisobingiz bormi?",
+    "signIn": "Kirish",
+    "duplicatePerson": "Bu shaxs uchun hisob allaqachon mavjud.",
+    "referralRequired": "Ro‘yxatdan o‘tish uchun taklif havolasi yoki kodi kerak."
+  },
+  "wallet": {
+    "insufficientToAccept": "Bu ishni olish uchun yana {shortfall} so‘m to‘ldiring.",
+    "insufficientFunds": "Hisobingizda mablag‘ yetarli emas.",
+    "withdrawMustKeep": "Hisobingizda ilova xizmati uchun {must_keep} so‘m qolishi kerak. Ko‘pi bilan {max} so‘m yechishingiz mumkin (bank o‘tkazma xizmati 1% — {fee} so‘m)."
+  },
+  "tax": {
+    "required": "Bepul oy tugadi. Ishni davom ettirish uchun soliq usulini tanlang."
+  },
+  "trip": {
+    "sharing": "Joylashuvingiz mijozga ko‘rinmoqda",
+    "eta": "{min} daqiqada yetib keladi"
+  },
+  "payment": {
+    "iPaid": "To‘ladim",
+    "iReceived": "Pulni qabul qildim",
+    "notReceived": "Pul kelmadi",
+    "feeCharged": "Xizmat haqi {fee} so‘m hisobingizdan yechildi."
+  },
+  "order": {
+    "notFound": "Buyurtma topilmadi.",
+    "customerConfirmRequired": "Oldingi buyurtma (#{order}) uchun «To‘ladim»ni bosing — shundan keyin yangi buyurtma joylaysiz.",
+    "executorConfirmRequired": "Oldingi ish (#{order}) uchun «Pulni qabul qildim»ni bosing — shundan keyin yangi ish olasiz."
+  },
+  "errors": {
+    "internal": "Nimadir xato ketdi. Keyinroq qayta urinib ko‘ring.",
+    "validation": "Kiritilgan ma’lumotlarni tekshiring.",
+    "notFound": "Topilmadi.",
+    "unauthorized": "Qaytadan kiring.",
+    "forbidden": "Bu amal uchun ruxsat yo‘q.",
+    "rateLimited": "Urinishlar juda ko‘p. Birozdan keyin qayta urinib ko‘ring.",
+    "network": "Internet aloqasini tekshiring."
+  }
+}

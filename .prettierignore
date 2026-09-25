@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+legacy
+docs
+Fronted rasmlar
+package-lock.json
+backend/src/generated
+backend/prisma/migrations
+mobile/.expo
+mobile/ios
+mobile/android
+*.md
