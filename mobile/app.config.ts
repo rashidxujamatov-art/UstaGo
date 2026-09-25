@@ -51,6 +51,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     extra: {
       appNameExpansion: required('APP_NAME_EXPANSION'),
       appDomain: required('APP_DOMAIN'),
+      // Legal entity and tax number for consent texts; placeholders until registered (§14).
+      operatorName: process.env.APP_OPERATOR_NAME?.trim() || '[MChJ nomi]',
+      operatorTin: process.env.APP_OPERATOR_TIN?.trim() || '[raqam]',
       ...(easProjectId ? { eas: { projectId: easProjectId } } : {}),
     },
   };

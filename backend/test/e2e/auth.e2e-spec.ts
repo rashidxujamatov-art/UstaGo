@@ -145,6 +145,15 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
     return { ...user, me: me.body };
   }
 
+  it('serves the public config the app shows before sign-in', async () => {
+    const res = await api().get('/api/v1/config').expect(200);
+    expect(res.body).toMatchObject({
+      free_period_days: 30,
+      demo_bonus: '2500000',
+      min_age_years: 16,
+    });
+  });
+
   it('rejects requests without a token', async () => {
     const res = await api().get('/api/v1/me').expect(401);
     expect(res.body).toEqual({ code: 'UNAUTHORIZED', params: {} });

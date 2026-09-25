@@ -4,6 +4,8 @@ import Constants from 'expo-constants';
 interface AppExtra {
   appNameExpansion?: string;
   appDomain?: string;
+  operatorName?: string;
+  operatorTin?: string;
 }
 
 function extra(): AppExtra {
@@ -20,4 +22,9 @@ export function appBranding(): { appName: string; appNameExpansion: string } {
 
 export function appDomain(): string {
   return extra().appDomain ?? '';
+}
+
+/** Personal-data operator shown in the consent texts (docs/01 §14: not registered yet). */
+export function appOperator(): { name: string; tin: string } {
+  return { name: extra().operatorName ?? '', tin: extra().operatorTin ?? '' };
 }
