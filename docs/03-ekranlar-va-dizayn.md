@@ -68,7 +68,7 @@ Xarita (Google Maps’ning o‘z uslubi ustiga, ixtiyoriy): kunduzi yo‘l #FFFF
 
 | ID | Nomi | Asosiy elementlar |
 |---|---|---|
-| Main | Til tanlash | Logo, "Usta toping yoki buyurtma oling", 4 til (O‘zbekcha, Русский, English, Тоҷикӣ), Kunduzgi/Tungi, "Davom etish", "Hisobingiz bormi? Kirish" |
+| Main | Til tanlash | Logo, "Usta toping yoki buyurtma oling", 4 til (O‘zbekcha, Русский, English, Тоҷикӣ), Kunduzgi/Tungi/Avto (kanvasda hozircha ikkitasi chizilgan), "Davom etish", "Hisobingiz bormi? Kirish" |
 | K2 | Ro‘yxatdan o‘tish | "Ro‘yxatdan o‘tish / Kirish" tablari, "Sizni {ism} taklif qildi" (taklif kodi majburiy), telefon, elektron pochta, parol |
 | K3 | SMS tasdiqlash | 2/5, 6 xonali kod, qayta yuborish taymeri, "Raqamni o‘zgartirish", "Kodni hech kimga aytmang" |
 | K3b | MyID: hujjat | 3/5, ID-karta yoki pasport, seriya va raqam, tug‘ilgan sana, rozilik belgisi (`[MChJ nomi]`, `STIR [raqam]`) |

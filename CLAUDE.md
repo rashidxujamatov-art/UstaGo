@@ -31,7 +31,7 @@ GTM — O‘zbekiston uchun usta topish mobil ilovasi. Buyurtmachi ish joylaydi,
 
 - Hujjatlar o‘zbek tilida. Kod, identifikatorlar, izohlar, commit xabarlari ingliz tilida.
 - Foydalanuvchiga ko‘rinadigan har bir matn 4 tilda bo‘ladi: `uz` (lotin), `ru`, `en`, `tg`. Matnni kodga yozmang — faqat tarjima kalitlari (i18n) ishlatilsin.
-- Backend foydalanuvchiga matn qaytarmaydi, faqat xato kodi va parametrlar qaytaradi: `{ "code": "WALLET_INSUFFICIENT_TO_ACCEPT", "params": { "shortfall": 1550000 } }`. Matnni mobil ilova tanlangan tilda ko‘rsatadi.
+- Backend foydalanuvchiga matn qaytarmaydi, faqat xato kodi va parametrlar qaytaradi: `{ "code": "WALLET_INSUFFICIENT_TO_ACCEPT", "params": { "shortfall": "1550000" } }` (pul — tiyinda, satr ko‘rinishida). Matnni mobil ilova tanlangan tilda ko‘rsatadi.
 
 ## Qat’iy qoidalar (buzilmasin)
 

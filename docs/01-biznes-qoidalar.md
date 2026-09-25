@@ -37,7 +37,7 @@ Bu hujjat — yagona haqiqat manbai. Hamma summalar so‘mda yozilgan, kodda esa
 | Bildirishnoma | `notifications.broadcast` | Barcha foydalanuvchilarga xabar yuborish |
 
 - Faqat `SUPER_ADMIN` qila oladi: komissiya va foizlarni o‘zgartirish, soliq usullarini yoqish/o‘chirish, pul qaytarish (refund), sozlamalar, adminlarni tayinlash, xarita sozlamalari.
-- Super admin ilova orqali yaratilmaydi, faqat seed yoki CLI orqali.
+- Super admin ilova orqali yaratilmaydi, faqat serverdagi CLI buyrug‘i orqali (telefon raqami buyruqqa parametr sifatida beriladi, kodda va seed’da saqlanmaydi). Har bir yaratish `audit_logs`ga yoziladi.
 - Bloklangan foydalanuvchi tizimga kira oladi, lekin buyurtma joylay olmaydi va ish qabul qila olmaydi. Hamyondagi pulini yechishi mumkin (agar nizo bo‘lmasa).
 
 ## 2. Ro‘yxatdan o‘tish va kirish
@@ -326,11 +326,16 @@ Super admin o‘zgartiradi (SA2, SA5, SA6 ekranlari). Har bir o‘zgarish `audit
 | `withdraw_fee_bps` | 100 | 1% — bank o‘tkazma xizmati, platforma olmaydi |
 | `topup_min` | 1 000 so‘m | |
 | `free_period_days` | 30 | |
+| `free_period_reminder_days` | 7, 3, 1 | Bepul davr tugashidan oldingi push-eslatmalar (§8) |
 | `demo_bonus` | 25 000 so‘m | |
 | `otp_length` / `otp_ttl_sec` / `otp_resend_sec` / `otp_max_attempts` | 6 / 300 / 60 / 5 | |
+| `otp_phone_limit` / `otp_ip_limit` / `otp_limit_window_sec` | 3 / 10 / 600 | Bitta telefon raqamiga va bitta IP’ga 10 daqiqada yuboriladigan SMS kodlar soni (§2) |
+| `order_photos_max` | 5 | Buyurtmadagi rasmlar soni (§3.1) |
+| `upload_max_mb` | 5 | Bitta yuklanadigan rasm hajmi |
 | `qr_payment_ttl_sec` | 300 | BJ4: QR amal qilish vaqti |
 | `location_interval_sec` | 5 | |
 | `eta_refresh_sec` | 120 | |
+| `route_deviation_m` | 300 | Usta yo‘ldan shuncha chetga chiqsa ETA qayta hisoblanadi (§10) |
 | `auto_stop_radius_m` | 50 | |
 | `max_trip_minutes` | 180 | |
 | `track_retention_days` | 30 | |
@@ -365,6 +370,9 @@ Hal qilingan savollar (2026-09-25):
 - Usta "Ishni tugatdim"ni bosmaguncha pul ololmaydi; naqd va Xolis’da — tasdiqlash tartibi (§5.1).
 - Pul yechishda 1% olinadi, buyurtmachidan ham. Bu — bank o‘tkazma xizmati, platforma hech narsa olmaydi.
 - Demodan to‘langan xizmat haqidan ham referal beriladi — platforma budjetidan.
+- Super admin faqat CLI buyrug‘i bilan yaratiladi (§1).
+- Til tanlash ekranida (Main) ko‘rinish uchta: Kunduzgi, Tungi, Avto.
+- §2, §3.1, §8, §10’da tilga olingan limitlar ham sozlamaga aylandi (§12): eslatma kunlari, OTP cheklovi, rasmlar soni va hajmi, yo‘ldan chetga chiqish masofasi. IP bo‘yicha OTP cheklovi (10) — texnik standart qiymat.
 
 ## 14. Yuridik talablar (real pul bilan ishga tushirishdan oldin)
 

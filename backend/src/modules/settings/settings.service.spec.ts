@@ -23,6 +23,17 @@ describe('settings seed defaults (docs/01-biznes-qoidalar.md §12)', () => {
     expect(settings.topup_min).toBe(100_000n); // 1 000 so'm
     expect(settings.demo_bonus).toBe(2_500_000n); // 25 000 so'm
   });
+
+  it('include the limits that §3, §8 and §10 mention outside the §12 table', () => {
+    expect(parseSettings(rowsFrom(settingsDefaults))).toMatchObject({
+      free_period_reminder_days: [7, 3, 1],
+      otp_phone_limit: 3,
+      otp_limit_window_sec: 600,
+      order_photos_max: 5,
+      upload_max_mb: 5,
+      route_deviation_m: 300,
+    });
+  });
 });
 
 describe('parseSettings', () => {

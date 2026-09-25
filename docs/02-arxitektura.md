@@ -114,7 +114,7 @@ Indekslar: `orders(status, location)` GIST, `orders(customer_id)`, `orders(execu
 
 ## 6. API (REST, `/api/v1`)
 
-Autentifikatsiya: `Authorization: Bearer <access>`. Xato formati: `{ "code": "ORDER_NOT_FOUND", "params": {} }`. Pul maydonlari tiyinda.
+Autentifikatsiya: `Authorization: Bearer <access>`. Xato formati: `{ "code": "ORDER_NOT_FOUND", "params": {} }`. Pul maydonlari tiyinda va JSON’da satr ko‘rinishida: `"1550000"` (15 500 so‘m). Satr — JS `number`ning aniqlik chegarasi va float xatolaridan himoya.
 
 | Guruh | Endpointlar |
 |---|---|
@@ -179,7 +179,7 @@ Har bir tashqi xizmat uchun interfeys yoziladi va ikkita implementatsiya bo‘la
 - Parollar `argon2id` bilan saqlanadi.
 - Access token 15 daqiqa, refresh token 30 kun. Refresh token rotatsiya qilinadi, bazada xesh holida saqlanadi, qayta ishlatilsa hamma sessiyalar yopiladi.
 - RBAC: `@Roles()` va `@Permissions()` guard’lari. Buyurtma ma’lumotini faqat uning tomonlari va ruxsati bor admin ko‘radi.
-- Cheklovlar: OTP (telefon bo‘yicha 10 daqiqada 3 ta, IP bo‘yicha ham), login urinishlari, ochiq endpointlar.
+- Cheklovlar: OTP (telefon va IP bo‘yicha, qiymatlari `settings`da: `otp_phone_limit`, `otp_ip_limit`, `otp_limit_window_sec`), login urinishlari, ochiq endpointlar.
 - PINFL `AES-256-GCM` bilan shifrlanadi, qidirish va takrorlanishni tekshirish uchun `HMAC-SHA256` xeshi saqlanadi. Kalitlar `.env` yoki KMS’da turadi.
 - Loglarda shaxsiy ma’lumot bo‘lmaydi. Admin ro‘yxatlarida telefon niqoblanadi: `+998 93 *** 21 08`.
 - Callback’lar imzo yoki auth bilan tekshiriladi. `provider_txn_id` unique, qayta kelgan callback idempotent javob oladi.
