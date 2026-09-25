@@ -1,0 +1,29 @@
+// Database schema. Conventions (docs/02-arxitektura.md §5):
+// - money columns are BIGINT in tiyin (1 so'm = 100 tiyin), percentages are bps;
+// - timestamps are TIMESTAMPTZ in UTC;
+// - tables and columns are snake_case, Prisma models are PascalCase/camelCase.
+// Tables are added stage by stage; stage 0 only has the settings store.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Super-admin settings (docs/01-biznes-qoidalar.md §12). One row per key.
+/// `value` is validated by src/modules/settings/settings.schema.ts;
+/// money values are stored as decimal strings of tiyin to stay exact.
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  /// User who made the last change; null for values written by the seed.
+  updatedBy String?  @map("updated_by") @db.Uuid
+
+  @@map("settings")
+}

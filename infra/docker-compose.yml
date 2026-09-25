@@ -1,0 +1,78 @@
+# Local development services: PostgreSQL + PostGIS, Redis, S3-compatible storage (MinIO).
+# Usage (from the repository root):
+#   cp infra/.env.example infra/.env   # then set passwords
+#   docker compose -f infra/docker-compose.yml up -d
+#
+# Every secret comes from infra/.env; nothing secret is written in this file.
+# All ports are bound to 127.0.0.1 so the services are not reachable from the network.
+
+services:
+  postgres:
+    image: postgis/postgis:17-3.5
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in infra/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in infra/.env}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in infra/.env}
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # Replaces the image's default init script, which would also install
+      # topology/tiger extensions that Prisma does not know about (schema drift).
+      - ./postgres/10_postgis.sh:/docker-entrypoint-initdb.d/10_postgis.sh:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD in infra/.env}
+    # BullMQ requires maxmemory-policy=noeviction; AOF keeps queued jobs across restarts.
+    command:
+      - sh
+      - -c
+      - exec redis-server --requirepass "$${REDIS_PASSWORD}" --appendonly yes --maxmemory-policy noeviction
+    ports:
+      - '127.0.0.1:${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'REDISCLI_AUTH="$${REDIS_PASSWORD}" redis-cli ping | grep -q PONG']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # MinIO community images were removed from Docker Hub; Chainguard publishes
+  # maintained MinIO builds for free.
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER in infra/.env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD in infra/.env}
+    command: ['server', '/data', '--console-address', ':9001']
+    ports:
+      - '127.0.0.1:${MINIO_API_PORT:-9000}:9000'
+      - '127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001'
+    volumes:
+      - minio-data:/data
+
+  # One-shot job: creates the uploads bucket. Retries until MinIO accepts connections.
+  minio-init:
+    image: cgr.dev/chainguard/minio-client:latest
+    depends_on:
+      - minio
+    restart: on-failure:20
+    environment:
+      MC_HOST_local: http://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@minio:9000
+    command: ['mb', '--ignore-existing', 'local/${S3_BUCKET:?set S3_BUCKET in infra/.env}']
+
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:

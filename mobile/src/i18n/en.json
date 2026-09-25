@@ -1,0 +1,83 @@
+{
+  "brand": {
+    "tagline": "Find a pro or get jobs",
+    "footer": "{appName} — {appNameExpansion} · {version}"
+  },
+  "common": {
+    "money": "{amount} UZS",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "back": "Back"
+  },
+  "language": {
+    "autonym": "English",
+    "title": "Choose language",
+    "names": {
+      "uz": "Uzbek",
+      "ru": "Russian",
+      "en": "English",
+      "tg": "Tajik"
+    }
+  },
+  "appearance": {
+    "title": "Appearance",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto"
+  },
+  "role": {
+    "customer": "Customer",
+    "executor": "Specialist (pro)"
+  },
+  "menu": {
+    "currentRole": "Current role",
+    "switchToCustomer": "Switch to Customer",
+    "switchToExecutor": "Switch to Specialist",
+    "myJobs": "My jobs",
+    "wallet": "Wallet",
+    "referral": "Referral program",
+    "settings": "Settings",
+    "language": "Language",
+    "nightMode": "Night mode",
+    "help": "Help",
+    "logout": "Log out"
+  },
+  "auth": {
+    "haveAccount": "Have an account?",
+    "signIn": "Sign in",
+    "duplicatePerson": "An account for this person already exists.",
+    "referralRequired": "You need an invite link or code to sign up."
+  },
+  "wallet": {
+    "insufficientToAccept": "Top up {shortfall} UZS more to take this job.",
+    "insufficientFunds": "Not enough money in your balance.",
+    "withdrawMustKeep": "{must_keep} UZS must stay in your balance for the app service fee. You can withdraw up to {max} UZS (1% bank transfer fee: {fee} UZS)."
+  },
+  "tax": {
+    "required": "Your free month has ended. Choose a tax method to keep working."
+  },
+  "trip": {
+    "sharing": "Your location is visible to the customer",
+    "eta": "Arrives in {min} min"
+  },
+  "payment": {
+    "iPaid": "I paid",
+    "iReceived": "Money received",
+    "notReceived": "Money didn’t arrive",
+    "feeCharged": "A {fee} UZS service fee was charged from your balance."
+  },
+  "order": {
+    "notFound": "Order not found.",
+    "customerConfirmRequired": "Tap “I paid” for your previous order (#{order}) — then you can post a new one.",
+    "executorConfirmRequired": "Tap “Money received” for your previous job (#{order}) — then you can take a new one."
+  },
+  "errors": {
+    "internal": "Something went wrong. Please try again later.",
+    "validation": "Please check the data you entered.",
+    "notFound": "Not found.",
+    "unauthorized": "Please sign in again.",
+    "forbidden": "You don’t have access to this action.",
+    "rateLimited": "Too many attempts. Please try again shortly.",
+    "network": "Check your internet connection."
+  }
+}
