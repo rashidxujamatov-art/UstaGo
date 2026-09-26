@@ -28,7 +28,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     name: appName,
     slug: required('APP_SLUG'),
     version: '1.0.0',
-    platforms: ['ios', 'android'],
+    // Web is only a developer preview (EXPO_WEB_PREVIEW=1), not a product platform.
+    platforms:
+      process.env.EXPO_WEB_PREVIEW === '1' ? ['ios', 'android', 'web'] : ['ios', 'android'],
     orientation: 'portrait',
     scheme: bundleId,
     userInterfaceStyle: 'automatic',
@@ -51,6 +53,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     extra: {
       appNameExpansion: required('APP_NAME_EXPANSION'),
       appDomain: required('APP_DOMAIN'),
+      // Legal entity and tax number for consent texts; placeholders until registered (§14).
+      operatorName: process.env.APP_OPERATOR_NAME?.trim() || '[MChJ nomi]',
+      operatorTin: process.env.APP_OPERATOR_TIN?.trim() || '[raqam]',
       ...(easProjectId ? { eas: { projectId: easProjectId } } : {}),
     },
   };

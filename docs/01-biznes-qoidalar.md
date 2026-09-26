@@ -48,7 +48,7 @@ Ketma-ketlik (ekranlar: Main → K2 → K3 → K3b → K3c → K3d → K4):
 2. **Ro‘yxatdan o‘tish** (K2):
    - telefon: `+998 XX XXX XX XX`, unique;
    - elektron pochta: unique;
-   - parol: kamida 8 belgi;
+   - parol: kamida 8 belgi, kamida bitta harf va bitta raqam (K2);
    - referal kod majburiy (tasdiqlangan): havoladan avtomatik olinadi (`https://{APP_DOMAIN}/r/{CODE}`) yoki qo‘lda kiritiladi. Kodsiz ro‘yxatdan o‘tib bo‘lmaydi: `AUTH_REFERRAL_REQUIRED`. Ekranda "Sizni {ism} taklif qildi" deb ko‘rsatiladi.
    - birinchi foydalanuvchilar va reklama uchun super admin platforma kodlarini yaratadi (`invite_codes`). Bunday kod bilan kelgan odamning L1’i bo‘lmaydi, bonus hech kimga yozilmaydi.
    - qoida hozircha hammaga tegishli: buyurtmachiga ham, ustaga ham (§13, 2-savol).
@@ -330,6 +330,8 @@ Super admin o‘zgartiradi (SA2, SA5, SA6 ekranlari). Har bir o‘zgarish `audit
 | `demo_bonus` | 25 000 so‘m | |
 | `otp_length` / `otp_ttl_sec` / `otp_resend_sec` / `otp_max_attempts` | 6 / 300 / 60 / 5 | |
 | `otp_phone_limit` / `otp_ip_limit` / `otp_limit_window_sec` | 3 / 10 / 600 | Bitta telefon raqamiga va bitta IP’ga 10 daqiqada yuboriladigan SMS kodlar soni (§2) |
+| `login_attempt_limit` / `login_attempt_window_sec` | 5 / 900 | Noto‘g‘ri paroldan keyin kirish 15 daqiqaga bloklanadi |
+| `min_age_years` | 16 | Eng kam yosh, MyID’dagi tug‘ilgan sana bo‘yicha (§2) |
 | `order_photos_max` | 5 | Buyurtmadagi rasmlar soni (§3.1) |
 | `upload_max_mb` | 5 | Bitta yuklanadigan rasm hajmi |
 | `qr_payment_ttl_sec` | 300 | BJ4: QR amal qilish vaqti |
@@ -371,6 +373,14 @@ Hal qilingan savollar (2026-09-25):
 - Pul yechishda 1% olinadi, buyurtmachidan ham. Bu — bank o‘tkazma xizmati, platforma hech narsa olmaydi.
 - Demodan to‘langan xizmat haqidan ham referal beriladi — platforma budjetidan.
 - Super admin faqat CLI buyrug‘i bilan yaratiladi (§1).
+
+Hal qilingan savollar (2026-09-26):
+
+- Taklif kodi faqat MyID’dan o‘tgan va bloklanmagan foydalanuvchida ishlaydi. Ro‘yxatdan o‘tishni tugatmagan yoki bloklangan odamning kodi bilan ro‘yxatdan o‘tib bo‘lmaydi.
+- Eng kam yosh — 16 (`min_age_years`). Yoshi yetmagan odam MyID bosqichida to‘xtaydi.
+- Takroriy PINFL chiqsa, yangi (hali tugallanmagan) ro‘yxatdan o‘tish o‘chiriladi, telefon raqami bo‘shaydi; K3d’da mavjud hisobning niqoblangan raqami, ochilgan sanasi va bepul davr ishlatilgani ko‘rsatiladi.
+- Elektron pochta tasdiqlanmaydi (pochta provayderi yo‘q), faqat unikal bo‘ladi.
+- Ilova o‘rnatilmagan holda bosilgan taklif havolasi kodni o‘rnatishdan keyin olib o‘tmaydi (deferred deep link). Hozircha kod K2’da qo‘lda kiritiladi; havola ilova o‘rnatilgan telefonda ishlaydi. Domen tanlangach App Links / Universal Links va Play Install Referrer qo‘shiladi.
 - Til tanlash ekranida (Main) ko‘rinish uchta: Kunduzgi, Tungi, Avto.
 - §2, §3.1, §8, §10’da tilga olingan limitlar ham sozlamaga aylandi (§12): eslatma kunlari, OTP cheklovi, rasmlar soni va hajmi, yo‘ldan chetga chiqish masofasi. IP bo‘yicha OTP cheklovi (10) — texnik standart qiymat.
 

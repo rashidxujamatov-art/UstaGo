@@ -6,6 +6,11 @@ const valid = {
   APP_DOMAIN: 'localhost',
   DATABASE_URL: 'postgresql://app:secret@localhost:5432/app',
   REDIS_URL: 'redis://:secret@localhost:6379/0',
+  JWT_ACCESS_SECRET: 'x'.repeat(48),
+  PINFL_ENC_KEY: Buffer.alloc(32, 1).toString('base64'),
+  PINFL_HMAC_KEY: 'y'.repeat(48),
+  SMS_PROVIDER: 'mock',
+  IDENTITY_PROVIDER: 'mock',
 };
 
 describe('validateEnv', () => {
@@ -15,12 +20,17 @@ describe('validateEnv', () => {
       LOG_LEVEL: 'info',
       CORS_ORIGINS: [],
       FEATURE_PAYOUTS_ENABLED: false,
+      OTP_TEST_MODE: false,
+      ACCESS_TOKEN_TTL_SEC: 900,
+      REFRESH_TOKEN_TTL_DAYS: 30,
     });
   });
 
   it('has no default for secrets and names every missing key', () => {
-    const { DATABASE_URL: _db, REDIS_URL: _redis, ...rest } = valid;
-    expect(() => validateEnv(rest)).toThrow(/DATABASE_URL[\s\S]*REDIS_URL/);
+    const { DATABASE_URL: _db, JWT_ACCESS_SECRET: _jwt, PINFL_ENC_KEY: _key, ...rest } = valid;
+    expect(() => validateEnv(rest)).toThrow(
+      /DATABASE_URL[\s\S]*JWT_ACCESS_SECRET[\s\S]*PINFL_ENC_KEY/,
+    );
   });
 
   it('parses the CORS list and the payouts flag', () => {
@@ -39,6 +49,28 @@ describe('validateEnv', () => {
   it('rejects database URLs that are not PostgreSQL', () => {
     expect(() => validateEnv({ ...valid, DATABASE_URL: 'mysql://localhost/app' })).toThrow(
       /DATABASE_URL/,
+    );
+  });
+
+  it('rejects a PINFL key that is not 32 bytes', () => {
+    expect(() =>
+      validateEnv({ ...valid, PINFL_ENC_KEY: Buffer.alloc(16).toString('base64') }),
+    ).toThrow(/PINFL_ENC_KEY/);
+  });
+
+  it('allows the fixed OTP code only in development (CLAUDE.md rule 6)', () => {
+    expect(validateEnv({ ...valid, OTP_TEST_MODE: 'true' }).OTP_TEST_MODE).toBe(true);
+    expect(() => validateEnv({ ...valid, NODE_ENV: 'staging', OTP_TEST_MODE: 'true' })).toThrow(
+      /OTP_TEST_MODE/,
+    );
+  });
+
+  it('refuses mock adapters in production and needs Eskiz credentials for Eskiz', () => {
+    expect(() => validateEnv({ ...valid, NODE_ENV: 'production' })).toThrow(
+      /SMS_PROVIDER[\s\S]*IDENTITY_PROVIDER/,
+    );
+    expect(() => validateEnv({ ...valid, SMS_PROVIDER: 'eskiz' })).toThrow(
+      /ESKIZ_EMAIL[\s\S]*ESKIZ_PASSWORD[\s\S]*ESKIZ_FROM/,
     );
   });
 });

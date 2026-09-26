@@ -7,7 +7,16 @@
     "money": "{amount} so‘m",
     "continue": "Davom etish",
     "cancel": "Bekor qilish",
-    "back": "Orqaga"
+    "back": "Orqaga",
+    "yes": "Ha",
+    "no": "Yo‘q",
+    "retry": "Qayta urinish",
+    "showPassword": "Parolni ko‘rsatish",
+    "hidePassword": "Parolni yashirish",
+    "comingSoon": "Bu bo‘lim keyingi bosqichlarda qo‘shiladi."
+  },
+  "startup": {
+    "offline": "Serverga ulanib bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring."
   },
   "language": {
     "autonym": "O‘zbekcha",
@@ -27,9 +36,21 @@
   },
   "role": {
     "customer": "Buyurtmachi",
-    "executor": "Bajaruvchi (usta)"
+    "executor": "Bajaruvchi (usta)",
+    "executorShort": "Bajaruvchi",
+    "title": "Ilovadan kim sifatida foydalanasiz?",
+    "subtitle": "Rolni keyinroq bosh menyudan istalgan vaqtda almashtirishingiz mumkin.",
+    "customerTagline": "Ish joylayman va ishonchli usta topaman",
+    "customerPoint1": "Buyurtmani 1 daqiqada joylash",
+    "customerPoint2": "Hisobdan, Click, Payme, karta yoki naqd",
+    "executorTagline": "Buyurtmalarni qabul qilaman va pul ishlayman",
+    "executorPoint1": "Yaqin atrofdagi buyurtmalar",
+    "freeBonus": "{days} kun bepul: {amount} so‘m bonus",
+    "continueCustomer": "Buyurtmachi sifatida davom etish",
+    "continueExecutor": "Bajaruvchi sifatida davom etish"
   },
   "menu": {
+    "open": "Menyuni ochish",
     "currentRole": "Joriy rol",
     "switchToCustomer": "Buyurtmachiga o‘tish",
     "switchToExecutor": "Bajaruvchiga o‘tish",
@@ -40,13 +61,109 @@
     "language": "Til",
     "nightMode": "Tungi rejim",
     "help": "Yordam",
-    "logout": "Chiqish"
+    "logout": "Chiqish",
+    "logoutConfirm": "Hisobdan chiqasizmi?"
+  },
+  "home": {
+    "greeting": "Salom, {name}!",
+    "freePeriodUntil": "Bepul davr {date} gacha"
   },
   "auth": {
     "haveAccount": "Hisobingiz bormi?",
     "signIn": "Kirish",
+    "register": "Ro‘yxatdan o‘tish",
+    "invitedBy": "Sizni <b>{name}</b> taklif qildi",
+    "invitedPlatform": "Taklif kodi qabul qilindi",
+    "inviteCode": "Taklif kodi: {code}",
+    "inviteCodeLabel": "Taklif kodi",
+    "inviteCodeHint": "Kodni sizni taklif qilgan odamdan so‘rang",
+    "inviteCodeCheck": "Tekshirish",
+    "changeInviteCode": "Boshqa kod kiritish",
+    "phoneLabel": "Telefon raqam",
+    "phoneHint": "Shu raqamga tasdiqlash kodi SMS orqali keladi",
+    "emailLabel": "Elektron pochta",
+    "passwordLabel": "Parol",
+    "passwordHint": "Kamida 8 ta belgi, harf va raqam",
+    "acceptTerms": "<em>Foydalanish shartlari</em> va <em>maxfiylik siyosati</em>ga roziman",
+    "getSmsCode": "SMS kod olish",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "invalidPhone": "Raqamni to‘liq kiriting: 90 123 45 67",
+    "invalidEmail": "Elektron pochta manzili noto‘g‘ri",
+    "termsRequired": "Davom etish uchun shartlarga rozilik bering",
     "duplicatePerson": "Bu shaxs uchun hisob allaqachon mavjud.",
-    "referralRequired": "Ro‘yxatdan o‘tish uchun taklif havolasi yoki kodi kerak."
+    "referralRequired": "Ro‘yxatdan o‘tish uchun taklif havolasi yoki kodi kerak.",
+    "referralInvalid": "Taklif kodi noto‘g‘ri yoki endi ishlamaydi.",
+    "phoneTaken": "Bu raqam bilan hisob bor. «Kirish» bo‘limidan foydalaning.",
+    "emailTaken": "Bu elektron pochta boshqa hisobda ishlatilgan.",
+    "weakPassword": "Parol kamida 8 ta belgidan iborat bo‘lsin, harf va raqam qatnashsin.",
+    "invalidCredentials": "Telefon raqam yoki parol noto‘g‘ri."
+  },
+  "otp": {
+    "title": "SMS kodni kiriting",
+    "sentTo": "{length} xonali kod <b>{phone}</b> raqamiga yuborildi",
+    "codeLabel": "SMS kod",
+    "resendIn": "Kodni qayta yuborish: <b>{time}</b>",
+    "resend": "Kodni qayta yuborish",
+    "changeNumber": "Raqamni o‘zgartirish",
+    "warning": "Kodni hech kimga aytmang — {appName} xodimlari uni hech qachon so‘ramaydi",
+    "confirm": "Tasdiqlash",
+    "invalid": "Kod noto‘g‘ri. Qolgan urinishlar: {attempts_left}",
+    "expired": "Kodning muddati tugagan. Yangi kod oling.",
+    "tooEarly": "Yangi kodni {retry_after} soniyadan keyin so‘rash mumkin."
+  },
+  "reset": {
+    "title": "Parolni tiklash",
+    "subtitle": "Telefon raqamingizga tasdiqlash kodi yuboramiz.",
+    "sendCode": "Kod olish",
+    "newPassword": "Yangi parol",
+    "save": "Parolni saqlash",
+    "done": "Parol yangilandi. Endi yangi parol bilan kiring."
+  },
+  "identity": {
+    "badge": "MyID orqali",
+    "title": "Shaxsingizni tasdiqlang",
+    "subtitle": "Ma’lumotlar davlat bazasi bilan tekshiriladi. Bu hisobingizni begona odamlardan himoya qiladi.",
+    "point1": "Bitta odam — bitta hisob",
+    "point2": "Bepul davr bir marta beriladi",
+    "point3": "Faqat o‘zingizning hujjatingiz so‘raladi",
+    "idCard": "ID-karta",
+    "passport": "Pasport",
+    "docNumber": "Seriya va raqam",
+    "birthDate": "Tug‘ilgan sana",
+    "birthDatePlaceholder": "kk.oo.yyyy",
+    "consent": "Shaxsga doir ma’lumotlarim {operator} (STIR {tin}) tomonidan MyID orqali tekshirilishiga <b>roziman</b>",
+    "toFace": "Yuzni tekshirishga o‘tish",
+    "invalidDoc": "Seriya va raqamni to‘liq kiriting: AD 1234567",
+    "invalidDate": "Sanani kk.oo.yyyy ko‘rinishida kiriting",
+    "consentRequired": "Davom etish uchun rozilik bering",
+    "required": "Avval shaxsingizni MyID orqali tasdiqlang.",
+    "alreadyVerified": "Shaxsingiz allaqachon tasdiqlangan.",
+    "failed": "MyID tekshiruvi o‘tmadi. Ma’lumotlarni tekshirib, qaytadan urinib ko‘ring.",
+    "ageRestricted": "Ilovadan {min_age} yoshdan boshlab foydalanish mumkin."
+  },
+  "face": {
+    "title": "Yuzingizni tekshiramiz",
+    "subtitle": "Telefonni yuz balandligida tuting va ramkaga qarang",
+    "detected": "Yuz aniqlandi",
+    "blink": "Endi ko‘zingizni sekin yuming va oching",
+    "tipLight": "Yorug‘ joyda",
+    "tipGlasses": "Ko‘zoynaksiz",
+    "tipHat": "Bosh kiyimsiz",
+    "privacy": "Tekshiruv MyID orqali · rasm faqat shu tekshiruv uchun",
+    "start": "Tekshiruvni boshlash",
+    "checking": "Tekshirilmoqda…"
+  },
+  "duplicate": {
+    "title": "Siz avval ro‘yxatdan o‘tgansiz",
+    "subtitle": "MyID tekshiruvi shu shaxs boshqa hisobga bog‘langanini ko‘rsatdi. Bitta odam faqat bitta hisob ochadi, bepul davr ham bir marta beriladi.",
+    "account": "Mavjud hisob",
+    "openedAt": "Ochilgan sana",
+    "freePeriod": "Bepul davr",
+    "freeUsed": "Ishlatilgan",
+    "freeUnused": "Ishlatilmagan",
+    "note": "Pasport yangilangan bo‘lsa ham JShShIR o‘zgarmaydi, shuning uchun yangi hisob ochib bo‘lmaydi.",
+    "signIn": "Mavjud hisobga kirish",
+    "notMe": "Bu men emasman — yordam"
   },
   "wallet": {
     "insufficientToAccept": "Bu ishni olish uchun yana {shortfall} so‘m to‘ldiring.",

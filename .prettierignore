@@ -11,3 +11,4 @@ mobile/.expo
 mobile/ios
 mobile/android
 *.md
+.claude

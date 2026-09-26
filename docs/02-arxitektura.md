@@ -89,7 +89,9 @@ Hamma pul ustunlari `BIGINT` (tiyin), vaqt `TIMESTAMPTZ` (UTC). Ekranda vaqt `As
 
 - `users`: id, phone (unique), email (unique), password_hash, lang, theme, active_role, status, referral_code (unique), referrer_id (bo‘sh faqat platforma kodi bilan kelganda), invite_code_id, created_at
 - `invite_codes`: id, code (unique), kind (`PLATFORM`), created_by (super admin), max_uses, used, expires_at — birinchi foydalanuvchilar va reklama uchun (referal kod majburiy)
-- `identities`: user_id, pinfl_hash (unique), pinfl_enc, full_name, birth_date, doc_type, myid_ref, verified_at
+- `identities`: user_id, pinfl_hash (unique), pinfl_enc, last_name, first_name, middle_name, birth_date, doc_type, myid_ref, verified_at
+- `devices`: user_id, device_id (ilova yaratgan tasodifiy ID), name, platform, trusted_at (SMS bilan tasdiqlangan), last_seen_at; keyin push token
+- `sessions`: user_id, device_row_id, refresh_hash (SHA-256), expires_at, revoked_at, replaced_by_id (rotatsiya zanjiri)
 - `consents`: user_id, type (`TERMS`, `PERSONAL_DATA`, `BIOMETRY`, `LOCATION`), version, accepted_at, device
 - `staff_permissions`: user_id, role (`ADMIN`, `SUPER_ADMIN`), permissions[]
 - `executor_profiles`: user_id, categories[], rating, free_period_start, free_period_end, tax_method, tax_status, tax_valid_until
@@ -108,7 +110,7 @@ Hamma pul ustunlari `BIGINT` (tiyin), vaqt `TIMESTAMPTZ` (UTC). Ekranda vaqt `As
 - `trip_points`: trip_id, at, location (point), accuracy_m, speed. 30 kundan keyin o‘chiriladi
 - `messages`: id, order_id, sender_id, text, attachments[], created_at, read_at
 - `disputes`: id, order_id, opened_by, reason, status, decision, decided_by, approved_by (super admin)
-- `notifications`, `devices` (push tokenlar), `categories`, `settings`, `audit_logs`, `maps_usage`
+- `notifications`, `categories`, `settings`, `audit_logs`, `maps_usage`
 
 Indekslar: `orders(status, location)` GIST, `orders(customer_id)`, `orders(executor_id)`, `ledger_entries(account_id)`, `trip_points(trip_id, at)`.
 
@@ -118,9 +120,9 @@ Autentifikatsiya: `Authorization: Bearer <access>`. Xato formati: `{ "code": "OR
 
 | Guruh | Endpointlar |
 |---|---|
-| Auth | `GET /auth/invite/:code` (kodni tekshirish, "Sizni {ism} taklif qildi"), `POST /auth/register` (`referral_code` majburiy — `AUTH_REFERRAL_REQUIRED`), `POST /auth/otp/verify`, `POST /auth/otp/resend`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/password/reset` |
+| Auth | `GET /auth/invite/:code` (kodni tekshirish, "Sizni {ism} taklif qildi"), `POST /auth/register` (`referral_code` majburiy — `AUTH_REFERRAL_REQUIRED`), `POST /auth/otp/verify` (`purpose`: `REGISTER` yoki `LOGIN` — yangi qurilma), `POST /auth/otp/resend`, `POST /auth/login` (notanish qurilmada `otp_required`), `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/password/reset`, `POST /auth/password/reset/confirm` |
 | Identity | `POST /identity/myid/session`, `POST /identity/myid/complete` |
-| Men | `GET /me`, `PATCH /me` (til, ko‘rinish), `POST /me/role`, `GET /me/referrals`, `GET /me/devices` |
+| Men | `GET /me`, `PATCH /me` (til, ko‘rinish), `POST /me/role`, `GET /me/referrals`, `GET /me/devices`, `DELETE /me/devices/:id` |
 | Buyurtmachi | `POST /orders` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_CUSTOMER_CONFIRMATION_REQUIRED`), `GET /orders`, `GET /orders/:id`, `POST /orders/:id/cancel`, `POST /orders/:id/confirm`, `POST /orders/:id/pay`, `POST /orders/:id/paid` ("To‘ladim", naqd va Xolis), `POST /orders/:id/dispute` ("Muammo bor") |
 | Usta | `GET /feed`, `POST /orders/:id/accept` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_EXECUTOR_CONFIRMATION_REQUIRED`), `POST /orders/:id/decline`, `POST /orders/:id/depart`, `POST /orders/:id/arrive`, `POST /orders/:id/start`, `POST /orders/:id/finish` ("Ishni tugatdim"), `POST /orders/:id/payment-received` ("Pulni qabul qildim"), `POST /orders/:id/payment-not-received` ("Pul kelmadi" → nizo), `POST /orders/:id/payment-session` |
 | Hamyon | `GET /wallet`, `GET /wallet/transactions`, `POST /wallet/topup`, `POST /wallet/withdraw/preview`, `POST /wallet/withdraw`, `GET /wallet/cards`, `POST /wallet/cards` |

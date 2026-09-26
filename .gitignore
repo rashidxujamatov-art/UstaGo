@@ -42,3 +42,6 @@ npm-debug.log*
 Thumbs.db
 .idea/
 .vscode/
+
+# Local Claude Code preview config (Windows-specific)
+.claude/launch.json

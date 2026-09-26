@@ -7,7 +7,16 @@
     "money": "{amount} UZS",
     "continue": "Continue",
     "cancel": "Cancel",
-    "back": "Back"
+    "back": "Back",
+    "yes": "Yes",
+    "no": "No",
+    "retry": "Try again",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "comingSoon": "This section is coming in a later stage."
+  },
+  "startup": {
+    "offline": "Could not reach the server. Check your internet connection and try again."
   },
   "language": {
     "autonym": "English",
@@ -27,9 +36,21 @@
   },
   "role": {
     "customer": "Customer",
-    "executor": "Specialist (pro)"
+    "executor": "Specialist (pro)",
+    "executorShort": "Specialist",
+    "title": "How will you use the app?",
+    "subtitle": "You can switch roles any time from the main menu.",
+    "customerTagline": "I post jobs and find a reliable pro",
+    "customerPoint1": "Post a job in 1 minute",
+    "customerPoint2": "Pay from balance, Click, Payme, card or cash",
+    "executorTagline": "I take jobs and earn money",
+    "executorPoint1": "Jobs near you",
+    "freeBonus": "{days} days free: {amount} UZS bonus",
+    "continueCustomer": "Continue as a customer",
+    "continueExecutor": "Continue as a specialist"
   },
   "menu": {
+    "open": "Open menu",
     "currentRole": "Current role",
     "switchToCustomer": "Switch to Customer",
     "switchToExecutor": "Switch to Specialist",
@@ -40,13 +61,109 @@
     "language": "Language",
     "nightMode": "Night mode",
     "help": "Help",
-    "logout": "Log out"
+    "logout": "Log out",
+    "logoutConfirm": "Log out of your account?"
+  },
+  "home": {
+    "greeting": "Hello, {name}!",
+    "freePeriodUntil": "Free period until {date}"
   },
   "auth": {
     "haveAccount": "Have an account?",
     "signIn": "Sign in",
+    "register": "Sign up",
+    "invitedBy": "<b>{name}</b> invited you",
+    "invitedPlatform": "Invite code accepted",
+    "inviteCode": "Invite code: {code}",
+    "inviteCodeLabel": "Invite code",
+    "inviteCodeHint": "Ask the person who invited you for the code",
+    "inviteCodeCheck": "Check",
+    "changeInviteCode": "Enter another code",
+    "phoneLabel": "Phone number",
+    "phoneHint": "We will text a confirmation code to this number",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "passwordHint": "At least 8 characters, letters and digits",
+    "acceptTerms": "I accept the <em>terms of use</em> and the <em>privacy policy</em>",
+    "getSmsCode": "Get SMS code",
+    "forgotPassword": "Forgot your password?",
+    "invalidPhone": "Enter the full number: 90 123 45 67",
+    "invalidEmail": "Invalid email address",
+    "termsRequired": "Accept the terms to continue",
     "duplicatePerson": "An account for this person already exists.",
-    "referralRequired": "You need an invite link or code to sign up."
+    "referralRequired": "You need an invite link or code to sign up.",
+    "referralInvalid": "The invite code is wrong or no longer valid.",
+    "phoneTaken": "This number already has an account. Please sign in.",
+    "emailTaken": "This email is already used by another account.",
+    "weakPassword": "The password needs at least 8 characters with letters and digits.",
+    "invalidCredentials": "Wrong phone number or password."
+  },
+  "otp": {
+    "title": "Enter the SMS code",
+    "sentTo": "A {length}-digit code was sent to <b>{phone}</b>",
+    "codeLabel": "SMS code",
+    "resendIn": "Resend the code in <b>{time}</b>",
+    "resend": "Resend the code",
+    "changeNumber": "Change number",
+    "warning": "Do not share the code — {appName} staff will never ask for it",
+    "confirm": "Confirm",
+    "invalid": "Wrong code. Attempts left: {attempts_left}",
+    "expired": "The code has expired. Get a new one.",
+    "tooEarly": "You can request a new code in {retry_after} s."
+  },
+  "reset": {
+    "title": "Reset password",
+    "subtitle": "We will text a confirmation code to your number.",
+    "sendCode": "Get code",
+    "newPassword": "New password",
+    "save": "Save password",
+    "done": "Password updated. Sign in with the new password."
+  },
+  "identity": {
+    "badge": "With MyID",
+    "title": "Confirm your identity",
+    "subtitle": "Your details are checked against the state database. This protects your account from strangers.",
+    "point1": "One person — one account",
+    "point2": "The free period is given once",
+    "point3": "Only your own document is needed",
+    "idCard": "ID card",
+    "passport": "Passport",
+    "docNumber": "Series and number",
+    "birthDate": "Date of birth",
+    "birthDatePlaceholder": "dd.mm.yyyy",
+    "consent": "I <b>agree</b> to my personal data being checked by {operator} (TIN {tin}) through MyID",
+    "toFace": "Go to face check",
+    "invalidDoc": "Enter the full series and number: AD 1234567",
+    "invalidDate": "Enter the date as dd.mm.yyyy",
+    "consentRequired": "Give your consent to continue",
+    "required": "Confirm your identity with MyID first.",
+    "alreadyVerified": "Your identity is already confirmed.",
+    "failed": "The MyID check did not pass. Check your details and try again.",
+    "ageRestricted": "The app can be used from the age of {min_age}."
+  },
+  "face": {
+    "title": "Let's check your face",
+    "subtitle": "Hold the phone at face level and look into the frame",
+    "detected": "Face found",
+    "blink": "Now slowly close and open your eyes",
+    "tipLight": "Good light",
+    "tipGlasses": "No glasses",
+    "tipHat": "No headwear",
+    "privacy": "Checked by MyID · the photo is used only for this check",
+    "start": "Start the check",
+    "checking": "Checking…"
+  },
+  "duplicate": {
+    "title": "You have already signed up",
+    "subtitle": "The MyID check shows this person is linked to another account. One person can open only one account, and the free period is given only once.",
+    "account": "Existing account",
+    "openedAt": "Opened on",
+    "freePeriod": "Free period",
+    "freeUsed": "Used",
+    "freeUnused": "Not used",
+    "note": "The PINFL stays the same even with a new passport, so a new account cannot be opened.",
+    "signIn": "Sign in to the existing account",
+    "notMe": "This is not me — help"
   },
   "wallet": {
     "insufficientToAccept": "Top up {shortfall} UZS more to take this job.",
