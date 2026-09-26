@@ -2,6 +2,7 @@ import { api } from '../api';
 import { ApiError } from '../api/client';
 import { endpoints } from '../api/endpoints';
 import type { SignedIn } from '../api/types';
+import { disconnectRealtime } from '../realtime/socket';
 import { themeToApi, usePreferences } from '../store/preferences';
 import { sessionTokenStore, useSession } from '../store/session';
 
@@ -46,5 +47,6 @@ export async function signOut(): Promise<void> {
   } catch {
     // Already invalid or offline: signing out locally is enough.
   }
+  disconnectRealtime();
   await sessionTokenStore.clear();
 }

@@ -103,6 +103,8 @@ model User {
   consents        Consent[]
   devices         Device[]
   sessions        Session[]
+  customerOrders  Order[]          @relation("CustomerOrders")
+  executorOrders  Order[]          @relation("ExecutorOrders")
 
   @@index([referrerId])
   @@map("users")
@@ -157,10 +159,12 @@ model StaffPermission {
 
 /// Created the first time the EXECUTOR role is activated; starts the free period (§8).
 model ExecutorProfile {
-  userId          String   @id @map("user_id") @db.Uuid
-  freePeriodStart DateTime @map("free_period_start") @db.Timestamptz(3)
-  freePeriodEnd   DateTime @map("free_period_end") @db.Timestamptz(3)
-  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  userId          String    @id @map("user_id") @db.Uuid
+  freePeriodStart DateTime  @map("free_period_start") @db.Timestamptz(3)
+  freePeriodEnd   DateTime  @map("free_period_end") @db.Timestamptz(3)
+  /// Tax method status (§9); after the free period only VERIFIED may take new jobs.
+  taxStatus       TaxStatus @default(NONE) @map("tax_status")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -197,6 +201,8 @@ model Device {
   platform   String
   trustedAt  DateTime? @map("trusted_at") @db.Timestamptz(3)
   lastSeenAt DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(3)
+  /// FCM registration token for push notifications.
+  pushToken  String?   @map("push_token")
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -241,4 +247,281 @@ model AuditLog {
 
   @@index([entityType, entityId])
   @@map("audit_logs")
+}
+
+enum TaxStatus {
+  NONE
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+// ---------------------------------------------------------------------------
+// Orders (docs/01-biznes-qoidalar.md §3)
+// ---------------------------------------------------------------------------
+
+enum OrderStatus {
+  PUBLISHED
+  ACCEPTED
+  EN_ROUTE
+  ARRIVED
+  IN_PROGRESS
+  DONE_BY_EXECUTOR
+  COMPLETED
+  PAID
+  CANCELLED
+  DISPUTED
+}
+
+enum PaymentMethod {
+  BALANCE
+  CLICK
+  PAYME
+  CARD
+  CASH
+  XOLIS_QR
+}
+
+/// Why an order was cancelled. EXPIRED is set by the system (§3.3).
+enum CancelReason {
+  NOT_NEEDED
+  FOUND_OTHER
+  EXECUTOR_LATE
+  NO_AGREEMENT
+  OTHER
+  EXPIRED
+}
+
+/// Service types (Elektrik, Santexnik, ...). Names in four languages.
+model Category {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  slug      String   @unique
+  /// { "uz": "...", "ru": "...", "en": "...", "tg": "..." }
+  names     Json
+  /// Icon key the app maps to an icon (lucide name).
+  icon      String
+  /// Accent color of the icon tile (hex).
+  color     String
+  sortOrder Int      @default(0) @map("sort_order")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  orders Order[]
+
+  @@map("categories")
+}
+
+model Order {
+  id                 String                                 @id @default(uuid(7)) @db.Uuid
+  /// Human-friendly number (#1024). Starts at 1001.
+  number             Int                                    @unique @default(autoincrement())
+  customerId         String                                 @map("customer_id") @db.Uuid
+  executorId         String?                                @map("executor_id") @db.Uuid
+  categoryId         String                                 @map("category_id") @db.Uuid
+  title              String
+  description        String
+  /// Object-storage keys of up to order_photos_max photos.
+  photoKeys          String[]                               @default([]) @map("photo_keys")
+  addressText        String                                 @map("address_text")
+  lat                Float
+  lng                Float
+  /// PostGIS point for radius search; written together with lat/lng.
+  location           Unsupported("geography(Point, 4326)")?
+  entrance           String?
+  floor              String?
+  apartment          String?
+  landmark           String?
+  timeFrom           DateTime                               @map("time_from") @db.Timestamptz(3)
+  timeTo             DateTime                               @map("time_to") @db.Timestamptz(3)
+  /// Tiyin.
+  price              BigInt
+  paymentMethod      PaymentMethod                          @map("payment_method")
+  status             OrderStatus                            @default(PUBLISHED)
+  // Rates copied at acceptance (CLAUDE.md rule 7).
+  feeBpsSnapshot     Int?                                   @map("fee_bps_snapshot")
+  refL1BpsSnapshot   Int?                                   @map("ref_l1_bps_snapshot")
+  refL2BpsSnapshot   Int?                                   @map("ref_l2_bps_snapshot")
+  /// Service fee computed at acceptance (§4, §6), tiyin.
+  fee                BigInt?
+  feeDemo            BigInt?                                @map("fee_demo")
+  feeReal            BigInt?                                @map("fee_real")
+  finishPhotoKeys    String[]                               @default([]) @map("finish_photo_keys")
+  createdAt          DateTime                               @default(now()) @map("created_at") @db.Timestamptz(3)
+  acceptedAt         DateTime?                              @map("accepted_at") @db.Timestamptz(3)
+  departedAt         DateTime?                              @map("departed_at") @db.Timestamptz(3)
+  arrivedAt          DateTime?                              @map("arrived_at") @db.Timestamptz(3)
+  startedAt          DateTime?                              @map("started_at") @db.Timestamptz(3)
+  /// Executor pressed "Ishni tugatdim".
+  finishedAt         DateTime?                              @map("finished_at") @db.Timestamptz(3)
+  /// Customer confirmed the cash / Xolis payment.
+  customerPaidAt     DateTime?                              @map("customer_paid_at") @db.Timestamptz(3)
+  /// Executor confirmed receiving the cash / Xolis payment.
+  executorReceivedAt DateTime?                              @map("executor_received_at") @db.Timestamptz(3)
+  paidAt             DateTime?                              @map("paid_at") @db.Timestamptz(3)
+  cancelledAt        DateTime?                              @map("cancelled_at") @db.Timestamptz(3)
+  /// Null when cancelled by the system.
+  cancelledBy        String?                                @map("cancelled_by") @db.Uuid
+  cancelReason       CancelReason?                          @map("cancel_reason")
+  cancelNote         String?                                @map("cancel_note")
+  updatedAt          DateTime                               @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  customer User         @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Restrict)
+  executor User?        @relation("ExecutorOrders", fields: [executorId], references: [id], onDelete: Restrict)
+  category Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  events   OrderEvent[]
+  messages Message[]
+  holds    WalletHold[]
+
+  @@index([status, timeTo])
+  @@index([customerId])
+  @@index([executorId])
+  @@index([location], type: Gist)
+  @@map("orders")
+}
+
+/// Every status change: who, when, from, to (§3.3).
+model OrderEvent {
+  id         String       @id @default(uuid(7)) @db.Uuid
+  orderId    String       @map("order_id") @db.Uuid
+  fromStatus OrderStatus? @map("from_status")
+  toStatus   OrderStatus  @map("to_status")
+  /// Null for system actions.
+  actorId    String?      @map("actor_id") @db.Uuid
+  at         DateTime     @default(now()) @db.Timestamptz(3)
+  payload    Json?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, at])
+  @@map("order_events")
+}
+
+enum MessageKind {
+  TEXT
+  PHOTO
+  /// Status notes in the chat ("Usta ishni boshladi").
+  SYSTEM
+}
+
+/// Order chat (BY4), open to the two parties after acceptance.
+model Message {
+  id         String      @id @default(uuid(7)) @db.Uuid
+  orderId    String      @map("order_id") @db.Uuid
+  /// Null for SYSTEM messages.
+  senderId   String?     @map("sender_id") @db.Uuid
+  /// Executor of the conversation: if a job is declined and taken by someone else,
+  /// the new executor does not see the earlier chat.
+  executorId String      @map("executor_id") @db.Uuid
+  kind       MessageKind
+  text       String?
+  photoKey   String?     @map("photo_key")
+  /// SYSTEM messages carry a code; the app shows it in the reader's language.
+  systemCode String?     @map("system_code")
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  readAt     DateTime?   @map("read_at") @db.Timestamptz(3)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, executorId, createdAt])
+  @@map("messages")
+}
+
+// ---------------------------------------------------------------------------
+// Wallet and ledger (docs/01-biznes-qoidalar.md §7, CLAUDE.md rules 1-3)
+// ---------------------------------------------------------------------------
+
+enum WalletAccountKind {
+  REAL
+  DEMO
+  PLATFORM_REVENUE
+  PLATFORM_MARKETING
+  PAYOUT_PROVIDER_FEES
+  /// Demo money spent on service fees; not revenue.
+  DEMO_SINK
+  /// Source of demo bonuses; its negative balance is the demo money in circulation.
+  DEMO_ISSUANCE
+  PAYMENT_CLEARING
+  PAYOUT_CLEARING
+}
+
+/// One account per owner and kind. `ownerKey` is the user id, or "PLATFORM".
+model WalletAccount {
+  id        String            @id @default(uuid(7)) @db.Uuid
+  ownerKey  String            @map("owner_key")
+  kind      WalletAccountKind
+  /// Cached sum of the entries, tiyin. Changed only by the ledger service.
+  balance   BigInt            @default(0)
+  createdAt DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  entries LedgerEntry[]
+
+  @@unique([ownerKey, kind])
+  @@map("wallet_accounts")
+}
+
+/// A balanced set of entries (their amounts sum to 0).
+model LedgerTransaction {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  type           String
+  orderId        String?  @map("order_id") @db.Uuid
+  idempotencyKey String   @unique @map("idempotency_key")
+  createdBy      String?  @map("created_by") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  entries LedgerEntry[]
+
+  @@map("ledger_transactions")
+}
+
+model LedgerEntry {
+  id            String @id @default(uuid(7)) @db.Uuid
+  transactionId String @map("transaction_id") @db.Uuid
+  accountId     String @map("account_id") @db.Uuid
+  /// Tiyin; positive = credit to the account, negative = debit.
+  amount        BigInt
+
+  transaction LedgerTransaction @relation(fields: [transactionId], references: [id], onDelete: Restrict)
+  account     WalletAccount     @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([accountId])
+  @@map("ledger_entries")
+}
+
+enum HoldStatus {
+  ACTIVE
+  SETTLED
+  RELEASED
+}
+
+/// Service fee reserved when a job is accepted (§4). Not an account and not a money
+/// movement: it only lowers what the executor has available.
+model WalletHold {
+  id         String     @id @default(uuid(7)) @db.Uuid
+  userId     String     @map("user_id") @db.Uuid
+  /**
+   * One ACTIVE hold per order; released holds stay for history (a declined job can be taken again).
+   */
+  orderId    String     @map("order_id") @db.Uuid
+  amountDemo BigInt     @map("amount_demo")
+  amountReal BigInt     @map("amount_real")
+  status     HoldStatus @default(ACTIVE)
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  closedAt   DateTime?  @map("closed_at") @db.Timestamptz(3)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([userId, status])
+  @@index([orderId])
+  @@map("wallet_holds")
+}
+
+/// Google Maps Platform requests, for the monthly free-limit view (SA6).
+model MapsUsage {
+  id   String   @id @default(uuid(7)) @db.Uuid
+  kind String
+  at   DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([kind, at])
+  @@map("maps_usage")
 }

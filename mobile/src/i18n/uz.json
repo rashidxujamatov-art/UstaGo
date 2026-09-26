@@ -5,6 +5,7 @@
   },
   "common": {
     "money": "{amount} so‘m",
+    "currency": "so‘m",
     "continue": "Davom etish",
     "cancel": "Bekor qilish",
     "back": "Orqaga",
@@ -13,7 +14,18 @@
     "retry": "Qayta urinish",
     "showPassword": "Parolni ko‘rsatish",
     "hidePassword": "Parolni yashirish",
-    "comingSoon": "Bu bo‘lim keyingi bosqichlarda qo‘shiladi."
+    "comingSoon": "Bu bo‘lim keyingi bosqichlarda qo‘shiladi.",
+    "today": "Bugun",
+    "tomorrow": "Ertaga",
+    "yesterday": "Kecha",
+    "justNow": "Hozirgina",
+    "minutesAgo": "{n} daqiqa oldin",
+    "hoursAgo": "{n} soat oldin",
+    "km": "{km} km",
+    "call": "Qo‘ng‘iroq",
+    "write": "Yozish",
+    "confirm": "Tasdiqlash",
+    "close": "Yopish"
   },
   "startup": {
     "offline": "Serverga ulanib bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring."
@@ -63,10 +75,6 @@
     "help": "Yordam",
     "logout": "Chiqish",
     "logoutConfirm": "Hisobdan chiqasizmi?"
-  },
-  "home": {
-    "greeting": "Salom, {name}!",
-    "freePeriodUntil": "Bepul davr {date} gacha"
   },
   "auth": {
     "haveAccount": "Hisobingiz bormi?",
@@ -181,12 +189,41 @@
     "iPaid": "To‘ladim",
     "iReceived": "Pulni qabul qildim",
     "notReceived": "Pul kelmadi",
-    "feeCharged": "Xizmat haqi {fee} so‘m hisobingizdan yechildi."
+    "feeCharged": "Xizmat haqi {fee} so‘m hisobingizdan yechildi.",
+    "method": {
+      "BALANCE": "Hisobdan",
+      "CLICK": "Click QR",
+      "PAYME": "Payme QR",
+      "CARD": "Karta",
+      "CASH": "Naqd",
+      "XOLIS_QR": "Xolis QR"
+    },
+    "cashChip": "Naqd to‘lov",
+    "onlineChip": "Karta / QR"
   },
   "order": {
     "notFound": "Buyurtma topilmadi.",
     "customerConfirmRequired": "Oldingi buyurtma (#{order}) uchun «To‘ladim»ni bosing — shundan keyin yangi buyurtma joylaysiz.",
-    "executorConfirmRequired": "Oldingi ish (#{order}) uchun «Pulni qabul qildim»ni bosing — shundan keyin yangi ish olasiz."
+    "executorConfirmRequired": "Oldingi ish (#{order}) uchun «Pulni qabul qildim»ni bosing — shundan keyin yangi ish olasiz.",
+    "title": "Buyurtma #{number}",
+    "statusSection": "Buyurtma holati",
+    "job": "Ish",
+    "address": "Manzil",
+    "price": "Narx",
+    "menu": "Buyurtma amallari",
+    "cancel": "Buyurtmani bekor qilish",
+    "cancelTitle": "Nega bekor qilyapsiz?",
+    "cancelConfirm": "Bekor qilish",
+    "cancelNote": "Sababni yozing",
+    "reasons": {
+      "NOT_NEEDED": "Usta endi kerak emas",
+      "FOUND_OTHER": "Boshqa usta topdim",
+      "EXECUTOR_LATE": "Usta kechikyapti yoki javob bermayapti",
+      "NO_AGREEMENT": "Narx yoki shartlarda kelisha olmadik",
+      "OTHER": "Boshqa sabab"
+    },
+    "paymentNext": "To‘lov keyingi bosqichda qo‘shiladi",
+    "noExecutor": "Buyurtmangiz ustalarga ko‘rsatilmoqda"
   },
   "errors": {
     "internal": "Nimadir xato ketdi. Keyinroq qayta urinib ko‘ring.",
@@ -196,5 +233,171 @@
     "forbidden": "Bu amal uchun ruxsat yo‘q.",
     "rateLimited": "Urinishlar juda ko‘p. Birozdan keyin qayta urinib ko‘ring.",
     "network": "Internet aloqasini tekshiring."
+  },
+  "customerHome": {
+    "tabAll": "Barchasi",
+    "tabActive": "Faol",
+    "tabFinished": "Yakunlangan",
+    "whatPro": "Qanday usta kerak?",
+    "myOrders": "Mening buyurtmalarim",
+    "empty": "Hali buyurtma yo‘q. Kategoriyani tanlab, birinchi buyurtmani joylang.",
+    "newOrder": "Buyurtma berish",
+    "cancelledByMe": "Siz bekor qildingiz",
+    "cancelledExpired": "Vaqti o‘tdi",
+    "cancelledOther": "Bekor qilindi"
+  },
+  "orderStatus": {
+    "PUBLISHED": "Usta qidirilmoqda…",
+    "ACCEPTED": "Usta topildi",
+    "EN_ROUTE": "Usta yo‘lda",
+    "ARRIVED": "Usta yetib keldi",
+    "IN_PROGRESS": "Ish bajarilmoqda",
+    "DONE_BY_EXECUTOR": "Usta ishni yakunladi",
+    "COMPLETED": "To‘lov tasdiqlanmoqda",
+    "PAID": "Yakunlandi",
+    "CANCELLED": "Bekor qilindi",
+    "DISPUTED": "Shikoyat ko‘rib chiqilmoqda"
+  },
+  "jobStatus": {
+    "PUBLISHED": "Yangi ish",
+    "ACCEPTED": "Siz qabul qildingiz",
+    "EN_ROUTE": "Siz yo‘ldasiz",
+    "ARRIVED": "Siz manzildasiz",
+    "IN_PROGRESS": "Ish bajarilmoqda",
+    "DONE_BY_EXECUTOR": "Buyurtmachi tasdig‘i kutilmoqda",
+    "COMPLETED": "To‘lov tasdiqlanmoqda",
+    "PAID": "Yakunlandi",
+    "CANCELLED": "Bekor qilindi",
+    "DISPUTED": "Shikoyat ko‘rib chiqilmoqda"
+  },
+  "timeline": {
+    "created": "Buyurtma joylandi",
+    "accepted": "Usta qabul qildi",
+    "departed": "Usta yo‘lga chiqdi",
+    "arrived": "Usta yetib keldi",
+    "started": "Ish boshlandi",
+    "finished": "Usta ishni yakunladi",
+    "checkAndAccept": "Ishni tekshirib, qabul qiling",
+    "payment": "To‘lov"
+  },
+  "newOrder": {
+    "title": "Yangi buyurtma",
+    "titleLabel": "Ish nomi",
+    "titlePlaceholder": "Masalan: rozetka almashtirish",
+    "descLabel": "Tavsif",
+    "descPlaceholder": "Nima qilish kerakligini qisqacha yozing",
+    "photo": "Rasm",
+    "photoHint": "Rasm ustaga ishni tezroq tushunishga yordam beradi",
+    "removePhoto": "Rasmni o‘chirish",
+    "address": "Manzil",
+    "addressPlaceholder": "Xaritada belgilang",
+    "when": "Qachon",
+    "whenPlaceholder": "Vaqtni tanlang",
+    "price": "Narx",
+    "paymentMethod": "To‘lov usuli",
+    "submit": "Buyurtmani joylash",
+    "needTitle": "Ish nomini yozing",
+    "needAddress": "Manzilni belgilang",
+    "needTime": "Vaqtni tanlang",
+    "needPrice": "Narxni kiriting",
+    "photoFailed": "Rasm yuklanmadi. Qaytadan urinib ko‘ring."
+  },
+  "timePicker": {
+    "title": "Qachon kelsin?",
+    "day": "Kun",
+    "from": "Boshlanishi",
+    "to": "Tugashi",
+    "choose": "Tanlash"
+  },
+  "address": {
+    "title": "Manzilni belgilang",
+    "search": "Manzilni qidiring",
+    "pinHint": "Belgini uyingiz ustiga qo‘ying",
+    "detected": "Belgi turgan joy bo‘yicha aniqlandi",
+    "entrance": "Podyezd",
+    "floor": "Qavat",
+    "apartment": "Xonadon",
+    "landmark": "Mo‘ljal (ixtiyoriy)",
+    "landmarkPlaceholder": "Masalan: maktab yonida",
+    "privacy": "Manzilingiz e’londa ustalarga ko‘rinadi. Telefon raqamingiz — faqat ishni olgan ustaga.",
+    "confirm": "Manzilni tasdiqlash",
+    "myLocation": "Mening joylashuvim",
+    "webNote": "Xarita telefonda ko‘rinadi. Bu yerda manzilni qidiruv orqali tanlang.",
+    "detecting": "Manzil aniqlanmoqda…"
+  },
+  "executorHome": {
+    "tabNew": "Yangi",
+    "tabMine": "Mening ishlarim",
+    "tabHistory": "Tarix",
+    "filterAll": "Barchasi",
+    "filterNearby": "{km} km gacha",
+    "filterCash": "Naqd",
+    "filterOnline": "Karta / QR",
+    "freeBanner": "<b>Bepul oy: {days} kun qoldi.</b> Demo bonusda {amount} so‘m bor",
+    "emptyNew": "Hozircha yangi buyurtma yo‘q",
+    "emptyMine": "Faol ishlaringiz yo‘q",
+    "emptyHistory": "Tarix bo‘sh",
+    "newChip": "Yangi",
+    "locationHint": "Masofani ko‘rish uchun joylashuvga ruxsat bering"
+  },
+  "job": {
+    "postedAgo": "{ago} joylandi",
+    "settlement": "Hisob-kitob",
+    "cashYouGet": "Naqd pul olasiz",
+    "onlineYouGet": "Hisobingizga tushadi",
+    "fee": "Xizmat haqi {percent}%",
+    "feeFromDemo": "Xizmat haqi {percent}%, demodan",
+    "net": "Sof daromadingiz",
+    "enough": "<b>Balans yetarli.</b> Ushlanadi: {fee} so‘m, sizda: {available} so‘m",
+    "accept": "Buyurtmani qabul qilish",
+    "customerLine": "{name} · {count} ta buyurtma",
+    "depart": "Yo‘lga chiqdim",
+    "arrive": "Yetib keldim",
+    "start": "Ishni boshladim",
+    "finish": "Ishni tugatdim",
+    "finishTitle": "Ishni tugatdingizmi?",
+    "finishPhoto": "Ish rasmini qo‘shish (ixtiyoriy)",
+    "decline": "Buyurtmadan voz kechish",
+    "declineConfirm": "Buyurtmadan voz kechasizmi? U boshqa ustalarga qayta ko‘rsatiladi.",
+    "openInMaps": "Google Maps’da ochish",
+    "waitingPayment": "Buyurtmachi to‘lovni tasdiqlashini kuting",
+    "customer": "Buyurtmachi"
+  },
+  "insufficient": {
+    "title": "Mablag‘ yetarli emas",
+    "text": "Bu ishni olish uchun yana <r>{shortfall} so‘m</r> to‘ldiring — shundan keyin ishni olasiz.",
+    "required": "Hisobda bo‘lishi kerak",
+    "have": "Hisobingizda",
+    "missing": "Yetishmaydi",
+    "taxNote": "{appName} soliq ushlamaydi — hisobda faqat shu ishning {percent}% xizmat haqi bo‘lishi kerak.",
+    "topUp": "{amount} so‘m to‘ldirish"
+  },
+  "chat": {
+    "placeholder": "Xabar yozing...",
+    "orderLink": "Buyurtma #{number} · {price}",
+    "photo": "Rasm",
+    "send": "Yuborish",
+    "attach": "Rasm biriktirish",
+    "system": {
+      "ORDER_ACCEPTED": "Usta buyurtmani qabul qildi",
+      "EXECUTOR_EN_ROUTE": "Usta yo‘lga chiqdi",
+      "EXECUTOR_ARRIVED": "Usta yetib keldi",
+      "WORK_STARTED": "Usta ishni boshladi",
+      "WORK_FINISHED": "Usta ishni yakunladi",
+      "ORDER_CANCELLED": "Buyurtma bekor qilindi"
+    }
+  },
+  "errorsExtra": {
+    "userBlocked": "Hisobingiz bloklangan.",
+    "uploadInvalid": "Rasm yuklanmadi. Qaytadan urinib ko‘ring.",
+    "roleRequired": "Bu amal uchun bosh menyudan rolni almashtiring.",
+    "ownOrder": "O‘z buyurtmangizni qabul qila olmaysiz.",
+    "notAvailable": "Bu buyurtmani boshqa usta olib bo‘ldi.",
+    "statusConflict": "Buyurtma holati o‘zgargan. Sahifani yangilang.",
+    "timeInvalid": "Vaqt oralig‘ini to‘g‘ri tanlang.",
+    "categoryInvalid": "Kategoriyani tanlang.",
+    "paymentDisabled": "Bu to‘lov usuli hozir ishlamaydi.",
+    "cancelReasonRequired": "Bekor qilish sababini tanlang.",
+    "chatClosed": "Bu buyurtma uchun chat yopiq."
   }
 }

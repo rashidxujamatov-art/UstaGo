@@ -1,15 +1,23 @@
 import { api } from './index';
 import type {
+  AcceptPreview,
+  CancelReason,
+  Category,
+  ChatMessage,
   DeviceInfo,
   Invite,
   Language,
   LoginResult,
   Me,
   OtpTicket,
+  NewOrderInput,
+  Order,
+  PlaceSuggestion,
   PublicConfig,
   Role,
   SignedIn,
   ThemeModeApi,
+  Wallet,
 } from './types';
 
 /** Typed calls to /api/v1 (docs/02-arxitektura.md §6). */
@@ -78,4 +86,67 @@ export const endpoints = {
 
   completeIdentity: (sessionId: string) =>
     api.post<Me>('/identity/myid/complete', { session_id: sessionId }),
+
+  // ---------------------------------------------------------------- stage 2
+
+  categories: () => api.get<Category[]>('/categories'),
+  wallet: () => api.get<Wallet>('/wallet'),
+
+  presignUpload: (purpose: 'ORDER_PHOTO' | 'FINISH_PHOTO' | 'CHAT_PHOTO', contentType: string) =>
+    api.post<{ key: string; url: string; headers: Record<string, string>; max_bytes: number }>(
+      '/uploads/presign',
+      { purpose, content_type: contentType },
+    ),
+
+  reverseGeocode: (lat: number, lng: number, lang: Language) =>
+    api.get<{ address: string | null }>(
+      `/maps/reverse-geocode?${new URLSearchParams({ lat: String(lat), lng: String(lng), lang })}`,
+    ),
+  autocomplete: (
+    q: string,
+    session: string,
+    lang: Language,
+    near?: { lat: number; lng: number },
+  ) => {
+    const params = new URLSearchParams({ q, session, lang });
+    if (near) {
+      params.set('lat', String(near.lat));
+      params.set('lng', String(near.lng));
+    }
+    return api.get<{ suggestions: PlaceSuggestion[] }>(`/maps/autocomplete?${params}`);
+  },
+  place: (placeId: string, session: string, lang: Language) =>
+    api.get<{ lat: number; lng: number; address: string }>(
+      `/maps/place/${encodeURIComponent(placeId)}?${new URLSearchParams({ session, lang })}`,
+    ),
+
+  createOrder: (input: NewOrderInput) => api.post<Order>('/orders', input),
+  myOrders: (scope: 'all' | 'active' | 'finished') => api.get<Order[]>(`/orders?scope=${scope}`),
+  order: (id: string) => api.get<Order>(`/orders/${id}`),
+  cancelOrder: (id: string, reason?: CancelReason, note?: string) =>
+    api.post<Order>(`/orders/${id}/cancel`, { reason, note }),
+
+  feed: (query: { lat?: number; lng?: number; nearby?: boolean; payment?: 'cash' | 'online' }) => {
+    const params = new URLSearchParams();
+    if (query.lat !== undefined && query.lng !== undefined) {
+      params.set('lat', String(query.lat));
+      params.set('lng', String(query.lng));
+    }
+    if (query.nearby) params.set('nearby', 'true');
+    if (query.payment) params.set('payment', query.payment);
+    return api.get<Order[]>(`/feed?${params}`);
+  },
+  myJobs: (scope: 'active' | 'history') => api.get<Order[]>(`/me/jobs?scope=${scope}`),
+  acceptPreview: (id: string) => api.get<AcceptPreview>(`/orders/${id}/accept-preview`),
+  acceptOrder: (id: string) => api.post<Order>(`/orders/${id}/accept`),
+  declineOrder: (id: string) => api.post<Order>(`/orders/${id}/decline`),
+  orderStep: (id: string, step: 'depart' | 'arrive' | 'start') =>
+    api.post<Order>(`/orders/${id}/${step}`),
+  finishOrder: (id: string, photoKeys: string[]) =>
+    api.post<Order>(`/orders/${id}/finish`, { photo_keys: photoKeys }),
+
+  messages: (id: string) => api.get<ChatMessage[]>(`/orders/${id}/messages`),
+  sendMessage: (id: string, input: { text?: string; photo_key?: string }) =>
+    api.post<ChatMessage>(`/orders/${id}/messages`, input),
+  markRead: (id: string) => api.post<void>(`/orders/${id}/messages/read`),
 };

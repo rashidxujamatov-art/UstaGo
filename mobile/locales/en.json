@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "Your location is used to mark the address on the map and show jobs nearby.",
+    "NSPhotoLibraryUsageDescription": "Photo access is used to add pictures to an order or a chat."
+  }
+}

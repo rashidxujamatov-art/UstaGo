@@ -29,6 +29,7 @@ export const settingsDefaults: StoredSettings = {
   login_attempt_window_sec: 900,
   min_age_years: 16,
   order_photos_max: 5,
+  feed_nearby_radius_m: 5_000,
   upload_max_mb: 5,
   qr_payment_ttl_sec: 300,
   location_interval_sec: 5,

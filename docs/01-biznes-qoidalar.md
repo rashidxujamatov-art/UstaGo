@@ -98,9 +98,10 @@ Kirish:
 |---|---|---|
 | `PUBLISHED → ACCEPTED` | usta | §4dagi hamma shartlar bajarilsa. Birinchi qabul qilgan usta oladi (atomik amal) |
 | `PUBLISHED → CANCELLED` | buyurtmachi, admin | Istalgan vaqtda |
+| `PUBLISHED → CANCELLED` | tizim | Vaqt oralig‘i (`time_to`) tugagan va hech kim olmagan buyurtma avtomatik bekor bo‘ladi (sabab `EXPIRED`), buyurtmachiga xabar boriladi |
 | `ACCEPTED → EN_ROUTE` | usta | "Yo‘lga chiqdim". Jonli joylashuv boshlanadi (§10) |
 | `ACCEPTED / EN_ROUTE → PUBLISHED` | usta | Usta voz kechsa, buyurtma qayta ochiladi, band qilingan summa qaytariladi |
-| `ACCEPTED / EN_ROUTE → CANCELLED` | buyurtmachi | Sabab bilan. Band qilingan summa qaytariladi |
+| `ACCEPTED / EN_ROUTE → CANCELLED` | buyurtmachi | Sabab bilan (ro‘yxatdan: usta endi kerak emas; boshqa usta topdim; usta kechikyapti yoki javob bermayapti; narx yoki shartlarda kelisha olmadik; boshqa sabab — matn bilan). Band qilingan summa qaytariladi |
 | `EN_ROUTE → ARRIVED` | usta yoki avtomatik | "Yetib keldim" tugmasi yoki manzilga 50 m qolganda |
 | `ARRIVED → IN_PROGRESS` | usta | "Ishni boshladim" |
 | `IN_PROGRESS → DONE_BY_EXECUTOR` | usta | "Ishni tugatdim". Usta pulni faqat shundan keyin oladi: QR (BJ4) va "To‘ladim" shu holatdan ochiladi |
@@ -383,6 +384,13 @@ Hal qilingan savollar (2026-09-26):
 - Ilova o‘rnatilmagan holda bosilgan taklif havolasi kodni o‘rnatishdan keyin olib o‘tmaydi (deferred deep link). Hozircha kod K2’da qo‘lda kiritiladi; havola ilova o‘rnatilgan telefonda ishlaydi. Domen tanlangach App Links / Universal Links va Play Install Referrer qo‘shiladi.
 - Til tanlash ekranida (Main) ko‘rinish uchta: Kunduzgi, Tungi, Avto.
 - §2, §3.1, §8, §10’da tilga olingan limitlar ham sozlamaga aylandi (§12): eslatma kunlari, OTP cheklovi, rasmlar soni va hajmi, yo‘ldan chetga chiqish masofasi. IP bo‘yicha OTP cheklovi (10) — texnik standart qiymat.
+
+Hal qilingan savollar (2026-09-26, 2-bosqich):
+
+- Vaqt oralig‘i o‘tib ketgan va hech bir usta olmagan buyurtma avtomatik bekor qilinadi (`EXPIRED`), buyurtmachi qayta joylashi mumkin.
+- Qabul qilingan buyurtmani bekor qilish sabablari: usta endi kerak emas; boshqa usta topdim; usta kechikyapti yoki javob bermayapti; narx yoki shartlarda kelisha olmadik; boshqa sabab (matn bilan).
+- Boshlang‘ich kategoriyalar: Elektrik, Santexnik, Ta’mirlash, Tozalash, Mebel, Konditsioner va Boshqa. Keyin super admin o‘zgartiradi.
+- Demo bonus (§8) usta bepul davri boshlanganda ledger orqali `DEMO` hisobiga yoziladi — 2-bosqichdan: ish qabul qilish sharti (§4) balansga tayanadi.
 
 ## 14. Yuridik talablar (real pul bilan ishga tushirishdan oldin)
 

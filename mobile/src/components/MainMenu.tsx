@@ -80,6 +80,11 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
     router.push('/soon');
   };
 
+  const myJobs = () => {
+    onClose();
+    router.navigate({ pathname: '/home', params: { tab: isExecutor ? 'mine' : 'active' } });
+  };
+
   const confirmLogout = () =>
     Alert.alert(t('menu.logoutConfirm'), undefined, [
       { text: t('common.no'), style: 'cancel' },
@@ -154,7 +159,7 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
               />
             </View>
 
-            <MenuRow icon={Briefcase} label={t('menu.myJobs')} onPress={soon} />
+            <MenuRow icon={Briefcase} label={t('menu.myJobs')} onPress={myJobs} />
             <MenuRow icon={Wallet} label={t('menu.wallet')} onPress={soon} />
             <MenuRow icon={Users} label={t('menu.referral')} onPress={soon} />
             <MenuRow icon={Settings} label={t('menu.settings')} onPress={soon} />

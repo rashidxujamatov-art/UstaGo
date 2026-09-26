@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
 } from '@nestjs/common';
 import { z } from 'zod';
 import { Auth, type AuthContext } from '../../common/auth/auth.decorators.js';
@@ -23,6 +24,7 @@ const preferencesSchema = z
   .refine((value) => value.lang !== undefined || value.theme !== undefined);
 
 const roleSchema = z.object({ role: z.enum(['CUSTOMER', 'EXECUTOR']) });
+const pushTokenSchema = z.object({ token: z.string().min(10).max(4096).nullable() });
 
 @Controller('me')
 export class MeController {
@@ -54,6 +56,16 @@ export class MeController {
   @Get('devices')
   devices(@Auth() auth: AuthContext) {
     return this.users.devices(auth.userId, auth.sessionId);
+  }
+
+  /** Registers this device for push notifications. */
+  @Put('devices/current/push-token')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  setPushToken(
+    @Auth() auth: AuthContext,
+    @Body(new ZodPipe(pushTokenSchema)) body: z.output<typeof pushTokenSchema>,
+  ) {
+    return this.users.setPushToken(auth.sessionId, body.token);
   }
 
   @Delete('devices/:id')

@@ -11,6 +11,9 @@ const valid = {
   PINFL_HMAC_KEY: 'y'.repeat(48),
   SMS_PROVIDER: 'mock',
   IDENTITY_PROVIDER: 'mock',
+  MAPS_PROVIDER: 'mock',
+  STORAGE_PROVIDER: 'mock',
+  PUSH_PROVIDER: 'mock',
 };
 
 describe('validateEnv', () => {

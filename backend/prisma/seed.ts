@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client.js';
 import { settingsSchema } from '../src/modules/settings/settings.schema.js';
+import { categoriesSeed } from './seed/categories.js';
 import { settingsDefaults } from './seed/settings.defaults.js';
 
 /**
@@ -29,6 +30,13 @@ async function main(): Promise<void> {
     console.log(
       `settings: ${missing.length} created, ${Object.keys(settingsDefaults).length - missing.length} already present`,
     );
+
+    // Categories: created when missing, never overwritten (the super admin edits them).
+    const { count } = await prisma.category.createMany({
+      data: categoriesSeed.map((category, index) => ({ ...category, sortOrder: index + 1 })),
+      skipDuplicates: true,
+    });
+    console.log(`categories: ${count} created`);
   } finally {
     await prisma.$disconnect();
   }

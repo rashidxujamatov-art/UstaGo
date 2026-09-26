@@ -55,6 +55,23 @@ export const envSchema = z
     /** Only the mock exists until MyID keys are issued (docs/01 §14). */
     IDENTITY_PROVIDER: z.enum(['mock']),
 
+    /** Google Maps Platform proxy (docs/01 §10). The server key is IP-restricted. */
+    MAPS_PROVIDER: z.enum(['mock', 'google']),
+    GOOGLE_MAPS_SERVER_KEY: z.string().optional(),
+
+    /** Photos: S3-compatible storage (MinIO locally), or an in-memory mock for tests. */
+    STORAGE_PROVIDER: z.enum(['mock', 's3']),
+    S3_ENDPOINT: z.url().optional(),
+    /** Endpoint the phones use in presigned URLs (e.g. http://10.0.2.2:9000 for the emulator). */
+    S3_PUBLIC_ENDPOINT: z.url().optional(),
+    S3_REGION: z.string().default('us-east-1'),
+    S3_BUCKET: z.string().optional(),
+    S3_ACCESS_KEY: z.string().optional(),
+    S3_SECRET_KEY: z.string().optional(),
+
+    /** Push notifications (FCM). The mock only logs. */
+    PUSH_PROVIDER: z.enum(['mock']),
+
     /** Fixed OTP code (all zeros). Allowed only with NODE_ENV=development (CLAUDE.md rule 6). */
     OTP_TEST_MODE: booleanString.default(false),
 
@@ -70,7 +87,13 @@ export const envSchema = z
       });
     }
     if (env.NODE_ENV === 'production') {
-      for (const key of ['SMS_PROVIDER', 'IDENTITY_PROVIDER'] as const) {
+      for (const key of [
+        'SMS_PROVIDER',
+        'IDENTITY_PROVIDER',
+        'MAPS_PROVIDER',
+        'STORAGE_PROVIDER',
+        'PUSH_PROVIDER',
+      ] as const) {
         if (env[key] === 'mock') {
           ctx.addIssue({
             code: 'custom',
@@ -79,6 +102,20 @@ export const envSchema = z
           });
         }
       }
+    }
+    const requireKeys = (keys: readonly (keyof typeof env)[], reason: string) => {
+      for (const key of keys) {
+        if (!env[key]) ctx.addIssue({ code: 'custom', path: [key], message: reason });
+      }
+    };
+    if (env.MAPS_PROVIDER === 'google') {
+      requireKeys(['GOOGLE_MAPS_SERVER_KEY'], 'required when MAPS_PROVIDER=google');
+    }
+    if (env.STORAGE_PROVIDER === 's3') {
+      requireKeys(
+        ['S3_ENDPOINT', 'S3_PUBLIC_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY', 'S3_SECRET_KEY'],
+        'required when STORAGE_PROVIDER=s3',
+      );
     }
     if (env.SMS_PROVIDER === 'eskiz') {
       for (const key of ['ESKIZ_EMAIL', 'ESKIZ_PASSWORD', 'ESKIZ_FROM'] as const) {

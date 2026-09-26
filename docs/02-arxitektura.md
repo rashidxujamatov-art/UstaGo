@@ -122,13 +122,14 @@ Autentifikatsiya: `Authorization: Bearer <access>`. Xato formati: `{ "code": "OR
 |---|---|
 | Auth | `GET /auth/invite/:code` (kodni tekshirish, "Sizni {ism} taklif qildi"), `POST /auth/register` (`referral_code` majburiy — `AUTH_REFERRAL_REQUIRED`), `POST /auth/otp/verify` (`purpose`: `REGISTER` yoki `LOGIN` — yangi qurilma), `POST /auth/otp/resend`, `POST /auth/login` (notanish qurilmada `otp_required`), `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/password/reset`, `POST /auth/password/reset/confirm` |
 | Identity | `POST /identity/myid/session`, `POST /identity/myid/complete` |
-| Men | `GET /me`, `PATCH /me` (til, ko‘rinish), `POST /me/role`, `GET /me/referrals`, `GET /me/devices`, `DELETE /me/devices/:id` |
+| Men | `GET /me`, `PATCH /me` (til, ko‘rinish), `POST /me/role`, `GET /me/referrals`, `GET /me/devices`, `DELETE /me/devices/:id`, `PUT /me/devices/current/push-token`, `GET /me/jobs` (usta: faol ishlar va tarix) |
 | Buyurtmachi | `POST /orders` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_CUSTOMER_CONFIRMATION_REQUIRED`), `GET /orders`, `GET /orders/:id`, `POST /orders/:id/cancel`, `POST /orders/:id/confirm`, `POST /orders/:id/pay`, `POST /orders/:id/paid` ("To‘ladim", naqd va Xolis), `POST /orders/:id/dispute` ("Muammo bor") |
-| Usta | `GET /feed`, `POST /orders/:id/accept` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_EXECUTOR_CONFIRMATION_REQUIRED`), `POST /orders/:id/decline`, `POST /orders/:id/depart`, `POST /orders/:id/arrive`, `POST /orders/:id/start`, `POST /orders/:id/finish` ("Ishni tugatdim"), `POST /orders/:id/payment-received` ("Pulni qabul qildim"), `POST /orders/:id/payment-not-received` ("Pul kelmadi" → nizo), `POST /orders/:id/payment-session` |
+| Usta | `GET /feed`, `GET /orders/:id/accept-preview` (BJ2/BJ3 hisob-kitobi), `POST /orders/:id/accept` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_EXECUTOR_CONFIRMATION_REQUIRED`), `POST /orders/:id/decline`, `POST /orders/:id/depart`, `POST /orders/:id/arrive`, `POST /orders/:id/start`, `POST /orders/:id/finish` ("Ishni tugatdim"), `POST /orders/:id/payment-received` ("Pulni qabul qildim"), `POST /orders/:id/payment-not-received` ("Pul kelmadi" → nizo), `POST /orders/:id/payment-session` |
 | Hamyon | `GET /wallet`, `GET /wallet/transactions`, `POST /wallet/topup`, `POST /wallet/withdraw/preview`, `POST /wallet/withdraw`, `GET /wallet/cards`, `POST /wallet/cards` |
 | Soliq | `GET /tax/status`, `POST /tax/self-employed`, `POST /tax/xolis` |
-| Chat | `GET /orders/:id/messages`, `POST /orders/:id/messages` |
-| Xarita | `GET /maps/reverse-geocode`, `GET /maps/autocomplete` |
+| Chat | `GET /orders/:id/messages`, `POST /orders/:id/messages`, `POST /orders/:id/messages/read` |
+| Xarita | `GET /maps/reverse-geocode`, `GET /maps/autocomplete`, `GET /maps/place/:id` |
+| Umumiy | `GET /config` (kirishdan oldin kerak bo‘lgan sozlamalar), `GET /categories`, `POST /uploads/presign` (rasm yuklash uchun presigned URL) |
 | Callback | `POST /payments/payme`, `POST /payments/click/prepare`, `POST /payments/click/complete` |
 | Admin | `GET /admin/users`, `POST /admin/users/:id/block`, `GET /admin/verifications`, `POST /admin/verifications/:id/decide`, `GET /admin/disputes`, `POST /admin/disputes/:id/decide`, `GET /admin/orders` |
 | Super admin | `GET/PUT /sa/settings`, `GET/POST /sa/invite-codes` (platforma kodlari), `GET/POST /sa/staff`, `PUT /sa/staff/:id/permissions`, `GET /sa/finance/summary`, `GET /sa/finance/ledger`, `POST /sa/disputes/:id/approve-refund`, `GET /sa/maps/usage` |
@@ -190,10 +191,11 @@ Har bir tashqi xizmat uchun interfeys yoziladi va ikkita implementatsiya bo‘la
 
 ## 11. Mobil ilova
 
-- **Navigatsiya**: `expo-router`. Kirishdan keyin `active_role`ga qarab tablar:
-  - Buyurtmachi: Bosh sahifa, Buyurtmalar, Chatlar, Menyu.
-  - Usta: Buyurtmalar (Yangi / Mening ishlarim / Tarix), Hamyon, Menyu.
+- **Navigatsiya**: `expo-router`. Pastki tab paneli yo‘q — dizayn (BY1, BJ1) bo‘yicha bosh sahifa `active_role`ga qarab ochiladi, bo‘limlar sarlavha panelidagi tablarda, qolgani U1 yon menyusida:
+  - Buyurtmachi (BY1): Barchasi / Faol / Yakunlangan; buyurtma → BY3, chat (BY4) buyurtmadan ochiladi.
+  - Usta (BJ1): Yangi / Mening ishlarim / Tarix; hamyon sarlavhadagi balansdan va menyudan.
   - Admin va super admin bo‘limlari menyudan, faqat ruxsat bo‘lsa ochiladi.
+  - Buyurtma ekrani bitta (`/order/[id]`): buyurtmachiga BY3, ustaga BJ2 va ish qadamlari — `viewer_role`ga qarab.
 - **Holat boshqaruvi**: server ma’lumotlari uchun TanStack Query, sessiya va sozlamalar uchun Zustand.
 - **i18n**: `i18next` + `react-i18next` + `expo-localization`. Fayllar: `src/i18n/uz.json`, `ru.json`, `en.json`, `tg.json`. Backend xato kodlari i18n kalitlariga moslanadi. Hermes’da `Intl.PluralRules` bo‘lmasa, polyfill qo‘shiladi.
 - **Pul va sana formati**: o‘z yordamchi funksiyalari (`180 000 so‘m`, `18.10.2026`, `+998 90 123 45 67`). `Intl`ga tayanilmaydi.

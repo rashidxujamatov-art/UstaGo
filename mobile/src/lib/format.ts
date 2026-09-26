@@ -83,6 +83,16 @@ export function maskPhone(phone: string): string {
   return `+998 ${operator} *** ${b} ${c}`;
 }
 
+/**
+ * Basis points as a percent number without the sign: 250 → "2.5", 25 → "0.25", 300 → "3".
+ * Integer arithmetic only; the design writes percents with a dot in every language.
+ */
+export function formatPercent(bps: number): string {
+  const whole = Math.trunc(bps / 100);
+  const fraction = (bps % 100).toString().padStart(2, '0').replace(/0+$/, '');
+  return fraction ? `${whole}.${fraction}` : whole.toString();
+}
+
 /** "#1024". */
 export function formatOrderNumber(orderNumber: number | bigint | string): string {
   return `#${orderNumber}`;

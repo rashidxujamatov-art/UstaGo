@@ -22,6 +22,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     throw new Error(`APP_BUNDLE_ID "${bundleId}" is not a valid Android package / iOS bundle ID.`);
   }
   const easProjectId = process.env.EAS_PROJECT_ID?.trim();
+  // Google Maps SDK keys, restricted to this app in Google Cloud. Without them the map is blank.
+  const mapsKeys = {
+    iosGoogleMapsApiKey: process.env.GOOGLE_MAPS_IOS_KEY?.trim() || undefined,
+    androidGoogleMapsApiKey: process.env.GOOGLE_MAPS_ANDROID_KEY?.trim() || undefined,
+  };
 
   return {
     ...config,
@@ -37,6 +42,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ios: {
       bundleIdentifier: bundleId,
       supportsTablet: false,
+      // Permission texts come from ./locales in the user's language.
+      infoPlist: { CFBundleAllowMixedLocalizations: true },
     },
     android: {
       package: bundleId,
@@ -46,7 +53,17 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       'expo-localization',
       // Same value as palette.light.brand (src/theme/tokens.ts); app config cannot import TS modules.
       ['expo-splash-screen', { backgroundColor: '#2461C2' }],
+      ['react-native-maps', mapsKeys],
+      // Foreground only; background tracking (BJ12) comes with stage 6.
+      ['expo-location', { isAndroidBackgroundLocationEnabled: false }],
+      ['expo-image-picker', { cameraPermission: false, microphonePermission: false }],
     ],
+    locales: {
+      uz: './locales/uz.json',
+      ru: './locales/ru.json',
+      en: './locales/en.json',
+      tg: './locales/tg.json',
+    },
     experiments: {
       typedRoutes: true,
     },

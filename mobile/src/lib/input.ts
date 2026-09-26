@@ -74,3 +74,16 @@ export function formatCountdown(seconds: number): string {
   const s = Math.max(0, Math.ceil(seconds));
   return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 }
+
+/** Longest price the BY2 field accepts, in whole so‘m digits (999 999 999 999). */
+const PRICE_MAX_DIGITS = 12;
+
+/** Whole so‘m typed in the price field: digits only, no leading zeros. */
+export function priceDigits(text: string): string {
+  return text.replace(/\D/g, '').replace(/^0+/, '').slice(0, PRICE_MAX_DIGITS);
+}
+
+/** Whole so‘m digits → tiyin string for the API ("500000" → "50000000"); null when empty. */
+export function somDigitsToTiyin(digits: string): string | null {
+  return /^[1-9]\d*$/.test(digits) ? `${digits}00` : null;
+}
