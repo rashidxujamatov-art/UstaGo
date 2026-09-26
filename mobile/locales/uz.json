@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "Manzilni xaritada belgilash va yaqin atrofdagi buyurtmalarni ko‘rsatish uchun joylashuvingiz kerak.",
+    "NSPhotoLibraryUsageDescription": "Buyurtma yoki chatga rasm qo‘shish uchun galereyaga ruxsat kerak."
+  }
+}

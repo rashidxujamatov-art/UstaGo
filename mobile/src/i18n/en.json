@@ -5,6 +5,7 @@
   },
   "common": {
     "money": "{amount} UZS",
+    "currency": "UZS",
     "continue": "Continue",
     "cancel": "Cancel",
     "back": "Back",
@@ -13,7 +14,18 @@
     "retry": "Try again",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
-    "comingSoon": "This section is coming in a later stage."
+    "comingSoon": "This section is coming in a later stage.",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "justNow": "Just now",
+    "minutesAgo": "{n} min ago",
+    "hoursAgo": "{n} h ago",
+    "km": "{km} km",
+    "call": "Call",
+    "write": "Message",
+    "confirm": "Confirm",
+    "close": "Close"
   },
   "startup": {
     "offline": "Could not reach the server. Check your internet connection and try again."
@@ -63,10 +75,6 @@
     "help": "Help",
     "logout": "Log out",
     "logoutConfirm": "Log out of your account?"
-  },
-  "home": {
-    "greeting": "Hello, {name}!",
-    "freePeriodUntil": "Free period until {date}"
   },
   "auth": {
     "haveAccount": "Have an account?",
@@ -181,12 +189,41 @@
     "iPaid": "I paid",
     "iReceived": "Money received",
     "notReceived": "Money didn’t arrive",
-    "feeCharged": "A {fee} UZS service fee was charged from your balance."
+    "feeCharged": "A {fee} UZS service fee was charged from your balance.",
+    "method": {
+      "BALANCE": "From balance",
+      "CLICK": "Click QR",
+      "PAYME": "Payme QR",
+      "CARD": "Card",
+      "CASH": "Cash",
+      "XOLIS_QR": "Xolis QR"
+    },
+    "cashChip": "Cash payment",
+    "onlineChip": "Card / QR"
   },
   "order": {
     "notFound": "Order not found.",
     "customerConfirmRequired": "Tap “I paid” for your previous order (#{order}) — then you can post a new one.",
-    "executorConfirmRequired": "Tap “Money received” for your previous job (#{order}) — then you can take a new one."
+    "executorConfirmRequired": "Tap “Money received” for your previous job (#{order}) — then you can take a new one.",
+    "title": "Order #{number}",
+    "statusSection": "Order status",
+    "job": "Job",
+    "address": "Address",
+    "price": "Price",
+    "menu": "Order actions",
+    "cancel": "Cancel order",
+    "cancelTitle": "Why are you cancelling?",
+    "cancelConfirm": "Cancel order",
+    "cancelNote": "Describe the reason",
+    "reasons": {
+      "NOT_NEEDED": "I no longer need a pro",
+      "FOUND_OTHER": "I found another pro",
+      "EXECUTOR_LATE": "The pro is late or not answering",
+      "NO_AGREEMENT": "We could not agree on price or terms",
+      "OTHER": "Other reason"
+    },
+    "paymentNext": "Payment comes in the next stage",
+    "noExecutor": "Your job is being shown to pros"
   },
   "errors": {
     "internal": "Something went wrong. Please try again later.",
@@ -196,5 +233,171 @@
     "forbidden": "You don’t have access to this action.",
     "rateLimited": "Too many attempts. Please try again shortly.",
     "network": "Check your internet connection."
+  },
+  "customerHome": {
+    "tabAll": "All",
+    "tabActive": "Active",
+    "tabFinished": "Finished",
+    "whatPro": "What kind of pro do you need?",
+    "myOrders": "My orders",
+    "empty": "No orders yet. Pick a category and post your first job.",
+    "newOrder": "Post a job",
+    "cancelledByMe": "You cancelled",
+    "cancelledExpired": "Time ran out",
+    "cancelledOther": "Cancelled"
+  },
+  "orderStatus": {
+    "PUBLISHED": "Looking for a pro…",
+    "ACCEPTED": "Pro found",
+    "EN_ROUTE": "Pro on the way",
+    "ARRIVED": "Pro has arrived",
+    "IN_PROGRESS": "Work in progress",
+    "DONE_BY_EXECUTOR": "The pro finished the work",
+    "COMPLETED": "Payment being confirmed",
+    "PAID": "Completed",
+    "CANCELLED": "Cancelled",
+    "DISPUTED": "Complaint under review"
+  },
+  "jobStatus": {
+    "PUBLISHED": "New job",
+    "ACCEPTED": "You accepted the job",
+    "EN_ROUTE": "You are on the way",
+    "ARRIVED": "You have arrived",
+    "IN_PROGRESS": "Work in progress",
+    "DONE_BY_EXECUTOR": "Waiting for the customer to confirm",
+    "COMPLETED": "Payment being confirmed",
+    "PAID": "Completed",
+    "CANCELLED": "Cancelled",
+    "DISPUTED": "Complaint under review"
+  },
+  "timeline": {
+    "created": "Job posted",
+    "accepted": "Pro accepted",
+    "departed": "Pro set off",
+    "arrived": "Pro arrived",
+    "started": "Work started",
+    "finished": "Pro finished the work",
+    "checkAndAccept": "Check the work and accept it",
+    "payment": "Payment"
+  },
+  "newOrder": {
+    "title": "New job",
+    "titleLabel": "Job title",
+    "titlePlaceholder": "For example: replace a socket",
+    "descLabel": "Description",
+    "descPlaceholder": "Briefly describe what needs to be done",
+    "photo": "Photo",
+    "photoHint": "A photo helps the pro understand the job faster",
+    "removePhoto": "Remove photo",
+    "address": "Address",
+    "addressPlaceholder": "Set it on the map",
+    "when": "When",
+    "whenPlaceholder": "Choose a time",
+    "price": "Price",
+    "paymentMethod": "Payment method",
+    "submit": "Post the job",
+    "needTitle": "Enter the job title",
+    "needAddress": "Set the address",
+    "needTime": "Choose a time",
+    "needPrice": "Enter the price",
+    "photoFailed": "The photo did not upload. Please try again."
+  },
+  "timePicker": {
+    "title": "When should the pro come?",
+    "day": "Day",
+    "from": "From",
+    "to": "To",
+    "choose": "Choose"
+  },
+  "address": {
+    "title": "Set the address",
+    "search": "Search for an address",
+    "pinHint": "Place the pin on your house",
+    "detected": "Found from the pin position",
+    "entrance": "Entrance",
+    "floor": "Floor",
+    "apartment": "Apartment",
+    "landmark": "Landmark (optional)",
+    "landmarkPlaceholder": "For example: next to the school",
+    "privacy": "Pros see your address in the job post. Your phone number goes only to the pro who takes the job.",
+    "confirm": "Confirm address",
+    "myLocation": "My location",
+    "webNote": "The map is available on the phone. Here, pick the address using search.",
+    "detecting": "Finding the address…"
+  },
+  "executorHome": {
+    "tabNew": "New",
+    "tabMine": "My jobs",
+    "tabHistory": "History",
+    "filterAll": "All",
+    "filterNearby": "Within {km} km",
+    "filterCash": "Cash",
+    "filterOnline": "Card / QR",
+    "freeBanner": "<b>Free month: {days} days left.</b> Demo bonus: {amount} UZS",
+    "emptyNew": "No new jobs yet",
+    "emptyMine": "No active jobs",
+    "emptyHistory": "No history yet",
+    "newChip": "New",
+    "locationHint": "Allow location access to see distances"
+  },
+  "job": {
+    "postedAgo": "Posted {ago}",
+    "settlement": "Earnings",
+    "cashYouGet": "You receive in cash",
+    "onlineYouGet": "Goes to your balance",
+    "fee": "Service fee {percent}%",
+    "feeFromDemo": "Service fee {percent}%, from demo",
+    "net": "Your net income",
+    "enough": "<b>Balance is enough.</b> Reserved: {fee} UZS, you have: {available} UZS",
+    "accept": "Accept the job",
+    "customerLine": "{name} · {count} orders",
+    "depart": "I’m on my way",
+    "arrive": "I’ve arrived",
+    "start": "Start work",
+    "finish": "Work done",
+    "finishTitle": "Finished the work?",
+    "finishPhoto": "Add a photo of the work (optional)",
+    "decline": "Withdraw from the job",
+    "declineConfirm": "Withdraw from this job? It will be shown to other pros again.",
+    "openInMaps": "Open in Google Maps",
+    "waitingPayment": "Waiting for the customer to confirm payment",
+    "customer": "Customer"
+  },
+  "insufficient": {
+    "title": "Not enough balance",
+    "text": "Top up <r>{shortfall} UZS</r> more to take this job — then it’s yours.",
+    "required": "Needed in balance",
+    "have": "In your balance",
+    "missing": "Missing",
+    "taxNote": "{appName} does not withhold tax — your balance only needs the {percent}% service fee for this job.",
+    "topUp": "Top up {amount} UZS"
+  },
+  "chat": {
+    "placeholder": "Message...",
+    "orderLink": "Order #{number} · {price}",
+    "photo": "Photo",
+    "send": "Send",
+    "attach": "Attach a photo",
+    "system": {
+      "ORDER_ACCEPTED": "The pro accepted the job",
+      "EXECUTOR_EN_ROUTE": "The pro set off",
+      "EXECUTOR_ARRIVED": "The pro has arrived",
+      "WORK_STARTED": "The pro started the work",
+      "WORK_FINISHED": "The pro finished the work",
+      "ORDER_CANCELLED": "The order was cancelled"
+    }
+  },
+  "errorsExtra": {
+    "userBlocked": "Your account is blocked.",
+    "uploadInvalid": "The photo did not upload. Please try again.",
+    "roleRequired": "Switch your role in the main menu to do this.",
+    "ownOrder": "You cannot accept your own job.",
+    "notAvailable": "Another pro has already taken this job.",
+    "statusConflict": "The order status has changed. Refresh the page.",
+    "timeInvalid": "Choose a valid time window.",
+    "categoryInvalid": "Choose a category.",
+    "paymentDisabled": "This payment method is not available right now.",
+    "cancelReasonRequired": "Choose a reason for cancelling.",
+    "chatClosed": "The chat for this order is closed."
   }
 }

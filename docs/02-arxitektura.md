@@ -191,10 +191,11 @@ Har bir tashqi xizmat uchun interfeys yoziladi va ikkita implementatsiya bo‘la
 
 ## 11. Mobil ilova
 
-- **Navigatsiya**: `expo-router`. Kirishdan keyin `active_role`ga qarab tablar:
-  - Buyurtmachi: Bosh sahifa, Buyurtmalar, Chatlar, Menyu.
-  - Usta: Buyurtmalar (Yangi / Mening ishlarim / Tarix), Hamyon, Menyu.
+- **Navigatsiya**: `expo-router`. Pastki tab paneli yo‘q — dizayn (BY1, BJ1) bo‘yicha bosh sahifa `active_role`ga qarab ochiladi, bo‘limlar sarlavha panelidagi tablarda, qolgani U1 yon menyusida:
+  - Buyurtmachi (BY1): Barchasi / Faol / Yakunlangan; buyurtma → BY3, chat (BY4) buyurtmadan ochiladi.
+  - Usta (BJ1): Yangi / Mening ishlarim / Tarix; hamyon sarlavhadagi balansdan va menyudan.
   - Admin va super admin bo‘limlari menyudan, faqat ruxsat bo‘lsa ochiladi.
+  - Buyurtma ekrani bitta (`/order/[id]`): buyurtmachiga BY3, ustaga BJ2 va ish qadamlari — `viewer_role`ga qarab.
 - **Holat boshqaruvi**: server ma’lumotlari uchun TanStack Query, sessiya va sozlamalar uchun Zustand.
 - **i18n**: `i18next` + `react-i18next` + `expo-localization`. Fayllar: `src/i18n/uz.json`, `ru.json`, `en.json`, `tg.json`. Backend xato kodlari i18n kalitlariga moslanadi. Hermes’da `Intl.PluralRules` bo‘lmasa, polyfill qo‘shiladi.
 - **Pul va sana formati**: o‘z yordamchi funksiyalari (`180 000 so‘m`, `18.10.2026`, `+998 90 123 45 67`). `Intl`ga tayanilmaydi.

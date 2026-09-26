@@ -2,6 +2,7 @@ import {
   formatAmount,
   formatDate,
   formatOrderNumber,
+  formatPercent,
   formatPhone,
   formatTime,
   GROUP_SEPARATOR as S,
@@ -61,5 +62,14 @@ describe('phones and order numbers', () => {
 
   it('prefixes order numbers with #', () => {
     expect(formatOrderNumber(1024)).toBe('#1024');
+  });
+});
+
+describe('formatPercent', () => {
+  it('turns basis points into a short percent (§6: 2.5%, 0.25%, 0.12%)', () => {
+    expect(formatPercent(250)).toBe('2.5');
+    expect(formatPercent(25)).toBe('0.25');
+    expect(formatPercent(12)).toBe('0.12');
+    expect(formatPercent(300)).toBe('3');
   });
 });

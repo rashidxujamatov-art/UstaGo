@@ -3,8 +3,8 @@ import { Public } from '../../common/auth/auth.decorators.js';
 import { SettingsService } from './settings.service.js';
 
 /**
- * Settings the app shows before sign-in (K2-K4): the texts use these values instead of
- * hard-coded numbers (CLAUDE.md rule 7). Money is a tiyin string.
+ * Settings the app shows in its texts and forms (K2-K4, BY2, BJ1) instead of hard-coded
+ * numbers (CLAUDE.md rule 7). Money is a tiyin string.
  */
 @Public()
 @Controller('config')
@@ -21,6 +21,8 @@ export class PublicConfigController {
       min_age_years: s.min_age_years,
       otp_length: s.otp_length,
       payment_methods_enabled: s.payment_methods_enabled,
+      order_photos_max: s.order_photos_max,
+      feed_nearby_radius_m: s.feed_nearby_radius_m,
     };
   }
 }

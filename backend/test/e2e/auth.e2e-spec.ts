@@ -154,6 +154,8 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       free_period_days: 30,
       demo_bonus: '2500000',
       min_age_years: 16,
+      order_photos_max: 5,
+      feed_nearby_radius_m: 5000,
     });
   });
 

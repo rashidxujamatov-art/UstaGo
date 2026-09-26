@@ -49,8 +49,8 @@ export interface OrderView {
     phone: string | null;
   };
   executor: { id: string; first_name: string; last_name: string; phone: string | null } | null;
-  /** Service fee reserved at acceptance; shown to the executor only (BJ2). */
-  fee: { fee: string; fee_demo: string; fee_real: string } | null;
+  /** Service fee reserved at acceptance and its rate snapshot; shown to the executor only (BJ2). */
+  fee: { fee: string; fee_demo: string; fee_real: string; fee_bps: number | null } | null;
   timeline: {
     created_at: string;
     accepted_at: string | null;
@@ -128,6 +128,7 @@ export function toOrderView(
             fee: order.fee.toString(),
             fee_demo: (order.feeDemo ?? 0n).toString(),
             fee_real: (order.feeReal ?? 0n).toString(),
+            fee_bps: order.feeBpsSnapshot,
           }
         : null,
     timeline: {

@@ -30,6 +30,17 @@ export const ERROR_MESSAGE_KEYS = {
   AUTH_IDENTITY_FAILED: 'identity.failed',
   AUTH_AGE_RESTRICTED: 'identity.ageRestricted',
   AUTH_DUPLICATE_PERSON: 'auth.duplicatePerson',
+  USER_BLOCKED: 'errorsExtra.userBlocked',
+  UPLOAD_INVALID: 'errorsExtra.uploadInvalid',
+  ORDER_ROLE_REQUIRED: 'errorsExtra.roleRequired',
+  ORDER_OWN: 'errorsExtra.ownOrder',
+  ORDER_NOT_AVAILABLE: 'errorsExtra.notAvailable',
+  ORDER_STATUS_CONFLICT: 'errorsExtra.statusConflict',
+  ORDER_TIME_INVALID: 'errorsExtra.timeInvalid',
+  ORDER_CATEGORY_INVALID: 'errorsExtra.categoryInvalid',
+  ORDER_PAYMENT_METHOD_DISABLED: 'errorsExtra.paymentDisabled',
+  ORDER_CANCEL_REASON_REQUIRED: 'errorsExtra.cancelReasonRequired',
+  CHAT_NOT_AVAILABLE: 'errorsExtra.chatClosed',
   ORDER_NOT_FOUND: 'order.notFound',
   ORDER_CUSTOMER_CONFIRMATION_REQUIRED: 'order.customerConfirmRequired',
   ORDER_EXECUTOR_CONFIRMATION_REQUIRED: 'order.executorConfirmRequired',
@@ -47,7 +58,7 @@ export interface ApiErrorBody {
 }
 
 /** Parameters that carry money (tiyin strings) and must be shown as formatted amounts. */
-const MONEY_PARAMS = new Set(['shortfall', 'must_keep', 'max', 'fee']);
+const MONEY_PARAMS = new Set(['shortfall', 'required', 'available', 'must_keep', 'max', 'fee']);
 
 function isErrorCode(code: string): code is ErrorCode {
   return Object.hasOwn(ERROR_MESSAGE_KEYS, code);

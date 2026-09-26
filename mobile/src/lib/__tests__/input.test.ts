@@ -9,6 +9,8 @@ import {
   isValidDocNumber,
   isValidEmail,
   phoneDigits,
+  priceDigits,
+  somDigitsToTiyin,
   toE164,
 } from '../input';
 
@@ -77,5 +79,18 @@ describe('misc', () => {
     expect(initials(null, null)).toBe('?');
     expect(formatCountdown(42)).toBe('0:42');
     expect(formatCountdown(61.2)).toBe('1:02');
+  });
+});
+
+describe('price input (BY2)', () => {
+  it('keeps whole so‘m digits without leading zeros', () => {
+    expect(priceDigits('500 000 so‘m')).toBe('500000');
+    expect(priceDigits('007')).toBe('7');
+    expect(priceDigits('1234567890123456')).toBe('123456789012');
+  });
+
+  it('sends the price in tiyin', () => {
+    expect(somDigitsToTiyin('500000')).toBe('50000000');
+    expect(somDigitsToTiyin('')).toBeNull();
   });
 });

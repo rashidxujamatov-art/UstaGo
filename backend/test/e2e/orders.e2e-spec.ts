@@ -168,7 +168,7 @@ describe.skipIf(!e2eEnabled)('orders flow (e2e)', () => {
       .expect(200);
     expect(accepted.body).toMatchObject({
       status: 'ACCEPTED',
-      fee: { fee: som(4_500), fee_demo: som(4_500), fee_real: '0' },
+      fee: { fee: som(4_500), fee_demo: som(4_500), fee_real: '0', fee_bps: 250 },
     });
     expect(accepted.body.customer.phone).toBe(customer.phone);
     const wallet = await h.api().get('/api/v1/wallet').set(executor.auth).expect(200);
