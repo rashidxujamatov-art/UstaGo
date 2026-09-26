@@ -474,6 +474,8 @@ model LedgerTransaction {
   id             String   @id @default(uuid(7)) @db.Uuid
   type           String
   orderId        String?  @map("order_id") @db.Uuid
+  /// Top-ups and order payments: the provider payment behind the posting.
+  paymentId      String?  @map("payment_id") @db.Uuid
   idempotencyKey String   @unique @map("idempotency_key")
   createdBy      String?  @map("created_by") @db.Uuid
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -548,12 +550,113 @@ model Withdrawal {
   feeBps         Int              @map("fee_bps")
   status         WithdrawalStatus @default(REQUESTED)
   idempotencyKey String           @unique @map("idempotency_key")
+  /// Destination card (BJ7).
+  cardId         String?          @map("card_id") @db.Uuid
+  /// Payout provider reference.
+  providerRef    String?          @map("provider_ref")
+  processedAt    DateTime?        @map("processed_at") @db.Timestamptz(3)
   failureReason  String?          @map("failure_reason")
   createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@index([userId, createdAt])
   @@map("withdrawals")
+}
+
+// ---------------------------------------------------------------------------
+// Payments (docs/01-biznes-qoidalar.md §5, §7; docs/02-arxitektura.md §9)
+// ---------------------------------------------------------------------------
+
+enum PaymentProvider {
+  PAYME
+  CLICK
+  CARD
+}
+
+enum PaymentPurpose {
+  TOPUP
+  ORDER
+}
+
+/// CREATED: link or QR issued; PENDING: the provider opened its transaction (Payme
+/// CreateTransaction, Click Prepare); PAID: money booked; REFUNDED: cancelled after PAID.
+enum PaymentStatus {
+  CREATED
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+  EXPIRED
+}
+
+/**
+ * One attempt to pay through a provider: a top-up (BJ6) or an order (BY5, the BJ4 QR).
+ * The provider sees our id as its account field (Payme `payment_id`, Click
+ * `merchant_trans_id`), so a callback always resolves to exactly one row.
+ */
+model Payment {
+  id                String          @id @default(uuid(7)) @db.Uuid
+  /// Numeric id for providers that want an integer (Click merchant_prepare_id).
+  seq               Int             @unique @default(autoincrement())
+  provider          PaymentProvider
+  purpose           PaymentPurpose
+  /// Who pays: the top-up owner or the order's customer.
+  userId            String          @map("user_id") @db.Uuid
+  orderId           String?         @map("order_id") @db.Uuid
+  /// The executor who showed the QR (BJ4); null when the payer started it.
+  createdBy         String?         @map("created_by") @db.Uuid
+  /// Tiyin; the provider must pay exactly this amount.
+  amount            BigInt
+  status            PaymentStatus   @default(CREATED)
+  /// Payme transaction id, Click click_trans_id or card receipt id.
+  providerTxnId     String?         @map("provider_txn_id")
+  /// When the provider transaction was opened on our side (Payme create_time).
+  providerCreatedAt DateTime?       @map("provider_created_at") @db.Timestamptz(3)
+  performedAt       DateTime?       @map("performed_at") @db.Timestamptz(3)
+  cancelledAt       DateTime?       @map("cancelled_at") @db.Timestamptz(3)
+  /// Payme cancel reason or Click error code.
+  cancelReason      Int?            @map("cancel_reason")
+  cardId            String?         @map("card_id") @db.Uuid
+  /// The link / QR stops working after this (qr_payment_ttl_sec for BJ4).
+  expiresAt         DateTime        @map("expires_at") @db.Timestamptz(3)
+  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@unique([provider, providerTxnId])
+  @@index([orderId])
+  @@index([userId, createdAt])
+  @@index([status, expiresAt])
+  @@map("payments")
+}
+
+enum CardBrand {
+  UZCARD
+  HUMO
+  VISA
+  MASTERCARD
+}
+
+/**
+ * A bank card saved through the card provider (BY5, BJ6, BJ7). Only the provider token is
+ * kept, encrypted (CARD_TOKEN_ENC_KEY); never the full number.
+ */
+model Card {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  provider   String
+  tokenEnc   Bytes     @map("token_enc")
+  /// "8600 **** **** 4417".
+  maskedPan  String    @map("masked_pan")
+  brand      CardBrand
+  /// MM/YY.
+  expire     String
+  /// Set after the SMS code check; unverified cards are not offered.
+  verifiedAt DateTime? @map("verified_at") @db.Timestamptz(3)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(3)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("cards")
 }
 
 model MapsUsage {

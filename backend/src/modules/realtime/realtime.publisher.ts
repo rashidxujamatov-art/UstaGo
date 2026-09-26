@@ -4,7 +4,8 @@ import type { Redis } from 'ioredis';
 import { REDIS } from '../../infra/redis/redis.module.js';
 
 /** Events sent to the app (docs/02-arxitektura.md §7). */
-export type RealtimeEvent = 'order.status' | 'chat.message' | 'chat.read' | 'notification';
+export type RealtimeEvent =
+  'order.status' | 'payment.status' | 'chat.message' | 'chat.read' | 'notification';
 
 export const userRoom = (userId: string) => `user:${userId}`;
 export const orderRoom = (orderId: string) => `order:${orderId}`;

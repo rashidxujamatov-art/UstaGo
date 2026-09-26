@@ -26,6 +26,9 @@ export const queryKeys = {
   messages: (id: string) => ['messages', id] as const,
   walletTransactions: ['wallet-transactions'] as const,
   referrals: ['referrals'] as const,
+  cards: ['cards'] as const,
+  payment: (id: string) => ['payment', id] as const,
+  withdrawPreview: (amount: string | null) => ['withdraw-preview', amount] as const,
 };
 
 export const useConfig = () => useQuery({ queryKey: queryKeys.config, queryFn: endpoints.config });
@@ -84,6 +87,27 @@ export const useWalletTransactions = () =>
 
 export const useReferrals = () =>
   useQuery({ queryKey: queryKeys.referrals, queryFn: endpoints.referrals });
+
+export const useCards = () => useQuery({ queryKey: queryKeys.cards, queryFn: endpoints.cards });
+
+/** A payment in progress; polls while it is open (the payment.status event also refreshes it). */
+export const usePayment = (id: string | null) =>
+  useQuery({
+    queryKey: queryKeys.payment(id ?? ''),
+    queryFn: () => endpoints.payment(id ?? ''),
+    enabled: id !== null,
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === 'CREATED' || status === 'PENDING' ? 4_000 : false;
+    },
+  });
+
+export const useWithdrawPreview = (amount: string | null) =>
+  useQuery({
+    queryKey: queryKeys.withdrawPreview(amount),
+    queryFn: () => endpoints.withdrawPreview(amount ?? undefined),
+    placeholderData: (previous) => previous,
+  });
 
 /** Everything that shows an order, its lists or the balance it holds. */
 export function invalidateOrder(client: QueryClient, orderId: string): void {

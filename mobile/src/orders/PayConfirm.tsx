@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { Check, Flag } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +8,7 @@ import { AppText } from '../components/AppText';
 import { BarHeader } from '../components/ui/BarHeader';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { leave } from '../lib/navigation';
 import { useTheme } from '../theme/ThemeProvider';
 import { DangerLink, LockNote, StatusBanner } from './ConfirmParts';
 import { DisputeSheet } from './DisputeSheet';
@@ -104,7 +104,7 @@ export function PayConfirm({ order }: { order: Order }) {
             disabled={actions.busy !== null}
             onPress={() =>
               void actions.paid().then((done) => {
-                if (done) router.back();
+                if (done) leave({ pathname: '/order/[id]', params: { id: order.id } });
               })
             }
           />
@@ -125,7 +125,7 @@ export function PayConfirm({ order }: { order: Order }) {
         onConfirm={(note) =>
           void actions.dispute(note).then((done) => {
             setDisputeOpen(false);
-            if (done) router.back();
+            if (done) leave({ pathname: '/order/[id]', params: { id: order.id } });
           })
         }
       />

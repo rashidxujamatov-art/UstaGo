@@ -74,7 +74,7 @@ Kirish:
 - Manzil: xaritadagi belgi (lat, lng), manzil matni (Google geocoding), podyezd, qavat, xonadon, mo‘ljal (ixtiyoriy).
 - Vaqt oralig‘i (masalan, "Bugun, 10:30 – 13:00").
 - Narx (so‘mda). Narxni buyurtmachi qo‘yadi, savdolashish yo‘q.
-- To‘lov usuli: `BALANCE`, `CLICK`, `PAYME`, `CARD`, `CASH` (§5).
+- To‘lov usuli: `BALANCE`, `CLICK`, `PAYME`, `CARD`, `CASH` (§5). Buyurtma joylanganda tanlanadi va keyin o‘zgarmaydi: to‘lov faqat shu usulda qilinadi (BY5, BJ4).
 - Buyurtma raqami — ketma-ket, odam uchun qulay (`#1024`). Ichki ID — UUID.
 
 ### 3.2. Holatlar
@@ -391,6 +391,10 @@ Hal qilingan savollar (2026-09-26, 2-bosqich):
 - Qabul qilingan buyurtmani bekor qilish sabablari: usta endi kerak emas; boshqa usta topdim; usta kechikyapti yoki javob bermayapti; narx yoki shartlarda kelisha olmadik; boshqa sabab (matn bilan).
 - Boshlang‘ich kategoriyalar: Elektrik, Santexnik, Ta’mirlash, Tozalash, Mebel, Konditsioner va Boshqa. Keyin super admin o‘zgartiradi.
 - Demo bonus (§8) usta bepul davri boshlanganda ledger orqali `DEMO` hisobiga yoziladi — 2-bosqichdan: ish qabul qilish sharti (§4) balansga tayanadi.
+
+Hal qilingan savollar (2026-09-26, 4-bosqich):
+
+- To‘lov usulini ish tugagach almashtirib bo‘lmaydi: buyurtma joylanganda tanlangan usulda to‘lanadi. BY5 faqat shu usulni ko‘rsatadi; BJ4 (QR) faqat Click yoki Payme buyurtmasida, o‘sha provayder bilan ochiladi. Online buyurtmani naqdga o‘tkazish ("Naqd pulni qabul qildim") yo‘q.
 
 ## 14. Yuridik talablar (real pul bilan ishga tushirishdan oldin)
 

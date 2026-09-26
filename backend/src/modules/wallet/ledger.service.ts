@@ -9,6 +9,7 @@ export type LedgerTxType =
   | 'DEMO_EXPIRE'
   | 'ORDER_INCOME'
   | 'TOPUP'
+  | 'TOPUP_REFUND'
   | 'SERVICE_FEE'
   | 'REFERRAL_L1'
   | 'REFERRAL_L2'
@@ -27,6 +28,7 @@ export interface PostInput {
   type: LedgerTxType;
   idempotencyKey: string;
   orderId?: string | null;
+  paymentId?: string | null;
   createdBy?: string | null;
   entries: LedgerEntryInput[];
   /**
@@ -84,6 +86,7 @@ export class LedgerService {
         type: input.type,
         idempotencyKey: input.idempotencyKey,
         orderId: input.orderId ?? null,
+        paymentId: input.paymentId ?? null,
         createdBy: input.createdBy ?? null,
         entries: { create: input.entries.map(({ accountId, amount }) => ({ accountId, amount })) },
       },

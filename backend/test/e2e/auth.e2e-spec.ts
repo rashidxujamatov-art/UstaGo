@@ -55,6 +55,10 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       STORAGE_PROVIDER: 'mock',
       PUSH_PROVIDER: 'mock',
       OTP_TEST_MODE: 'false',
+      PAYMENT_TEST_MODE: 'false',
+      CARD_PROVIDER: 'mock',
+      CARD_TOKEN_ENC_KEY: Buffer.alloc(32, 5).toString('base64'),
+      PAYOUT_PROVIDER: 'mock',
       LOG_LEVEL: 'fatal',
     });
 
@@ -156,6 +160,8 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       min_age_years: 16,
       order_photos_max: 5,
       feed_nearby_radius_m: 5000,
+      topup_min: '100000',
+      withdraw_fee_bps: 100,
     });
   });
 

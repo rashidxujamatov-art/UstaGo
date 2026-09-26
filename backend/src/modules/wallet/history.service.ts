@@ -28,6 +28,8 @@ export interface HistoryItem {
   } | null;
   /** Referral rows: the pro who did the job. */
   from: { first_name: string; last_initial: string } | null;
+  /** Top-ups: PAYME, CLICK or CARD. */
+  provider: string | null;
 }
 
 export interface ReferralSummary {
@@ -54,6 +56,7 @@ interface Row {
   id: string;
   type: LedgerTxType;
   order_id: string | null;
+  payment_id: string | null;
   created_at: Date;
   amount: bigint;
   demo_amount: bigint;
@@ -75,7 +78,8 @@ export class WalletHistoryService {
   ): Promise<{ items: HistoryItem[]; next: string | null }> {
     const cursor = before ? Prisma.sql`AND t.id < ${before}::uuid` : Prisma.empty;
     const rows = await this.prisma.$queryRaw<Row[]>`
-      SELECT t.id::text AS id, t.type, t.order_id::text AS order_id, t.created_at,
+      SELECT t.id::text AS id, t.type, t.order_id::text AS order_id,
+             t.payment_id::text AS payment_id, t.created_at,
              SUM(e.amount)::bigint AS amount,
              SUM(CASE WHEN a.kind = 'DEMO' THEN e.amount ELSE 0 END)::bigint AS demo_amount
       FROM ledger_entries e
@@ -101,6 +105,12 @@ export class WalletHistoryService {
       },
     });
     const byId = new Map(orders.map((order) => [order.id, order]));
+    const paymentIds = page.flatMap((row) => (row.payment_id ? [row.payment_id] : []));
+    const payments = await this.prisma.payment.findMany({
+      where: { id: { in: paymentIds } },
+      select: { id: true, provider: true },
+    });
+    const providers = new Map(payments.map((payment) => [payment.id, payment.provider]));
 
     const items = page.map((row): HistoryItem => {
       const order = row.order_id ? byId.get(row.order_id) : undefined;
@@ -126,6 +136,7 @@ export class WalletHistoryService {
           referral && pro
             ? { first_name: pro.firstName, last_initial: pro.lastName.slice(0, 1) }
             : null,
+        provider: row.payment_id ? (providers.get(row.payment_id) ?? null) : null,
       };
     });
     return { items, next: rows.length > PAGE ? (page.at(-1)?.id ?? null) : null };

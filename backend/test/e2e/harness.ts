@@ -18,6 +18,9 @@ export const e2eRedisUrl = process.env.E2E_REDIS_URL;
 export const e2eEnabled = Boolean(e2eDatabaseUrl && e2eRedisUrl);
 export const realRedis = e2eEnabled && e2eRedisUrl !== 'mock';
 
+export const E2E_PAYME = { merchantId: 'e2e-merchant', key: 'e2e-payme-key' };
+export const E2E_CLICK = { serviceId: '1001', merchantId: '2002', secret: 'e2e-click-secret' };
+
 export interface Harness {
   app: INestApplication;
   api: () => ReturnType<typeof request>;
@@ -46,6 +49,17 @@ export async function createHarness(): Promise<Harness> {
     PUSH_PROVIDER: 'mock',
     OTP_TEST_MODE: 'false',
     LOG_LEVEL: 'fatal',
+    // Test merchants: the e2e tests play Payme and Click with these credentials.
+    PAYME_MERCHANT_ID: E2E_PAYME.merchantId,
+    PAYME_KEY: E2E_PAYME.key,
+    CLICK_SERVICE_ID: E2E_CLICK.serviceId,
+    CLICK_MERCHANT_ID: E2E_CLICK.merchantId,
+    CLICK_SECRET_KEY: E2E_CLICK.secret,
+    CARD_PROVIDER: 'mock',
+    CARD_TOKEN_ENC_KEY: Buffer.alloc(32, 5).toString('base64'),
+    PAYOUT_PROVIDER: 'mock',
+    FEATURE_PAYOUTS_ENABLED: 'true',
+    PAYMENT_TEST_MODE: 'false',
   });
 
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: e2eDatabaseUrl! }) });
@@ -53,7 +67,7 @@ export async function createHarness(): Promise<Harness> {
   await prisma.$executeRawUnsafe(
     `TRUNCATE users, invite_codes, audit_logs, settings, categories, orders, order_events,
        messages, wallet_accounts, ledger_transactions, ledger_entries, wallet_holds, withdrawals,
-       maps_usage
+       payments, cards, maps_usage
      RESTART IDENTITY CASCADE`,
   );
   await redis.flushdb();

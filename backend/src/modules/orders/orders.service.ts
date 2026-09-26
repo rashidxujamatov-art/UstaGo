@@ -43,6 +43,14 @@ const STEP_EFFECTS: Record<
 
 const FEED_LIMIT = 50;
 
+/** An online payment that committed; notifyOnlinePaid() sends the updates. */
+export interface OnlinePaid {
+  orderId: string;
+  executorId: string;
+  customerId: string;
+  fee: bigint;
+}
+
 /** Balances as the §4 acceptance check sees them: only demo that still counts. */
 function quoteBalances(b: WalletBalances) {
   return { real: b.real, demo: b.demoActive, heldDemo: b.heldDemo, heldReal: b.heldReal };
@@ -497,39 +505,95 @@ export class OrdersService {
   }
 
   /**
-   * Online payment confirmed (provider callback or balance payment, stage 4): the price
-   * goes to the executor and the job is settled (§5 steps 1–4). Returns false when the
-   * order was already paid, so a repeated callback changes nothing.
+   * Online payment confirmed (provider callback, card or balance payment): the price goes
+   * to the executor and the job is settled (§5 steps 1–4). Returns false when the order
+   * was already paid, so a repeated callback changes nothing.
    */
-  async settleOnlinePayment(orderId: string): Promise<boolean> {
-    const rule = ORDER_RULES.ONLINE_PAID;
-    const result = await this.prisma.$transaction(async (tx) => {
-      const [row] = await tx.$queryRaw<{ status: OrderStatus }[]>`
-        SELECT status FROM orders WHERE id = ${orderId}::uuid FOR UPDATE`;
-      if (!row) throw this.notFound();
-      if (row.status === 'PAID') return null;
-      const locked = await this.lockForPayment(tx, orderId, rule.from);
-      if (PARTY_CONFIRMED_METHODS.includes(locked.paymentMethod)) throw this.conflict(row.status);
-      await tx.order.update({
-        where: { id: orderId },
-        data: { status: rule.to, paidAt: new Date() },
-      });
-      const settled = await this.settlement.settle(tx, locked, null);
-      await this.event(tx, orderId, locked.status, rule.to, null, {
-        fee: settled.fee.toString(),
-      });
-      await this.chat.system(tx, { id: orderId, executorId: locked.executorId }, 'ORDER_PAID');
-      return { executorId: locked.executorId, customerId: locked.customerId, fee: settled.fee };
-    });
-    if (!result) return false;
-
-    await this.afterChange(orderId, rule.to, {
-      userId: result.executorId,
-      push: 'ORDER_PAID_FEE',
-      params: { fee: result.fee },
-    });
-    await this.notifyPaid(orderId, result.customerId);
+  async settleOnlinePayment(orderId: string, actorId: string | null = null): Promise<boolean> {
+    const paid = await this.prisma.$transaction((tx) =>
+      this.settleOnlineInTx(tx, orderId, actorId),
+    );
+    if (!paid) return false;
+    await this.notifyOnlinePaid(paid);
     return true;
+  }
+
+  /**
+   * The settlement part of an online payment inside the caller's transaction, so a
+   * provider transaction and the money it moves commit together. Null when already paid;
+   * ORDER_STATUS_CONFLICT when the order cannot be paid online now.
+   */
+  async settleOnlineInTx(
+    tx: Tx,
+    orderId: string,
+    actorId: string | null,
+  ): Promise<OnlinePaid | null> {
+    const rule = ORDER_RULES.ONLINE_PAID;
+    const [row] = await tx.$queryRaw<{ status: OrderStatus }[]>`
+      SELECT status FROM orders WHERE id = ${orderId}::uuid FOR UPDATE`;
+    if (!row) throw this.notFound();
+    if (row.status === 'PAID') return null;
+    const locked = await this.lockForPayment(tx, orderId, rule.from);
+    if (PARTY_CONFIRMED_METHODS.includes(locked.paymentMethod)) throw this.conflict(row.status);
+    await tx.order.update({
+      where: { id: orderId },
+      data: { status: rule.to, paidAt: new Date() },
+    });
+    const settled = await this.settlement.settle(tx, locked, actorId);
+    await this.event(tx, orderId, locked.status, rule.to, actorId, { fee: settled.fee.toString() });
+    await this.chat.system(tx, { id: orderId, executorId: locked.executorId }, 'ORDER_PAID');
+    return {
+      orderId,
+      executorId: locked.executorId,
+      customerId: locked.customerId,
+      fee: settled.fee,
+    };
+  }
+
+  /** Real-time updates and pushes once an online payment has committed. */
+  async notifyOnlinePaid(paid: OnlinePaid): Promise<void> {
+    await this.afterChange(paid.orderId, 'PAID', {
+      userId: paid.executorId,
+      push: 'ORDER_PAID_FEE',
+      params: { fee: paid.fee },
+    });
+    await this.notifyPaid(paid.orderId, paid.customerId);
+  }
+
+  /** BY5 "Hisobdan o‘tkazish": a BALANCE order paid from the customer's REAL account. */
+  async payFromBalance(userId: string, orderId: string): Promise<OrderView> {
+    const order = await this.findForParty(orderId, userId);
+    if (order.customerId !== userId) throw this.notFound();
+    if (order.paymentMethod !== 'BALANCE') {
+      throw new AppError(
+        ErrorCode.ORDER_PAYMENT_METHOD_MISMATCH,
+        { method: order.paymentMethod },
+        HttpStatus.CONFLICT,
+      );
+    }
+    await this.settleOnlinePayment(orderId, userId);
+    return this.get(userId, orderId);
+  }
+
+  /** Who may pay an order online and how much (BY5, the BJ4 QR, provider callbacks). */
+  async payableOrder(orderId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      select: {
+        id: true,
+        number: true,
+        status: true,
+        price: true,
+        paymentMethod: true,
+        customerId: true,
+        executorId: true,
+      },
+    });
+    if (!order) throw this.notFound();
+    return {
+      ...order,
+      payable: ORDER_RULES.ONLINE_PAID.from.includes(order.status),
+    };
   }
 
   /**

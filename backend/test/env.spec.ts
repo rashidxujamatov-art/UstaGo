@@ -14,6 +14,9 @@ const valid = {
   MAPS_PROVIDER: 'mock',
   STORAGE_PROVIDER: 'mock',
   PUSH_PROVIDER: 'mock',
+  CARD_PROVIDER: 'mock',
+  CARD_TOKEN_ENC_KEY: Buffer.alloc(32, 2).toString('base64'),
+  PAYOUT_PROVIDER: 'mock',
 };
 
 describe('validateEnv', () => {
@@ -24,6 +27,8 @@ describe('validateEnv', () => {
       CORS_ORIGINS: [],
       FEATURE_PAYOUTS_ENABLED: false,
       OTP_TEST_MODE: false,
+      PAYMENT_TEST_MODE: false,
+      PAYME_CHECKOUT_URL: 'https://checkout.paycom.uz',
       ACCESS_TOKEN_TTL_SEC: 900,
       REFRESH_TOKEN_TTL_DAYS: 30,
     });
@@ -74,6 +79,17 @@ describe('validateEnv', () => {
     );
     expect(() => validateEnv({ ...valid, SMS_PROVIDER: 'eskiz' })).toThrow(
       /ESKIZ_EMAIL[\s\S]*ESKIZ_PASSWORD[\s\S]*ESKIZ_FROM/,
+    );
+    expect(() => validateEnv({ ...valid, NODE_ENV: 'production' })).toThrow(/CARD_PROVIDER/);
+    expect(() => validateEnv({ ...valid, CARD_PROVIDER: 'payme' })).toThrow(
+      /PAYME_MERCHANT_ID[\s\S]*PAYME_KEY/,
+    );
+  });
+
+  it('allows the payment test mode only in development', () => {
+    expect(validateEnv({ ...valid, PAYMENT_TEST_MODE: 'true' }).PAYMENT_TEST_MODE).toBe(true);
+    expect(() => validateEnv({ ...valid, NODE_ENV: 'staging', PAYMENT_TEST_MODE: 'true' })).toThrow(
+      /PAYMENT_TEST_MODE/,
     );
   });
 });

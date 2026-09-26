@@ -18,6 +18,8 @@ export interface Shortfall {
   required: string;
   available: string;
   feeBps: number;
+  /** The job the top-up is for (BJ6 "#1052 buyurtmani olish uchun yetadi"). */
+  orderNumber?: number;
 }
 
 interface InsufficientSheetProps {
@@ -72,9 +74,15 @@ export function InsufficientSheet({ value, onClose }: InsufficientSheetProps) {
           icon={Plus}
           title={t('insufficient.topUp', { amount: texts.amount(amount) })}
           onPress={() => {
-            // Top-up (BJ6) arrives with the payments stage.
             close();
-            router.push('/soon');
+            router.push({
+              pathname: '/wallet/topup',
+              params: {
+                amount: amount.toString(),
+                required: value.required,
+                ...(value.orderNumber ? { order: String(value.orderNumber) } : {}),
+              },
+            });
           }}
         />
       }

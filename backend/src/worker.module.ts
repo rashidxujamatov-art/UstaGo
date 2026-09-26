@@ -16,6 +16,14 @@ import {
   OrderExpiryScheduler,
 } from './modules/orders/order-expiry.processor.js';
 import { OrdersModule } from './modules/orders/orders.module.js';
+import {
+  PAYMENTS_QUEUE,
+  PaymentsProcessor,
+  PaymentsScheduler,
+  PayoutsProcessor,
+} from './modules/payments/payments.processor.js';
+import { PaymentsModule } from './modules/payments/payments.module.js';
+import { PAYOUTS_QUEUE } from './modules/payments/payouts.service.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
 import {
@@ -43,7 +51,12 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
     PrismaModule,
     RedisModule,
     QueuesModule,
-    BullModule.registerQueue({ name: ORDERS_QUEUE }, { name: WALLET_QUEUE }),
+    BullModule.registerQueue(
+      { name: ORDERS_QUEUE },
+      { name: WALLET_QUEUE },
+      { name: PAYMENTS_QUEUE },
+      { name: PAYOUTS_QUEUE },
+    ),
     CommonModule,
     AuditModule,
     NotificationsModule,
@@ -51,7 +64,16 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
     SettingsModule,
     OrdersModule,
     WalletModule,
+    PaymentsModule,
   ],
-  providers: [OrderExpiryScheduler, OrderExpiryProcessor, FreePeriodScheduler, FreePeriodProcessor],
+  providers: [
+    OrderExpiryScheduler,
+    OrderExpiryProcessor,
+    FreePeriodScheduler,
+    FreePeriodProcessor,
+    PaymentsScheduler,
+    PaymentsProcessor,
+    PayoutsProcessor,
+  ],
 })
 export class WorkerModule {}

@@ -20,7 +20,7 @@ import { DisputeSheet } from './DisputeSheet';
 import { DetailRow, Footer, PhotoStrip } from './OrderParts';
 import { PartyCard } from './PartyCard';
 import { usePaymentActions } from './payment-actions';
-import { awaitsCustomerPaid, canCancel, canDispute } from './status';
+import { awaitsCustomerPaid, awaitsOnlinePayment, canCancel, canDispute } from './status';
 import { useOrderTexts } from './texts';
 import { Timeline } from './Timeline';
 import { showNotice } from '../lib/notice';
@@ -60,17 +60,16 @@ export function CustomerOrder({ order, refreshing, onRefresh }: CustomerOrderPro
     }
   };
 
-  // Online payment (BY5, QR) arrives with stage 4; cash and Xolis are confirmed on BY9.
+  // Online jobs are paid on BY5; cash and Xolis are confirmed on BY9.
+  const payOnline = awaitsOnlinePayment(order);
   const footerText =
-    order.status === 'DONE_BY_EXECUTOR' && !awaitsCustomerPaid(order)
-      ? t('confirm.onlineNext')
-      : order.status === 'COMPLETED'
-        ? t('confirm.waitingExecutor')
-        : order.status === 'DISPUTED'
-          ? t('confirm.disputed')
-          : order.status === 'PAID'
-            ? t('confirm.closed')
-            : null;
+    order.status === 'COMPLETED' && !payOnline
+      ? t('confirm.waitingExecutor')
+      : order.status === 'DISPUTED'
+        ? t('confirm.disputed')
+        : order.status === 'PAID'
+          ? t('confirm.closed')
+          : null;
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.bg2 }}>
@@ -159,7 +158,7 @@ export function CustomerOrder({ order, refreshing, onRefresh }: CustomerOrderPro
         <View style={{ height: insets.bottom }} />
       </ScrollView>
 
-      {footerText || awaitsCustomerPaid(order) ? (
+      {footerText || awaitsCustomerPaid(order) || payOnline ? (
         <Footer>
           <View style={{ gap: theme.spacing.xs, paddingBottom: insets.bottom }}>
             {awaitsCustomerPaid(order) ? (
@@ -168,6 +167,14 @@ export function CustomerOrder({ order, refreshing, onRefresh }: CustomerOrderPro
                 title={t('confirm.iPaid', { amount: texts.money(order.price) })}
                 onPress={() =>
                   router.push({ pathname: '/order/[id]/confirm', params: { id: order.id } })
+                }
+              />
+            ) : payOnline ? (
+              <Button
+                icon={Check}
+                title={t('order.payAccept')}
+                onPress={() =>
+                  router.push({ pathname: '/order/[id]/pay', params: { id: order.id } })
                 }
               />
             ) : (

@@ -8,6 +8,7 @@ import {
   type LucideIcon,
   MapPin,
   Navigation,
+  QrCode,
   User,
 } from 'lucide-react-native';
 import { type ReactNode, useState } from 'react';
@@ -41,6 +42,8 @@ import { PaymentTag } from './PaymentTag';
 import { usePaymentActions } from './payment-actions';
 import {
   awaitsExecutorReceived,
+  awaitsOnlinePayment,
+  hasPaymentQr,
   canDecline,
   canDispute,
   type ExecutorStep,
@@ -92,6 +95,7 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
           required: String(params.required ?? '0'),
           available: String(params.available ?? '0'),
           feeBps: preview.data?.fee_bps ?? 0,
+          orderNumber: order.number,
         });
       } else if (
         error instanceof ApiError &&
@@ -293,6 +297,16 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
                 />
               ) : null}
             </>
+          ) : mine && hasPaymentQr(order) ? (
+            <Button
+              icon={QrCode}
+              title={t('job.takePayment')}
+              onPress={() => router.push({ pathname: '/order/[id]/qr', params: { id: order.id } })}
+            />
+          ) : mine && awaitsOnlinePayment(order) ? (
+            <AppText color="text2" style={{ textAlign: 'center' }}>
+              {t('job.waitingOnline')}
+            </AppText>
           ) : mine && awaitsExecutorReceived(order) ? (
             <>
               <Button

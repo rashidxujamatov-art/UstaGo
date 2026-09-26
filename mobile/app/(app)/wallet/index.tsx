@@ -4,17 +4,17 @@ import type { ReactNode } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useWallet, useWalletTransactions } from '../../src/api/queries';
-import { AppText } from '../../src/components/AppText';
-import { BarHeader } from '../../src/components/ui/BarHeader';
-import { Button } from '../../src/components/ui/Button';
-import { Card, Separator } from '../../src/components/ui/Card';
-import { formatDate } from '../../src/lib/format';
-import { OrderPlaceholder } from '../../src/orders/OrderParts';
-import { useOrderTexts } from '../../src/orders/texts';
-import { useTheme } from '../../src/theme/ThemeProvider';
-import { TransactionRow } from '../../src/wallet/TransactionRow';
-import { useErrorText } from '../../src/api/use-error-text';
+import { useWallet, useWalletTransactions } from '../../../src/api/queries';
+import { AppText } from '../../../src/components/AppText';
+import { BarHeader } from '../../../src/components/ui/BarHeader';
+import { Button } from '../../../src/components/ui/Button';
+import { Card, Separator } from '../../../src/components/ui/Card';
+import { formatDate } from '../../../src/lib/format';
+import { OrderPlaceholder } from '../../../src/orders/OrderParts';
+import { useOrderTexts } from '../../../src/orders/texts';
+import { useTheme } from '../../../src/theme/ThemeProvider';
+import { TransactionRow } from '../../../src/wallet/TransactionRow';
+import { useErrorText } from '../../../src/api/use-error-text';
 
 /** BJ5 "Hamyon": balance, demo bonus and the history of every movement (docs/01 §7). */
 export default function WalletScreen() {
@@ -153,17 +153,16 @@ export default function WalletScreen() {
           </View>
 
           <View style={{ flexDirection: 'row', gap: theme.spacing.md }}>
-            {/* Top-up (BJ6) and withdrawal (BJ7) arrive with the payments stage. */}
             <CardAction
               icon={Plus}
               label={t('wallet.topUp')}
               light
-              onPress={() => router.push('/soon')}
+              onPress={() => router.push('/wallet/topup')}
             />
             <CardAction
               icon={ArrowUpRight}
               label={t('wallet.withdraw')}
-              onPress={() => router.push('/soon')}
+              onPress={() => router.push('/wallet/withdraw')}
             />
           </View>
         </View>

@@ -23,6 +23,8 @@ export class PublicConfigController {
       payment_methods_enabled: s.payment_methods_enabled,
       order_photos_max: s.order_photos_max,
       feed_nearby_radius_m: s.feed_nearby_radius_m,
+      topup_min: s.topup_min.toString(),
+      withdraw_fee_bps: s.withdraw_fee_bps,
     };
   }
 }

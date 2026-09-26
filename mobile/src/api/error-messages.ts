@@ -49,6 +49,15 @@ export const ERROR_MESSAGE_KEYS = {
   WALLET_INSUFFICIENT_FUNDS: 'wallet.insufficientFunds',
   WALLET_WITHDRAW_EXCEEDS_LIMIT: 'wallet.withdrawMustKeep',
   TAX_METHOD_REQUIRED: 'tax.required',
+  PAYMENT_AMOUNT_INVALID: 'payErrors.amountInvalid',
+  PAYMENT_PROVIDER_UNAVAILABLE: 'payErrors.providerUnavailable',
+  PAYMENT_NOT_AVAILABLE: 'payErrors.notAvailable',
+  CARD_INVALID: 'payErrors.cardInvalid',
+  CARD_NOT_SUPPORTED: 'payErrors.cardNotSupported',
+  CARD_CODE_INVALID: 'payErrors.cardCodeInvalid',
+  CARD_DECLINED: 'payErrors.cardDeclined',
+  CARD_NOT_FOUND: 'payErrors.cardNotFound',
+  WITHDRAWALS_DISABLED: 'payErrors.withdrawalsDisabled',
 } as const;
 
 export type ErrorCode = keyof typeof ERROR_MESSAGE_KEYS;
@@ -59,7 +68,15 @@ export interface ApiErrorBody {
 }
 
 /** Parameters that carry money (tiyin strings) and must be shown as formatted amounts. */
-const MONEY_PARAMS = new Set(['shortfall', 'required', 'available', 'must_keep', 'max', 'fee']);
+const MONEY_PARAMS = new Set([
+  'shortfall',
+  'required',
+  'available',
+  'must_keep',
+  'max',
+  'fee',
+  'min',
+]);
 
 function isErrorCode(code: string): code is ErrorCode {
   return Object.hasOwn(ERROR_MESSAGE_KEYS, code);

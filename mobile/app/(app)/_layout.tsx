@@ -27,7 +27,17 @@ function useLiveUpdates() {
       void client.invalidateQueries({ queryKey: queryKeys.messages(payload.order_id) }),
     [client],
   );
+  const onPayment = useCallback(
+    (payload: { payment_id: string; order_id: string | null }) => {
+      void client.invalidateQueries({ queryKey: queryKeys.payment(payload.payment_id) });
+      void client.invalidateQueries({ queryKey: queryKeys.wallet });
+      void client.invalidateQueries({ queryKey: queryKeys.walletTransactions });
+      if (payload.order_id) invalidateOrder(client, payload.order_id);
+    },
+    [client],
+  );
   useRealtime('order.status', onStatus);
+  useRealtime('payment.status', onPayment);
   useRealtime('chat.message', onChat);
   useRealtime('chat.read', onChat);
 }
