@@ -40,6 +40,7 @@ export const ERROR_MESSAGE_KEYS = {
   ORDER_CATEGORY_INVALID: 'errorsExtra.categoryInvalid',
   ORDER_PAYMENT_METHOD_DISABLED: 'errorsExtra.paymentDisabled',
   ORDER_CANCEL_REASON_REQUIRED: 'errorsExtra.cancelReasonRequired',
+  ORDER_PAYMENT_METHOD_MISMATCH: 'errorsExtra.paymentMismatch',
   CHAT_NOT_AVAILABLE: 'errorsExtra.chatClosed',
   ORDER_NOT_FOUND: 'order.notFound',
   ORDER_CUSTOMER_CONFIRMATION_REQUIRED: 'order.customerConfirmRequired',

@@ -1,4 +1,4 @@
-import { type QueryClient, useQuery } from '@tanstack/react-query';
+import { type QueryClient, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { endpoints } from './endpoints';
 
 /** TanStack Query keys and hooks for server data (docs/02-arxitektura.md §11). */
@@ -24,6 +24,8 @@ export const queryKeys = {
   jobs: (scope: 'active' | 'history') => ['jobs', scope] as const,
   acceptPreview: (id: string) => ['accept-preview', id] as const,
   messages: (id: string) => ['messages', id] as const,
+  walletTransactions: ['wallet-transactions'] as const,
+  referrals: ['referrals'] as const,
 };
 
 export const useConfig = () => useQuery({ queryKey: queryKeys.config, queryFn: endpoints.config });
@@ -41,8 +43,8 @@ export const useWallet = () => useQuery({ queryKey: queryKeys.wallet, queryFn: e
 export const useMyOrders = () =>
   useQuery({ queryKey: queryKeys.orders, queryFn: () => endpoints.myOrders('all') });
 
-export const useOrder = (id: string) =>
-  useQuery({ queryKey: queryKeys.order(id), queryFn: () => endpoints.order(id) });
+export const useOrder = (id: string, enabled = true) =>
+  useQuery({ queryKey: queryKeys.order(id), queryFn: () => endpoints.order(id), enabled });
 
 /** New jobs are not pushed to every executor, so the feed also refreshes on a timer. */
 export const useFeed = (filter: FeedFilter, coords: Coords | null) =>
@@ -71,6 +73,18 @@ export const useMessages = (id: string) =>
     staleTime: 0,
   });
 
+/** BJ5 "Tarix", page by page. */
+export const useWalletTransactions = () =>
+  useInfiniteQuery({
+    queryKey: queryKeys.walletTransactions,
+    queryFn: ({ pageParam }) => endpoints.walletTransactions(pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next ?? undefined,
+  });
+
+export const useReferrals = () =>
+  useQuery({ queryKey: queryKeys.referrals, queryFn: endpoints.referrals });
+
 /** Everything that shows an order, its lists or the balance it holds. */
 export function invalidateOrder(client: QueryClient, orderId: string): void {
   void client.invalidateQueries({ queryKey: queryKeys.order(orderId) });
@@ -79,4 +93,5 @@ export function invalidateOrder(client: QueryClient, orderId: string): void {
   void client.invalidateQueries({ queryKey: ['jobs'] });
   void client.invalidateQueries({ queryKey: queryKeys.acceptPreview(orderId) });
   void client.invalidateQueries({ queryKey: queryKeys.wallet });
+  void client.invalidateQueries({ queryKey: queryKeys.walletTransactions });
 }

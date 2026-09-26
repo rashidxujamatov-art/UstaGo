@@ -176,7 +176,42 @@
   "wallet": {
     "insufficientToAccept": "Top up {shortfall} UZS more to take this job.",
     "insufficientFunds": "Not enough money in your balance.",
-    "withdrawMustKeep": "{must_keep} UZS must stay in your balance for the app service fee. You can withdraw up to {max} UZS (1% bank transfer fee: {fee} UZS)."
+    "withdrawMustKeep": "{must_keep} UZS must stay in your balance for the app service fee. You can withdraw up to {max} UZS (1% bank transfer fee: {fee} UZS).",
+    "title": "Wallet",
+    "freeBadge": "Free · {days} d",
+    "total": "Total balance",
+    "real": "Main account",
+    "realHint": "can be withdrawn",
+    "demo": "Demo bonus",
+    "demoOf": "/ {total}",
+    "topUp": "Top up",
+    "withdraw": "Withdraw",
+    "demoInfo": "During the free month the service fee is taken from the demo bonus first. The demo bonus <b>cannot be withdrawn</b> — it is valid until {date}.",
+    "held": "Service fee reserved: {amount}",
+    "history": "History",
+    "empty": "No transactions yet",
+    "more": "Show more",
+    "demoBadge": "DEMO",
+    "demoPart": "of which demo {amount}",
+    "tx": {
+      "ORDER_INCOME": "Income · #{number}",
+      "SERVICE_FEE": "Service fee · #{number}",
+      "REFERRAL_L1": "Referral bonus · level 1",
+      "REFERRAL_L2": "Referral bonus · level 2",
+      "TOPUP": "Top-up",
+      "WITHDRAWAL": "Withdrawal",
+      "WITHDRAWAL_FEE": "Bank fee",
+      "WITHDRAWAL_REFUND": "Withdrawal returned",
+      "WITHDRAWAL_FEE_REFUND": "Bank fee returned",
+      "DEMO_BONUS": "Demo bonus",
+      "DEMO_EXPIRE": "Demo bonus expired"
+    },
+    "sub": {
+      "income": "{method} · {when}",
+      "fee": "{percent}% · {when}",
+      "feeCash": "Cash job · {when}",
+      "referral": "Job done by {name} · {when}"
+    }
   },
   "tax": {
     "required": "Your free month has ended. Choose a tax method to keep working."
@@ -278,7 +313,8 @@
     "started": "Work started",
     "finished": "Pro finished the work",
     "checkAndAccept": "Check the work and accept it",
-    "payment": "Payment"
+    "payment": "Payment",
+    "disputed": "Dispute opened"
   },
   "newOrder": {
     "title": "New job",
@@ -384,7 +420,11 @@
       "EXECUTOR_ARRIVED": "The pro has arrived",
       "WORK_STARTED": "The pro started the work",
       "WORK_FINISHED": "The pro finished the work",
-      "ORDER_CANCELLED": "The order was cancelled"
+      "ORDER_CANCELLED": "The order was cancelled",
+      "CUSTOMER_PAID": "The customer tapped “I paid”",
+      "PAYMENT_RECEIVED": "The pro received the money, the order is closed",
+      "ORDER_PAID": "Payment received, the order is closed",
+      "DISPUTE_OPENED": "A dispute was opened, an admin will review it"
     }
   },
   "errorsExtra": {
@@ -398,6 +438,72 @@
     "categoryInvalid": "Choose a category.",
     "paymentDisabled": "This payment method is not available right now.",
     "cancelReasonRequired": "Choose a reason for cancelling.",
-    "chatClosed": "The chat for this order is closed."
+    "chatClosed": "The chat for this order is closed.",
+    "paymentMismatch": "This is only for cash and Xolis payments."
+  },
+  "referral": {
+    "title": "Referral programme",
+    "heading": "Invite your friends",
+    "sub": "You get a bonus from every job done by the pros you invited.",
+    "you": "You",
+    "level1": "Level 1",
+    "level2": "Level 2",
+    "people": "{count} invited",
+    "total": "Your bonuses",
+    "note": "The platform pays the bonus, in the free month too — the pro earns just as much.",
+    "linkTitle": "Your invite link",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "share": "Share link",
+    "shareMessage": "{appName} — find a pro or take jobs. My invite link: {link}",
+    "recent": "Latest bonuses",
+    "recentEmpty": "Bonuses appear here once the pros you invited complete jobs.",
+    "recentSub": "{level} · {price} UZS job"
+  },
+  "confirm": {
+    "payTitle": "Confirm payment",
+    "orderLine": "Order #{number} · {title}",
+    "finished": "The pro finished the work",
+    "finishedSub": "{name} · {when}",
+    "amountLabel": "Amount to pay the pro",
+    "amountNote": "The amount was agreed in the order and does not change.",
+    "howTitle": "How it is confirmed",
+    "stepCash": "Give the pro the money in cash",
+    "stepXolis": "Pay to the pro’s Xolis QR code",
+    "stepPress": "Tap “I paid”",
+    "stepExecutor": "The pro taps “Money received” — the order is closed",
+    "lockCustomer": "You cannot post a new order until you tap “I paid”.",
+    "iPaid": "I paid — {amount}",
+    "problem": "Report a problem",
+    "receiveTitle": "Confirm the payment",
+    "receiveLine": "Order #{number} · {name}",
+    "customerPaid": "The customer tapped “I paid”",
+    "customerPaidSub": "{when} · {method}",
+    "customerNotYet": "The customer has not tapped “I paid” yet",
+    "customerNotYetSub": "If you have the money, you can confirm it",
+    "settlement": "Settlement",
+    "receivedCash": "Money you received",
+    "receivedXolis": "Paid to your Xolis wallet",
+    "fee": "Service fee {percent}%",
+    "feeDemo": "Service fee {percent}%, from demo",
+    "net": "Your net income",
+    "balance": "Your balance",
+    "heldNote": "{fee} UZS was reserved when you took the job — it is now taken automatically.",
+    "lockExecutor": "You cannot take new jobs until you confirm.",
+    "blockCustomerTitle": "Close your previous order first",
+    "blockCustomerText": "The pro finished order #{number}. If you have paid, tap “I paid” — then you can post a new order.",
+    "blockExecutorTitle": "Confirm the payment first",
+    "blockExecutorPaid": "On order #{number} the customer says they paid {amount} UZS. Tap “Money received” — then you can take new jobs.",
+    "blockExecutorWaiting": "If you got the money for order #{number}, tap “Money received” — then you can take new jobs.",
+    "feeAuto": "The {fee} UZS service fee is taken from your balance automatically.",
+    "disputeTitle": "Is there a problem?",
+    "notReceivedTitle": "Money did not arrive?",
+    "disputeText": "A dispute is opened and an admin reviews it. The restriction caused by this order is lifted.",
+    "disputeNote": "What happened? (optional)",
+    "disputeConfirm": "Open a dispute",
+    "waitingExecutor": "Waiting for the pro to confirm the money",
+    "disputed": "A dispute is open. An admin will review it",
+    "closed": "The order is closed",
+    "onlineNext": "Online payment comes in the next stage"
   }
 }

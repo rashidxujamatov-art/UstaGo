@@ -19,6 +19,7 @@ const LABELS = {
   finished: 'timeline.finished',
   payment: 'timeline.payment',
   cancelled: 'orderStatus.CANCELLED',
+  disputed: 'timeline.disputed',
 } as const satisfies Record<TimelineKey, string>;
 
 /** BY3 "Buyurtma holati": the order's steps with their times. */
@@ -33,7 +34,7 @@ export function Timeline({ order, hint }: { order: Order; hint?: string }) {
       <View>
         {steps.map((step, index) => {
           const last = index === steps.length - 1;
-          const cancelled = step.key === 'cancelled';
+          const cancelled = step.key === 'cancelled' || step.key === 'disputed';
           const current = step.state === 'current';
           const next = steps[index + 1];
           return (

@@ -135,8 +135,13 @@ export interface Order {
     arrived_at: string | null;
     started_at: string | null;
     finished_at: string | null;
+    customer_paid_at: string | null;
+    executor_received_at: string | null;
+    paid_at: string | null;
+    disputed_at: string | null;
     cancelled_at: string | null;
   };
+  dispute: { by_me: boolean } | null;
   cancel: { reason: string | null; by_me: boolean; by_system: boolean } | null;
   finish_photos: string[];
   distance_m: number | null;
@@ -156,9 +161,71 @@ export interface AcceptPreview {
 
 export interface Wallet {
   real: string;
+  /** Demo that still counts (all of it during the free period). */
   demo: string;
   holds: string;
   available: string;
+  must_keep: string;
+  max_withdraw: string;
+  /** Demo bonus credited (BJ5 "1 500 / 25 000"). */
+  demo_granted: string;
+  free_period: { ends_at: string; days_left: number; active: boolean } | null;
+}
+
+export type LedgerTxType =
+  | 'DEMO_BONUS'
+  | 'DEMO_EXPIRE'
+  | 'ORDER_INCOME'
+  | 'TOPUP'
+  | 'SERVICE_FEE'
+  | 'REFERRAL_L1'
+  | 'REFERRAL_L2'
+  | 'WITHDRAWAL'
+  | 'WITHDRAWAL_FEE'
+  | 'WITHDRAWAL_REFUND'
+  | 'WITHDRAWAL_FEE_REFUND';
+
+/** One row of BJ5 "Tarix". */
+export interface WalletTransaction {
+  id: string;
+  type: LedgerTxType;
+  /** Signed, tiyin. */
+  amount: string;
+  demo_amount: string;
+  created_at: string;
+  order: {
+    id: string;
+    number: number;
+    title: string;
+    price: string;
+    payment_method: PaymentMethod;
+    fee_bps: number | null;
+  } | null;
+  from: { first_name: string; last_initial: string } | null;
+}
+
+export interface WalletTransactionsPage {
+  items: WalletTransaction[];
+  next: string | null;
+}
+
+/** U2 "Referal dasturi". */
+export interface ReferralSummary {
+  code: string;
+  link: string;
+  l1_bps: number;
+  l2_bps: number;
+  l1_count: number;
+  l2_count: number;
+  total: string;
+  recent: {
+    id: string;
+    level: 1 | 2;
+    amount: string;
+    order_price: string | null;
+    from: { first_name: string; last_name: string } | null;
+    created_at: string;
+  }[];
 }
 
 export interface ChatMessage {

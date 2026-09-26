@@ -14,10 +14,12 @@ import type {
   Order,
   PlaceSuggestion,
   PublicConfig,
+  ReferralSummary,
   Role,
   SignedIn,
   ThemeModeApi,
   Wallet,
+  WalletTransactionsPage,
 } from './types';
 
 /** Typed calls to /api/v1 (docs/02-arxitektura.md §6). */
@@ -149,4 +151,21 @@ export const endpoints = {
   sendMessage: (id: string, input: { text?: string; photo_key?: string }) =>
     api.post<ChatMessage>(`/orders/${id}/messages`, input),
   markRead: (id: string) => api.post<void>(`/orders/${id}/messages/read`),
+
+  // ---------------------------------------------------------------- stage 3
+
+  walletTransactions: (before?: string) =>
+    api.get<WalletTransactionsPage>(
+      `/wallet/transactions${before ? `?before=${encodeURIComponent(before)}` : ''}`,
+    ),
+  referrals: () => api.get<ReferralSummary>('/me/referrals'),
+  /** BY9 "To'ladim". */
+  customerPaid: (id: string) => api.post<Order>(`/orders/${id}/paid`),
+  /** BJ13 "Pulni qabul qildim". */
+  paymentReceived: (id: string) => api.post<Order>(`/orders/${id}/payment-received`),
+  /** BJ13 "Pul kelmadi". */
+  paymentNotReceived: (id: string, note?: string) =>
+    api.post<Order>(`/orders/${id}/payment-not-received`, { note }),
+  /** BY9 "Muammo bor". */
+  dispute: (id: string, note?: string) => api.post<Order>(`/orders/${id}/dispute`, { note }),
 };

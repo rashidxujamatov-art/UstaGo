@@ -80,6 +80,11 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
     router.push('/soon');
   };
 
+  const open = (path: '/wallet' | '/referral') => {
+    onClose();
+    router.push(path);
+  };
+
   const myJobs = () => {
     onClose();
     router.navigate({ pathname: '/home', params: { tab: isExecutor ? 'mine' : 'active' } });
@@ -160,8 +165,8 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
             </View>
 
             <MenuRow icon={Briefcase} label={t('menu.myJobs')} onPress={myJobs} />
-            <MenuRow icon={Wallet} label={t('menu.wallet')} onPress={soon} />
-            <MenuRow icon={Users} label={t('menu.referral')} onPress={soon} />
+            <MenuRow icon={Wallet} label={t('menu.wallet')} onPress={() => open('/wallet')} />
+            <MenuRow icon={Users} label={t('menu.referral')} onPress={() => open('/referral')} />
             <MenuRow icon={Settings} label={t('menu.settings')} onPress={soon} />
             <MenuRow
               icon={Globe}

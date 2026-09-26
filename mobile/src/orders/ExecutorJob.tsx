@@ -4,6 +4,7 @@ import {
   Calendar,
   Check,
   CircleCheck,
+  CircleX,
   type LucideIcon,
   MapPin,
   Navigation,
@@ -29,12 +30,23 @@ import { formatPercent } from '../lib/format';
 import { openDirections } from '../lib/maps';
 import { useTheme } from '../theme/ThemeProvider';
 import { netIncome } from './amounts';
+import { ConfirmBlockSheet } from './ConfirmBlockSheet';
+import { DangerLink } from './ConfirmParts';
+import { DisputeSheet } from './DisputeSheet';
 import { FinishSheet } from './FinishSheet';
 import { InsufficientSheet, type Shortfall } from './InsufficientSheet';
 import { Footer, PhotoStrip } from './OrderParts';
 import { PartyCard } from './PartyCard';
 import { PaymentTag } from './PaymentTag';
-import { canDecline, type ExecutorStep, nextExecutorStep, paymentKind } from './status';
+import { usePaymentActions } from './payment-actions';
+import {
+  awaitsExecutorReceived,
+  canDecline,
+  canDispute,
+  type ExecutorStep,
+  nextExecutorStep,
+  paymentKind,
+} from './status';
 import { useOrderTexts } from './texts';
 import { Timeline } from './Timeline';
 import { showNotice } from '../lib/notice';
@@ -62,6 +74,9 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
   const [shortfall, setShortfall] = useState<Shortfall | null>(null);
   const [declineOpen, setDeclineOpen] = useState(false);
   const [finishOpen, setFinishOpen] = useState(false);
+  const [disputeOpen, setDisputeOpen] = useState(false);
+  const [blockingOrder, setBlockingOrder] = useState<string | null>(null);
+  const actions = usePaymentActions(order);
 
   const run = async (key: NonNullable<Busy>, action: () => Promise<Order>) => {
     setBusy(key);
@@ -78,6 +93,13 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
           available: String(params.available ?? '0'),
           feeBps: preview.data?.fee_bps ?? 0,
         });
+      } else if (
+        error instanceof ApiError &&
+        error.code === 'ORDER_EXECUTOR_CONFIRMATION_REQUIRED' &&
+        typeof error.params.order_id === 'string'
+      ) {
+        // BJ14: the previous cash / Xolis job must be confirmed first (§5.1).
+        setBlockingOrder(error.params.order_id);
       } else {
         showNotice(errorText(error));
         if (error instanceof ApiError && error.status === 409) invalidateOrder(client, order.id);
@@ -271,9 +293,32 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
                 />
               ) : null}
             </>
-          ) : mine && (order.status === 'DONE_BY_EXECUTOR' || order.status === 'COMPLETED') ? (
+          ) : mine && awaitsExecutorReceived(order) ? (
+            <>
+              <Button
+                icon={Check}
+                title={t('payment.iReceived')}
+                onPress={() =>
+                  router.push({ pathname: '/order/[id]/confirm', params: { id: order.id } })
+                }
+              />
+              <DangerLink
+                icon={CircleX}
+                label={t('payment.notReceived')}
+                onPress={() => setDisputeOpen(true)}
+              />
+            </>
+          ) : mine && order.status === 'DONE_BY_EXECUTOR' ? (
             <AppText color="text2" style={{ textAlign: 'center' }}>
               {t('job.waitingPayment')}
+            </AppText>
+          ) : mine && order.status === 'PAID' && order.fee ? (
+            <AppText color="text2" style={{ textAlign: 'center' }}>
+              {t('payment.feeCharged', { fee: texts.amount(order.fee.fee) })}
+            </AppText>
+          ) : mine && order.status === 'DISPUTED' ? (
+            <AppText color="text2" style={{ textAlign: 'center' }}>
+              {t('confirm.disputed')}
             </AppText>
           ) : (
             <AppText color="text2" style={{ textAlign: 'center' }}>
@@ -284,6 +329,16 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
       </Footer>
 
       <InsufficientSheet value={shortfall} onClose={() => setShortfall(null)} />
+      <ConfirmBlockSheet orderId={blockingOrder} onClose={() => setBlockingOrder(null)} />
+      {mine && canDispute(order.status) ? (
+        <DisputeSheet
+          visible={disputeOpen}
+          executor
+          busy={actions.busy === 'dispute'}
+          onClose={() => setDisputeOpen(false)}
+          onConfirm={(note) => void actions.dispute(note).then(() => setDisputeOpen(false))}
+        />
+      ) : null}
       <ConfirmSheet
         visible={declineOpen}
         title={t('job.declineConfirm')}
