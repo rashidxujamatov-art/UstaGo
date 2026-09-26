@@ -77,14 +77,41 @@ export const envSchema = z
 
     /** Payouts stay behind this flag until the legal scheme is approved (docs/01 §14). */
     FEATURE_PAYOUTS_ENABLED: booleanString.default(false),
+
+    // Payments (docs/02-arxitektura.md §9). Callbacks are always checked (CLAUDE.md rule 4):
+    // without the key or secret below, every callback of that provider is refused.
+    /** Payme merchant (cash desk) id and key; the key authenticates Payme's callbacks. */
+    PAYME_MERCHANT_ID: z.string().optional(),
+    PAYME_KEY: z.string().optional(),
+    /** https://checkout.paycom.uz in production, https://test.paycom.uz in the sandbox. */
+    PAYME_CHECKOUT_URL: z.url().default('https://checkout.paycom.uz'),
+    /** Click merchant; the secret key signs Prepare / Complete. */
+    CLICK_SERVICE_ID: z.string().optional(),
+    CLICK_MERCHANT_ID: z.string().optional(),
+    CLICK_SECRET_KEY: z.string().optional(),
+    /** Card tokens and card payments (BY5, BJ6): mock locally, Payme Subscribe API for real. */
+    CARD_PROVIDER: z.enum(['mock', 'payme']),
+    /** Payme Subscribe API endpoint (https://checkout.paycom.uz/api; sandbox test.paycom.uz/api). */
+    PAYME_SUBSCRIBE_URL: z.url().default('https://checkout.paycom.uz/api'),
+    /** Card tokens are stored encrypted (AES-256-GCM). */
+    CARD_TOKEN_ENC_KEY: base64Key32,
+    /** Payouts to cards (BJ7). The provider is not chosen yet (docs/01 §14): only the mock. */
+    PAYOUT_PROVIDER: z.enum(['mock']),
+    /**
+     * Lets the payer finish a Click / Payme payment without the provider app, for local
+     * testing. Allowed only with NODE_ENV=development, like OTP_TEST_MODE.
+     */
+    PAYMENT_TEST_MODE: booleanString.default(false),
   })
   .superRefine((env, ctx) => {
-    if (env.OTP_TEST_MODE && env.NODE_ENV !== 'development') {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['OTP_TEST_MODE'],
-        message: 'allowed only when NODE_ENV=development',
-      });
+    for (const key of ['OTP_TEST_MODE', 'PAYMENT_TEST_MODE'] as const) {
+      if (env[key] && env.NODE_ENV !== 'development') {
+        ctx.addIssue({
+          code: 'custom',
+          path: [key],
+          message: 'allowed only when NODE_ENV=development',
+        });
+      }
     }
     if (env.NODE_ENV === 'production') {
       for (const key of [
@@ -93,6 +120,7 @@ export const envSchema = z
         'MAPS_PROVIDER',
         'STORAGE_PROVIDER',
         'PUSH_PROVIDER',
+        'CARD_PROVIDER',
       ] as const) {
         if (env[key] === 'mock') {
           ctx.addIssue({
@@ -108,6 +136,9 @@ export const envSchema = z
         if (!env[key]) ctx.addIssue({ code: 'custom', path: [key], message: reason });
       }
     };
+    if (env.CARD_PROVIDER === 'payme') {
+      requireKeys(['PAYME_MERCHANT_ID', 'PAYME_KEY'], 'required when CARD_PROVIDER=payme');
+    }
     if (env.MAPS_PROVIDER === 'google') {
       requireKeys(['GOOGLE_MAPS_SERVER_KEY'], 'required when MAPS_PROVIDER=google');
     }

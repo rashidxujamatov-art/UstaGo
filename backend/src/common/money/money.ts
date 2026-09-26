@@ -76,6 +76,24 @@ export function applyBps(amountTiyin: bigint, bps: number | bigint, rounding: Ro
   return mulDivToSom(amountTiyin, bps, BPS_DENOMINATOR, rounding);
 }
 
+/**
+ * A so'm amount written as a decimal string by a provider ("15500", "15500.00") → tiyin.
+ * Null for anything else; never goes through a float (Click sends amounts this way).
+ */
+export function parseSomDecimal(value: string): bigint | null {
+  const match = /^(\d{1,15})(?:\.(\d{1,2}))?$/.exec(value.trim());
+  if (!match) return null;
+  const whole = match[1] ?? '0';
+  const fraction = (match[2] ?? '').padEnd(2, '0');
+  return BigInt(whole) * TIYIN_PER_SOM + BigInt(fraction);
+}
+
+/** Tiyin → so'm decimal string with two decimals ("15500.00"), for provider requests. */
+export function formatSomDecimal(tiyin: bigint): string {
+  const cents = tiyin % TIYIN_PER_SOM;
+  return `${tiyin / TIYIN_PER_SOM}.${cents.toString().padStart(2, '0')}`;
+}
+
 const NO_BREAK_SPACE = String.fromCharCode(0xa0);
 
 /** Whole so'm of a tiyin amount with no-break spaces between thousands ("7 500"). */

@@ -16,6 +16,7 @@ import { IdentityModule } from './modules/identity/identity.module.js';
 import { MapsModule } from './modules/maps/maps.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import { OrdersModule } from './modules/orders/orders.module.js';
+import { PaymentsModule } from './modules/payments/payments.module.js';
 import { RealtimeModule } from './modules/realtime/realtime.module.js';
 import { ReferralsModule } from './modules/referrals/referrals.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
@@ -51,6 +52,7 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
     MapsModule,
     WalletModule,
     OrdersModule,
+    PaymentsModule,
     RealtimeModule,
     HealthModule,
   ],

@@ -102,10 +102,10 @@ Hamma pul ustunlari `BIGINT` (tiyin), vaqt `TIMESTAMPTZ` (UTC). Ekranda vaqt `As
 - `ledger_transactions`: id, type, order_id, idempotency_key (unique), created_by, created_at
 - `ledger_entries`: id, transaction_id, account_id, amount (manfiy yoki musbat). Har bir tranzaksiyada yig‘indi 0
 - `wallet_holds`: id, user_id, order_id (unique), amount_demo, amount_real (qabul qilinganda oldindan hisoblanadi), status (`ACTIVE`, `SETTLED`, `RELEASED`). Faol hold’dagi demo bepul davr tugaganda yonmaydi
-- `payments`: id, provider, purpose (`TOPUP`, `ORDER`), user_id, order_id, amount, status, provider_txn_id (unique), raw, timestamps
-- `payment_sessions`: id, order_id, provider, qr_payload, expires_at, status
-- `cards`: user_id, provider, token, masked_pan, brand
-- `payouts`: id, user_id, amount, fee, card_id, status, provider_ref, timestamps
+- `payments`: id, seq (Click uchun butun son), provider (`PAYME`, `CLICK`, `CARD`), purpose (`TOPUP`, `ORDER`), user_id, order_id, created_by (QR ko‘rsatgan usta), amount, status (`CREATED`, `PENDING`, `PAID`, `CANCELLED`, `REFUNDED`, `EXPIRED`), provider_txn_id (provider bilan unique), expires_at, timestamps
+- `payment_sessions` alohida jadval emas: BJ4 QR — muddati (`expires_at`) bor `payments` yozuvi; yangi QR eskisini yopadi
+- `cards`: user_id, provider, token (AES-256-GCM, `CARD_TOKEN_ENC_KEY`), masked_pan, brand, expire, verified_at (SMS kod), deleted_at
+- `withdrawals` (pul yechish): id, user_id, amount, fee, card_id, status, provider_ref, processed_at, idempotency_key
 - `trips`: id, order_id, executor_id, started_at, ended_at, end_reason, last_eta_sec, last_distance_m
 - `trip_points`: trip_id, at, location (point), accuracy_m, speed. 30 kundan keyin o‘chiriladi
 - `messages`: id, order_id, sender_id, text, attachments[], created_at, read_at
@@ -123,14 +123,14 @@ Autentifikatsiya: `Authorization: Bearer <access>`. Xato formati: `{ "code": "OR
 | Auth | `GET /auth/invite/:code` (kodni tekshirish, "Sizni {ism} taklif qildi"), `POST /auth/register` (`referral_code` majburiy — `AUTH_REFERRAL_REQUIRED`), `POST /auth/otp/verify` (`purpose`: `REGISTER` yoki `LOGIN` — yangi qurilma), `POST /auth/otp/resend`, `POST /auth/login` (notanish qurilmada `otp_required`), `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/password/reset`, `POST /auth/password/reset/confirm` |
 | Identity | `POST /identity/myid/session`, `POST /identity/myid/complete` |
 | Men | `GET /me`, `PATCH /me` (til, ko‘rinish), `POST /me/role`, `GET /me/referrals`, `GET /me/devices`, `DELETE /me/devices/:id`, `PUT /me/devices/current/push-token`, `GET /me/jobs` (usta: faol ishlar va tarix) |
-| Buyurtmachi | `POST /orders` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_CUSTOMER_CONFIRMATION_REQUIRED`), `GET /orders`, `GET /orders/:id`, `POST /orders/:id/cancel`, `POST /orders/:id/confirm`, `POST /orders/:id/pay`, `POST /orders/:id/paid` ("To‘ladim", naqd va Xolis), `POST /orders/:id/dispute` ("Muammo bor"; `note` ixtiyoriy) |
-| Usta | `GET /feed`, `GET /orders/:id/accept-preview` (BJ2/BJ3 hisob-kitobi), `POST /orders/:id/accept` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_EXECUTOR_CONFIRMATION_REQUIRED`), `POST /orders/:id/decline`, `POST /orders/:id/depart`, `POST /orders/:id/arrive`, `POST /orders/:id/start`, `POST /orders/:id/finish` ("Ishni tugatdim"), `POST /orders/:id/payment-received` ("Pulni qabul qildim"), `POST /orders/:id/payment-not-received` ("Pul kelmadi" → nizo), `POST /orders/:id/payment-session` |
-| Hamyon | `GET /wallet`, `GET /wallet/transactions` (BJ5 tarixi, `before` kursori bilan), `POST /wallet/topup`, `POST /wallet/withdraw/preview`, `POST /wallet/withdraw`, `GET /wallet/cards`, `POST /wallet/cards` |
+| Buyurtmachi | `POST /orders` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_CUSTOMER_CONFIRMATION_REQUIRED`), `GET /orders`, `GET /orders/:id`, `POST /orders/:id/cancel`, `POST /orders/:id/pay` (BY5: hisobdan darhol, karta — `card_id` bilan, Click/Payme — to‘lov havolasi), `POST /orders/:id/paid` ("To‘ladim", naqd va Xolis), `POST /orders/:id/dispute` ("Muammo bor"; `note` ixtiyoriy) |
+| Usta | `GET /feed`, `GET /orders/:id/accept-preview` (BJ2/BJ3 hisob-kitobi), `POST /orders/:id/accept` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_EXECUTOR_CONFIRMATION_REQUIRED`), `POST /orders/:id/decline`, `POST /orders/:id/depart`, `POST /orders/:id/arrive`, `POST /orders/:id/start`, `POST /orders/:id/finish` ("Ishni tugatdim"), `POST /orders/:id/payment-received` ("Pulni qabul qildim"), `POST /orders/:id/payment-not-received` ("Pul kelmadi" → nizo), `POST /orders/:id/payment-session` (BJ4: Click/Payme QR, `qr_payment_ttl_sec`) |
+| Hamyon | `GET /wallet`, `GET /wallet/transactions` (BJ5 tarixi, `before` kursori bilan), `POST /wallet/topup` (BJ6: Click, Payme yoki karta), `POST /wallet/withdraw/preview`, `POST /wallet/withdraw` (`idempotency_key`, `FEATURE_PAYOUTS_ENABLED`), `GET /wallet/cards`, `POST /wallet/cards` (raqam va muddat → SMS kod), `POST /wallet/cards/:id/verify`, `DELETE /wallet/cards/:id`, `GET /payments/:id`, `POST /payments/:id/test-complete` (faqat `PAYMENT_TEST_MODE`, development) |
 | Soliq | `GET /tax/status`, `POST /tax/self-employed`, `POST /tax/xolis` |
 | Chat | `GET /orders/:id/messages`, `POST /orders/:id/messages`, `POST /orders/:id/messages/read` |
 | Xarita | `GET /maps/reverse-geocode`, `GET /maps/autocomplete`, `GET /maps/place/:id` |
 | Umumiy | `GET /config` (kirishdan oldin kerak bo‘lgan sozlamalar), `GET /categories`, `POST /uploads/presign` (rasm yuklash uchun presigned URL) |
-| Callback | `POST /payments/payme`, `POST /payments/click/prepare`, `POST /payments/click/complete` |
+| Callback | `POST /payments/payme` (JSON-RPC, Basic auth; hisob maydoni — `payment_id`), `POST /payments/click/prepare`, `POST /payments/click/complete` (MD5 imzo; `merchant_trans_id` — to‘lov ID) |
 | Admin | `GET /admin/users`, `POST /admin/users/:id/block`, `GET /admin/verifications`, `POST /admin/verifications/:id/decide`, `GET /admin/disputes`, `POST /admin/disputes/:id/decide`, `GET /admin/orders` |
 | Super admin | `GET/PUT /sa/settings`, `GET/POST /sa/invite-codes` (platforma kodlari), `GET/POST /sa/staff`, `PUT /sa/staff/:id/permissions`, `GET /sa/finance/summary`, `GET /sa/finance/ledger`, `POST /sa/disputes/:id/approve-refund`, `GET /sa/maps/usage` |
 

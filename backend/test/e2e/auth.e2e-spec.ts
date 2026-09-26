@@ -55,6 +55,10 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       STORAGE_PROVIDER: 'mock',
       PUSH_PROVIDER: 'mock',
       OTP_TEST_MODE: 'false',
+      PAYMENT_TEST_MODE: 'false',
+      CARD_PROVIDER: 'mock',
+      CARD_TOKEN_ENC_KEY: Buffer.alloc(32, 5).toString('base64'),
+      PAYOUT_PROVIDER: 'mock',
       LOG_LEVEL: 'fatal',
     });
 

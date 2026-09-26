@@ -15,8 +15,7 @@ import { type WithdrawQuote, withdrawFee, withdrawQuote } from './withdraw-quote
  * PAYOUT_CLEARING until the provider pays it out; the 1% bank fee goes to
  * PAYOUT_PROVIDER_FEES and is never platform revenue (T17). A FAILED payout returns both.
  *
- * Card binding, the payout provider and the endpoint (BJ7) come with stage 4, behind the
- * payout feature flag (§14).
+ * The payout itself (card, provider, FEATURE_PAYOUTS_ENABLED) is PayoutsService's job.
  */
 @Injectable()
 export class WithdrawalsService {
@@ -44,7 +43,12 @@ export class WithdrawalsService {
    * Books a withdrawal request. `idempotencyKey` comes from the client, so a repeated
    * request returns the same withdrawal instead of taking the money twice.
    */
-  async request(userId: string, amount: bigint, idempotencyKey: string): Promise<Withdrawal> {
+  async request(
+    userId: string,
+    amount: bigint,
+    idempotencyKey: string,
+    cardId: string | null = null,
+  ): Promise<Withdrawal> {
     if (amount <= 0n || amount % TIYIN_PER_SOM !== 0n) {
       throw new AppError(ErrorCode.VALIDATION_FAILED, { fields: 'amount' });
     }
@@ -73,7 +77,7 @@ export class WithdrawalsService {
 
       const fee = withdrawFee(amount, s.withdraw_fee_bps);
       const withdrawal = await tx.withdrawal.create({
-        data: { userId, amount, fee, feeBps: s.withdraw_fee_bps, idempotencyKey: key },
+        data: { userId, amount, fee, feeBps: s.withdraw_fee_bps, idempotencyKey: key, cardId },
       });
       const real = await this.ledger.accountId(tx, userId, 'REAL');
       await this.ledger.post(tx, {
@@ -112,6 +116,31 @@ export class WithdrawalsService {
       );
       return withdrawal;
     });
+  }
+
+  /** Takes a requested withdrawal for sending; null when another worker already has it. */
+  async claim(withdrawalId: string): Promise<Withdrawal | null> {
+    const { count } = await this.prisma.withdrawal.updateMany({
+      where: { id: withdrawalId, status: 'REQUESTED' },
+      data: { status: 'PROCESSING' },
+    });
+    return count === 1 ? this.prisma.withdrawal.findUnique({ where: { id: withdrawalId } }) : null;
+  }
+
+  /** The provider paid the card. The money already left REAL when it was requested. */
+  async markPaid(withdrawalId: string, providerRef: string | null): Promise<Withdrawal> {
+    const paid = await this.prisma.withdrawal.update({
+      where: { id: withdrawalId },
+      data: { status: 'PAID', providerRef, processedAt: new Date() },
+    });
+    await this.audit.log({
+      actorType: 'SYSTEM',
+      action: 'wallet.withdrawal_paid',
+      entityType: 'withdrawal',
+      entityId: withdrawalId,
+      data: { providerRef },
+    });
+    return paid;
   }
 
   /** The provider rejected the payout: amount and bank fee go back to REAL (§7). */
@@ -154,7 +183,7 @@ export class WithdrawalsService {
       }
       const failed = await tx.withdrawal.update({
         where: { id: withdrawal.id },
-        data: { status: 'FAILED', failureReason: reason },
+        data: { status: 'FAILED', failureReason: reason, processedAt: new Date() },
       });
       await this.audit.log(
         {
