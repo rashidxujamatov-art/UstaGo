@@ -18,6 +18,12 @@ import {
 import { OrdersModule } from './modules/orders/orders.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
+import {
+  FreePeriodProcessor,
+  FreePeriodScheduler,
+  WALLET_QUEUE,
+} from './modules/wallet/free-period.processor.js';
+import { WalletModule } from './modules/wallet/wallet.module.js';
 
 /**
  * Background worker (BullMQ). Same code base as the API, different entry point.
@@ -37,14 +43,15 @@ import { StorageModule } from './modules/storage/storage.module.js';
     PrismaModule,
     RedisModule,
     QueuesModule,
-    BullModule.registerQueue({ name: ORDERS_QUEUE }),
+    BullModule.registerQueue({ name: ORDERS_QUEUE }, { name: WALLET_QUEUE }),
     CommonModule,
     AuditModule,
     NotificationsModule,
     StorageModule,
     SettingsModule,
     OrdersModule,
+    WalletModule,
   ],
-  providers: [OrderExpiryScheduler, OrderExpiryProcessor],
+  providers: [OrderExpiryScheduler, OrderExpiryProcessor, FreePeriodScheduler, FreePeriodProcessor],
 })
 export class WorkerModule {}

@@ -58,8 +58,16 @@ export interface OrderView {
     arrived_at: string | null;
     started_at: string | null;
     finished_at: string | null;
+    /** Cash / Xolis: the customer's "To'ladim" (§5.1). */
+    customer_paid_at: string | null;
+    /** Cash / Xolis: the executor's "Pulni qabul qildim". */
+    executor_received_at: string | null;
+    paid_at: string | null;
+    disputed_at: string | null;
     cancelled_at: string | null;
   };
+  /** Who opened the dispute ("Pul kelmadi" / "Muammo bor"). */
+  dispute: { by_me: boolean } | null;
   cancel: { reason: string | null; by_me: boolean; by_system: boolean } | null;
   finish_photos: string[];
   distance_m: number | null;
@@ -138,8 +146,13 @@ export function toOrderView(
       arrived_at: iso(order.arrivedAt),
       started_at: iso(order.startedAt),
       finished_at: iso(order.finishedAt),
+      customer_paid_at: iso(order.customerPaidAt),
+      executor_received_at: iso(order.executorReceivedAt),
+      paid_at: iso(order.paidAt),
+      disputed_at: iso(order.disputedAt),
       cancelled_at: iso(order.cancelledAt),
     },
+    dispute: order.disputedAt ? { by_me: order.disputedBy === viewer.userId } : null,
     cancel:
       order.status === 'CANCELLED'
         ? {

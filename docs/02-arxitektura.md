@@ -123,9 +123,9 @@ Autentifikatsiya: `Authorization: Bearer <access>`. Xato formati: `{ "code": "OR
 | Auth | `GET /auth/invite/:code` (kodni tekshirish, "Sizni {ism} taklif qildi"), `POST /auth/register` (`referral_code` majburiy — `AUTH_REFERRAL_REQUIRED`), `POST /auth/otp/verify` (`purpose`: `REGISTER` yoki `LOGIN` — yangi qurilma), `POST /auth/otp/resend`, `POST /auth/login` (notanish qurilmada `otp_required`), `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/password/reset`, `POST /auth/password/reset/confirm` |
 | Identity | `POST /identity/myid/session`, `POST /identity/myid/complete` |
 | Men | `GET /me`, `PATCH /me` (til, ko‘rinish), `POST /me/role`, `GET /me/referrals`, `GET /me/devices`, `DELETE /me/devices/:id`, `PUT /me/devices/current/push-token`, `GET /me/jobs` (usta: faol ishlar va tarix) |
-| Buyurtmachi | `POST /orders` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_CUSTOMER_CONFIRMATION_REQUIRED`), `GET /orders`, `GET /orders/:id`, `POST /orders/:id/cancel`, `POST /orders/:id/confirm`, `POST /orders/:id/pay`, `POST /orders/:id/paid` ("To‘ladim", naqd va Xolis), `POST /orders/:id/dispute` ("Muammo bor") |
+| Buyurtmachi | `POST /orders` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_CUSTOMER_CONFIRMATION_REQUIRED`), `GET /orders`, `GET /orders/:id`, `POST /orders/:id/cancel`, `POST /orders/:id/confirm`, `POST /orders/:id/pay`, `POST /orders/:id/paid` ("To‘ladim", naqd va Xolis), `POST /orders/:id/dispute` ("Muammo bor"; `note` ixtiyoriy) |
 | Usta | `GET /feed`, `GET /orders/:id/accept-preview` (BJ2/BJ3 hisob-kitobi), `POST /orders/:id/accept` (tasdiqlanmagan to‘lov bo‘lsa — `ORDER_EXECUTOR_CONFIRMATION_REQUIRED`), `POST /orders/:id/decline`, `POST /orders/:id/depart`, `POST /orders/:id/arrive`, `POST /orders/:id/start`, `POST /orders/:id/finish` ("Ishni tugatdim"), `POST /orders/:id/payment-received` ("Pulni qabul qildim"), `POST /orders/:id/payment-not-received` ("Pul kelmadi" → nizo), `POST /orders/:id/payment-session` |
-| Hamyon | `GET /wallet`, `GET /wallet/transactions`, `POST /wallet/topup`, `POST /wallet/withdraw/preview`, `POST /wallet/withdraw`, `GET /wallet/cards`, `POST /wallet/cards` |
+| Hamyon | `GET /wallet`, `GET /wallet/transactions` (BJ5 tarixi, `before` kursori bilan), `POST /wallet/topup`, `POST /wallet/withdraw/preview`, `POST /wallet/withdraw`, `GET /wallet/cards`, `POST /wallet/cards` |
 | Soliq | `GET /tax/status`, `POST /tax/self-employed`, `POST /tax/xolis` |
 | Chat | `GET /orders/:id/messages`, `POST /orders/:id/messages`, `POST /orders/:id/messages/read` |
 | Xarita | `GET /maps/reverse-geocode`, `GET /maps/autocomplete`, `GET /maps/place/:id` |
@@ -134,7 +134,7 @@ Autentifikatsiya: `Authorization: Bearer <access>`. Xato formati: `{ "code": "OR
 | Admin | `GET /admin/users`, `POST /admin/users/:id/block`, `GET /admin/verifications`, `POST /admin/verifications/:id/decide`, `GET /admin/disputes`, `POST /admin/disputes/:id/decide`, `GET /admin/orders` |
 | Super admin | `GET/PUT /sa/settings`, `GET/POST /sa/invite-codes` (platforma kodlari), `GET/POST /sa/staff`, `PUT /sa/staff/:id/permissions`, `GET /sa/finance/summary`, `GET /sa/finance/ledger`, `POST /sa/disputes/:id/approve-refund`, `GET /sa/maps/usage` |
 
-`GET /wallet` javobi: `real`, `demo`, `holds`, `available`, `must_keep`, `max_withdraw`, `free_period_end`.
+`GET /wallet` javobi: `real`, `demo` (hali amal qiladigan demo), `holds`, `available`, `must_keep`, `max_withdraw`, `demo_granted` (berilgan demo bonus), `free_period` (`ends_at`, `days_left`, `active`; faqat ustada).
 
 OpenAPI spetsifikatsiyasi NestJS’dan avtomatik yaratiladi. Mobil ilova API klientini shundan generatsiya qiladi.
 
@@ -225,8 +225,8 @@ Har bir bosqich tugaganda testlar o‘tishi va tegishli ekranlar ishlashi kerak.
 | 0. Poydevor | Monorepo, TypeScript, lint, Docker (Postgres, Redis, MinIO), Prisma, sozlamalar seed’i, 4 tilli i18n skeleti, mavzu tokenlari, CI. Eski prototip `legacy/`ga | `docker compose up` va `npm test` ishlaydi |
 | 1. Kirish | Ro‘yxatdan o‘tish, kirish, OTP (Eskiz mock), MyID (mock), PINFL takrorlanishi, rol tanlash va almashtirish, referal havola yoki kod (majburiy), platforma kodlari | Main, K2–K4, U1 ishlaydi |
 | 2. Buyurtmalar | Yaratish (BY2 + BY6 xarita belgisi), feed (BJ1, PostGIS radius), qabul qilish sharti va hold (BJ2, BJ3), holatlar mashinasi, chat (BY4), push | Buyurtma `PUBLISHED`dan `DONE_BY_EXECUTOR`gacha boradi |
-| 3. Hamyon | Ledger, holdlar (qabul qilinganda oldindan hisob-kitob), hisob-kitob, referal (demo ishlarda — marketing budjetidan), demo va bepul davr, tarix (BJ5) | T1–T18 test holatlari o‘tadi |
-| 4. To‘lovlar | Payme va Click (sandbox), QR sessiya (BJ4), naqd va Xolis tasdig‘i ("To‘ladim" / "Pulni qabul qildim", cheklovlar — BY9, BY10, BJ13, BJ14), to‘ldirish (BJ6), hisobdan to‘lash (BY5), pul yechish (BJ7, payout mock) | Sandbox’da to‘lov `PAID`gacha boradi, callback’lar idempotent |
+| 3. Hamyon | Ledger, holdlar (qabul qilinganda oldindan hisob-kitob), hisob-kitob, referal (demo ishlarda — marketing budjetidan), demo va bepul davr, tarix (BJ5), referal ekrani (U2), naqd va Xolis tasdig‘i ("To‘ladim" / "Pulni qabul qildim", cheklovlar — BY9, BY10, BJ13, BJ14), pul yechish formulasi va ledger yozuvlari | T1–T18 test holatlari o‘tadi |
+| 4. To‘lovlar | Payme va Click (sandbox), QR sessiya (BJ4), to‘ldirish (BJ6), hisobdan to‘lash (BY5), pul yechish (BJ7: karta, payout mock) | Sandbox’da to‘lov `PAID`gacha boradi, callback’lar idempotent |
 | 5. Soliq | Usul tanlash (BJ8), o‘zini o‘zi band (BJ9, AD1 navbati), Xolis (BJ10), SA5 | Bepul davrdan keyin usulsiz ish olinmaydi |
 | 6. Jonli joylashuv | BJ11, BJ12, BY7, BY8, Routes ETA, geozona, saqlash muddati, SA6 | Buyurtmachi ustani xaritada ko‘radi, yetib kelganda kuzatuv to‘xtaydi |
 | 7. Admin | AD1–AD3, SA1–SA4, ruxsatlar, audit, moliya hisobotlari | Admin faqat berilgan ruxsatlar doirasida ishlaydi |
