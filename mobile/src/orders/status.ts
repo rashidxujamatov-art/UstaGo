@@ -74,6 +74,24 @@ export function paymentKind(method: PaymentMethod): 'cash' | 'online' {
   return method === 'CASH' || method === 'XOLIS_QR' ? 'cash' : 'online';
 }
 
+/** BY9: the customer of a cash / Xolis job can press "To'ladim". */
+export function awaitsCustomerPaid(order: Pick<Order, 'status' | 'payment_method'>): boolean {
+  return order.status === 'DONE_BY_EXECUTOR' && paymentKind(order.payment_method) === 'cash';
+}
+
+/** BJ13: the executor of a cash / Xolis job can press "Pulni qabul qildim" (§5.1). */
+export function awaitsExecutorReceived(order: Pick<Order, 'status' | 'payment_method'>): boolean {
+  return (
+    (order.status === 'DONE_BY_EXECUTOR' || order.status === 'COMPLETED') &&
+    paymentKind(order.payment_method) === 'cash'
+  );
+}
+
+/** "Muammo bor" / "Pul kelmadi" open a dispute once the work is reported done. */
+export function canDispute(status: OrderStatus): boolean {
+  return status === 'DONE_BY_EXECUTOR' || status === 'COMPLETED';
+}
+
 /** How long a job carries the "Yangi" chip on BJ1. A display choice, not a business rule. */
 const NEW_JOB_MS = 10 * 60 * 1000;
 
@@ -89,7 +107,8 @@ export type TimelineKey =
   | 'started'
   | 'finished'
   | 'payment'
-  | 'cancelled';
+  | 'cancelled'
+  | 'disputed';
 
 export interface TimelineStep {
   key: TimelineKey;
@@ -112,15 +131,19 @@ export function timelineSteps(order: Pick<Order, 'status' | 'timeline'>): Timeli
     { key: 'finished', at: timeline.finished_at },
   ];
 
-  if (order.status === 'CANCELLED') {
+  if (order.status === 'CANCELLED' || order.status === 'DISPUTED') {
+    const end: TimelineStep =
+      order.status === 'CANCELLED'
+        ? { key: 'cancelled', at: timeline.cancelled_at, state: 'current' }
+        : { key: 'disputed', at: timeline.disputed_at, state: 'current' };
     return [
       ...stamped.filter((step) => step.at).map((step) => ({ ...step, state: 'done' as const })),
-      { key: 'cancelled', at: timeline.cancelled_at, state: 'current' },
+      end,
     ];
   }
 
   const paid = order.status === 'PAID';
-  const steps = [...stamped, { key: 'payment' as const, at: null }];
+  const steps = [...stamped, { key: 'payment' as const, at: timeline.paid_at }];
   const lastReached = paid ? steps.length - 1 : stamped.findLastIndex((step) => step.at);
   return steps.map((step, index) => ({
     ...step,

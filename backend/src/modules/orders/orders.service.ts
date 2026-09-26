@@ -1,7 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { AppError } from '../../common/errors/app-error.js';
 import { ErrorCode } from '../../common/errors/error-codes.js';
-import { Prisma, type OrderStatus } from '../../generated/prisma/client.js';
+import { formatSom } from '../../common/money/money.js';
+import { Prisma, type OrderStatus, type PaymentMethod } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { ChatService, type SystemMessageCode } from '../chat/chat.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
@@ -10,13 +11,15 @@ import { RealtimePublisher } from '../realtime/realtime.publisher.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { UploadsService } from '../storage/uploads.service.js';
 import { acceptQuote } from '../wallet/accept-quote.js';
-import { WalletService } from '../wallet/wallet.service.js';
+import { SettlementService } from '../wallet/settlement.service.js';
+import { type WalletBalances, WalletService } from '../wallet/wallet.service.js';
 import {
   ACTIVE_STATUSES,
   cancelNeedsReason,
   FINISHED_STATUSES,
   HOLDING_STATUSES,
   ORDER_RULES,
+  PARTY_CONFIRMED_METHODS,
 } from './order-state.js';
 import { orderInclude, type OrderView, type OrderWithParties, toOrderView } from './order-view.js';
 import type { CancelOrderInput, CreateOrderInput, FeedQuery } from './orders.schemas.js';
@@ -40,6 +43,11 @@ const STEP_EFFECTS: Record<
 
 const FEED_LIMIT = 50;
 
+/** Balances as the §4 acceptance check sees them: only demo that still counts. */
+function quoteBalances(b: WalletBalances) {
+  return { real: b.real, demo: b.demoActive, heldDemo: b.heldDemo, heldReal: b.heldReal };
+}
+
 export interface AcceptPreview {
   required: string;
   available: string;
@@ -51,13 +59,14 @@ export interface AcceptPreview {
   fee_bps: number;
 }
 
-/** Order lifecycle up to "Ishni tugatdim" (docs/01-biznes-qoidalar.md §3, §4, §5.1). */
+/** Order lifecycle and its payment confirmation (docs/01-biznes-qoidalar.md §3, §4, §5). */
 @Injectable()
 export class OrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly settings: SettingsService,
     private readonly wallet: WalletService,
+    private readonly settlement: SettlementService,
     private readonly uploads: UploadsService,
     private readonly chat: ChatService,
     private readonly notifications: NotificationsService,
@@ -72,13 +81,13 @@ export class OrdersService {
 
     const unpaid = await this.prisma.order.findFirst({
       where: { customerId: userId, status: 'DONE_BY_EXECUTOR' },
-      select: { number: true },
+      select: { id: true, number: true },
       orderBy: { finishedAt: 'asc' },
     });
     if (unpaid) {
       throw new AppError(
         ErrorCode.ORDER_CUSTOMER_CONFIRMATION_REQUIRED,
-        { order: unpaid.number },
+        { order: unpaid.number, order_id: unpaid.id },
         HttpStatus.CONFLICT,
       );
     }
@@ -278,7 +287,7 @@ export class OrdersService {
       price: order.price,
       feeBps: s.fee_bps,
       acceptThresholdBps: s.accept_threshold_bps,
-      ...(await this.wallet.balances(userId)),
+      ...quoteBalances(await this.wallet.balances(userId)),
     });
     return {
       required: quote.required.toString(),
@@ -317,7 +326,7 @@ export class OrdersService {
         price: order.price,
         feeBps: s.fee_bps,
         acceptThresholdBps: s.accept_threshold_bps,
-        ...(await this.wallet.balances(userId, tx)),
+        ...quoteBalances(await this.wallet.balances(userId, tx)),
       });
       if (!quote.sufficient) {
         throw new AppError(ErrorCode.WALLET_INSUFFICIENT_TO_ACCEPT, {
@@ -427,6 +436,196 @@ export class OrdersService {
     return this.get(userId, orderId);
   }
 
+  // ---------------------------------------------------------------- payment (§5.1)
+
+  /** BY9 "To'ladim": the customer says they paid cash or to the pro's Xolis QR. */
+  async customerPaid(userId: string, orderId: string): Promise<OrderView> {
+    const order = await this.findForParty(orderId, userId);
+    if (order.customerId !== userId) throw this.notFound();
+    this.assertPartyConfirmed(order.paymentMethod);
+    const rule = ORDER_RULES.CUSTOMER_PAID;
+    if (!rule.from.includes(order.status)) throw this.conflict(order.status);
+
+    await this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.order.updateMany({
+        where: { id: orderId, status: order.status },
+        data: { status: rule.to, customerPaidAt: new Date() },
+      });
+      if (count === 0) throw this.conflict(order.status);
+      await this.event(tx, orderId, order.status, rule.to, userId);
+      await this.chat.system(tx, order, 'CUSTOMER_PAID');
+    });
+
+    await this.afterChange(
+      orderId,
+      rule.to,
+      order.executorId ? { userId: order.executorId, push: 'PAYMENT_CUSTOMER_PAID' } : null,
+    );
+    return this.get(userId, orderId);
+  }
+
+  /**
+   * BJ13 "Pulni qabul qildim": closes a cash / Xolis job and settles it — the fee held at
+   * acceptance is charged and the referral paid (§5 steps 3–4). Allowed before the
+   * customer's "To'ladim" too; that also lifts the customer's block.
+   */
+  async paymentReceived(userId: string, orderId: string): Promise<OrderView> {
+    const order = await this.findForParty(orderId, userId);
+    if (order.executorId !== userId) throw this.notFound();
+    this.assertPartyConfirmed(order.paymentMethod);
+    const rule = ORDER_RULES.PAYMENT_RECEIVED;
+    if (!rule.from.includes(order.status)) throw this.conflict(order.status);
+
+    const fee = await this.prisma.$transaction(async (tx) => {
+      const locked = await this.lockForPayment(tx, orderId, rule.from);
+      const now = new Date();
+      await tx.order.update({
+        where: { id: orderId },
+        data: { status: rule.to, executorReceivedAt: now, paidAt: now },
+      });
+      const settled = await this.settlement.settle(tx, locked, userId);
+      await this.event(tx, orderId, locked.status, rule.to, userId, {
+        fee: settled.fee.toString(),
+      });
+      await this.chat.system(tx, order, 'PAYMENT_RECEIVED');
+      return settled.fee;
+    });
+
+    await this.afterChange(orderId, rule.to, { userId, push: 'ORDER_PAID_FEE', params: { fee } });
+    await this.notifyPaid(orderId, order.customerId);
+    return this.get(userId, orderId);
+  }
+
+  /**
+   * Online payment confirmed (provider callback or balance payment, stage 4): the price
+   * goes to the executor and the job is settled (§5 steps 1–4). Returns false when the
+   * order was already paid, so a repeated callback changes nothing.
+   */
+  async settleOnlinePayment(orderId: string): Promise<boolean> {
+    const rule = ORDER_RULES.ONLINE_PAID;
+    const result = await this.prisma.$transaction(async (tx) => {
+      const [row] = await tx.$queryRaw<{ status: OrderStatus }[]>`
+        SELECT status FROM orders WHERE id = ${orderId}::uuid FOR UPDATE`;
+      if (!row) throw this.notFound();
+      if (row.status === 'PAID') return null;
+      const locked = await this.lockForPayment(tx, orderId, rule.from);
+      if (PARTY_CONFIRMED_METHODS.includes(locked.paymentMethod)) throw this.conflict(row.status);
+      await tx.order.update({
+        where: { id: orderId },
+        data: { status: rule.to, paidAt: new Date() },
+      });
+      const settled = await this.settlement.settle(tx, locked, null);
+      await this.event(tx, orderId, locked.status, rule.to, null, {
+        fee: settled.fee.toString(),
+      });
+      await this.chat.system(tx, { id: orderId, executorId: locked.executorId }, 'ORDER_PAID');
+      return { executorId: locked.executorId, customerId: locked.customerId, fee: settled.fee };
+    });
+    if (!result) return false;
+
+    await this.afterChange(orderId, rule.to, {
+      userId: result.executorId,
+      push: 'ORDER_PAID_FEE',
+      params: { fee: result.fee },
+    });
+    await this.notifyPaid(orderId, result.customerId);
+    return true;
+  }
+
+  /**
+   * "Pul kelmadi" (executor) or "Muammo bor" (customer) → DISPUTED. The admin decides
+   * (stage 7); meanwhile the hold stays and both §5.1 blocks for this order are lifted.
+   */
+  async dispute(userId: string, orderId: string, note?: string): Promise<OrderView> {
+    const order = await this.findForParty(orderId, userId);
+    const rule = ORDER_RULES.DISPUTE;
+    if (!rule.from.includes(order.status)) throw this.conflict(order.status);
+
+    await this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.order.updateMany({
+        where: { id: orderId, status: order.status },
+        data: {
+          status: rule.to,
+          disputedAt: new Date(),
+          disputedBy: userId,
+          disputeNote: note ?? null,
+        },
+      });
+      if (count === 0) throw this.conflict(order.status);
+      await this.event(tx, orderId, order.status, rule.to, userId, { note: note ?? null });
+      await this.chat.system(tx, order, 'DISPUTE_OPENED');
+    });
+
+    const other = userId === order.customerId ? order.executorId : order.customerId;
+    await this.afterChange(
+      orderId,
+      rule.to,
+      other ? { userId: other, push: 'ORDER_DISPUTED' } : null,
+    );
+    return this.get(userId, orderId);
+  }
+
+  /**
+   * §5.1 reminders: `confirm_reminder_hours` (2, 24) after the job was reported done, the
+   * customer is reminded to press "To'ladim"; after the customer's "To'ladim", the
+   * executor to press "Pulni qabul qildim". Each mark is pushed once. Run by the worker.
+   */
+  async sendPaymentReminders(now = new Date()): Promise<number> {
+    const { confirm_reminder_hours: marks } = await this.settings.getAll();
+    const hoursSince = (date: Date | null) =>
+      date ? Math.floor((now.getTime() - date.getTime()) / 3_600_000) : -1;
+    const earliest = new Date(now.getTime() - Math.min(...marks) * 3_600_000);
+
+    const waiting = await this.prisma.order.findMany({
+      where: {
+        OR: [
+          { status: 'DONE_BY_EXECUTOR', finishedAt: { lte: earliest } },
+          {
+            status: 'COMPLETED',
+            paymentMethod: { in: [...PARTY_CONFIRMED_METHODS] },
+            customerPaidAt: { lte: earliest },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        number: true,
+        status: true,
+        customerId: true,
+        executorId: true,
+        finishedAt: true,
+        customerPaidAt: true,
+        customerReminded: true,
+        executorReminded: true,
+      },
+      take: 500,
+    });
+
+    let sent = 0;
+    for (const order of waiting) {
+      const forCustomer = order.status === 'DONE_BY_EXECUTOR';
+      const since = hoursSince(forCustomer ? order.finishedAt : order.customerPaidAt);
+      const done = forCustomer ? order.customerReminded : order.executorReminded;
+      const due = marks.filter((mark) => since >= mark && !done.includes(mark));
+      const recipient = forCustomer ? order.customerId : order.executorId;
+      if (due.length === 0 || !recipient) continue;
+
+      const field = forCustomer ? 'customerReminded' : 'executorReminded';
+      const { count } = await this.prisma.order.updateMany({
+        where: { id: order.id, status: order.status, [field]: { equals: done } },
+        data: { [field]: [...done, ...due] },
+      });
+      if (count === 0) continue;
+      await this.notifications.notify(recipient, {
+        type: forCustomer ? 'REMIND_CUSTOMER_PAY' : 'REMIND_EXECUTOR_RECEIVED',
+        orderId: order.id,
+        orderNumber: order.number,
+      });
+      sent += 1;
+    }
+    return sent;
+  }
+
   // ---------------------------------------------------------------- system
 
   /**
@@ -501,13 +700,13 @@ export class OrdersService {
         status: { in: ['DONE_BY_EXECUTOR', 'COMPLETED'] },
         executorReceivedAt: null,
       },
-      select: { number: true },
+      select: { id: true, number: true },
       orderBy: { finishedAt: 'asc' },
     });
     if (unconfirmed) {
       throw new AppError(
         ErrorCode.ORDER_EXECUTOR_CONFIRMATION_REQUIRED,
-        { order: unconfirmed.number },
+        { order: unconfirmed.number, order_id: unconfirmed.id },
         HttpStatus.CONFLICT,
       );
     }
@@ -519,12 +718,62 @@ export class OrdersService {
     }
   }
 
+  private assertPartyConfirmed(method: PaymentMethod): void {
+    if (!PARTY_CONFIRMED_METHODS.includes(method)) {
+      throw new AppError(ErrorCode.ORDER_PAYMENT_METHOD_MISMATCH, { method }, HttpStatus.CONFLICT);
+    }
+  }
+
   // ---------------------------------------------------------------- helpers
+
+  /** Locks the order row and returns what settlement needs; checks the status again. */
+  private async lockForPayment(tx: Tx, orderId: string, from: readonly OrderStatus[]) {
+    await tx.$queryRaw`SELECT id FROM orders WHERE id = ${orderId}::uuid FOR UPDATE`;
+    const order = await tx.order.findUniqueOrThrow({
+      where: { id: orderId },
+      select: {
+        id: true,
+        status: true,
+        price: true,
+        paymentMethod: true,
+        customerId: true,
+        executorId: true,
+        fee: true,
+        feeDemo: true,
+        feeReal: true,
+        feeBpsSnapshot: true,
+        refL1BpsSnapshot: true,
+        refL2BpsSnapshot: true,
+      },
+    });
+    if (!from.includes(order.status) || !order.executorId) throw this.conflict(order.status);
+    return { ...order, executorId: order.executorId };
+  }
+
+  /** Tells the customer the job is closed. */
+  private async notifyPaid(orderId: string, customerId: string): Promise<void> {
+    const { number } = await this.prisma.order.findUniqueOrThrow({
+      where: { id: orderId },
+      select: { number: true },
+    });
+    await this.notifications.notify(customerId, {
+      type: 'ORDER_PAID',
+      orderId,
+      orderNumber: number,
+    });
+  }
 
   private async findForParty(orderId: string, userId: string) {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
-      select: { id: true, number: true, status: true, customerId: true, executorId: true },
+      select: {
+        id: true,
+        number: true,
+        status: true,
+        paymentMethod: true,
+        customerId: true,
+        executorId: true,
+      },
     });
     if (!order || (order.customerId !== userId && order.executorId !== userId))
       throw this.notFound();
@@ -546,7 +795,7 @@ export class OrdersService {
   private async afterChange(
     orderId: string,
     status: OrderStatus,
-    push: { userId: string; push: PushType } | null,
+    push: { userId: string; push: PushType; params?: { fee: bigint } } | null,
     alsoNotify: string[] = [],
   ): Promise<void> {
     const order = await this.prisma.order.findUnique({
@@ -564,6 +813,7 @@ export class OrdersService {
         type: push.push,
         orderId,
         orderNumber: order.number,
+        ...(push.params ? { params: { fee: formatSom(push.params.fee) } } : {}),
       });
     }
   }

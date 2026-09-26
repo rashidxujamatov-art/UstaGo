@@ -3,6 +3,20 @@ import { type Prisma, type WalletAccountKind } from '../../generated/prisma/clie
 
 export const PLATFORM = 'PLATFORM';
 
+/** Kinds of ledger transactions; the wallet history (BJ5) is built from them. */
+export type LedgerTxType =
+  | 'DEMO_BONUS'
+  | 'DEMO_EXPIRE'
+  | 'ORDER_INCOME'
+  | 'TOPUP'
+  | 'SERVICE_FEE'
+  | 'REFERRAL_L1'
+  | 'REFERRAL_L2'
+  | 'WITHDRAWAL'
+  | 'WITHDRAWAL_FEE'
+  | 'WITHDRAWAL_REFUND'
+  | 'WITHDRAWAL_FEE_REFUND';
+
 export interface LedgerEntryInput {
   accountId: string;
   /** Tiyin; positive credits the account, negative debits it. */
@@ -10,11 +24,16 @@ export interface LedgerEntryInput {
 }
 
 export interface PostInput {
-  type: string;
+  type: LedgerTxType;
   idempotencyKey: string;
   orderId?: string | null;
   createdBy?: string | null;
   entries: LedgerEntryInput[];
+  /**
+   * User accounts this posting may take below zero. Only the service fee at settlement
+   * uses it: a shortfall there is recorded as a debt (docs/01 §5) instead of failing.
+   */
+  allowNegative?: string[];
 }
 
 type Tx = Prisma.TransactionClient;
@@ -80,7 +99,7 @@ export class LedgerService {
     // User money accounts never go below zero (docs/01 §11, invariant).
     const negative = await tx.walletAccount.findFirst({
       where: {
-        id: { in: accountIds },
+        id: { in: accountIds.filter((id) => !input.allowNegative?.includes(id)) },
         ownerKey: { not: PLATFORM },
         balance: { lt: 0n },
       },

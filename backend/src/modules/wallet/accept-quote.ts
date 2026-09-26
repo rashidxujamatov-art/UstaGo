@@ -33,12 +33,15 @@ export interface AcceptQuote {
  *   available = real + demo_active − Σ active holds
  *   fee       = ROUND_HALF_UP(price × fee_bps / 10 000)
  *   fee_demo  = MIN(demo still free of holds, fee); fee_real = fee − fee_demo
+ * A negative REAL balance (debt, §5) blocks acceptance until it is topped up.
  * All results are whole so'm, in tiyin.
  */
 export function acceptQuote(input: AcceptQuoteInput): AcceptQuote {
   const required = applyBps(input.price, input.acceptThresholdBps, 'CEIL');
   const available = input.real + input.demo - input.heldDemo - input.heldReal;
-  const shortfall = required > available ? required - available : 0n;
+  let shortfall = required > available ? required - available : 0n;
+  // A debt (negative REAL after a dispute, §5) must be repaid before taking new jobs.
+  if (input.real < 0n && -input.real > shortfall) shortfall = -input.real;
 
   const fee = applyBps(input.price, input.feeBps, 'HALF_UP');
   const demoFree = input.demo > input.heldDemo ? input.demo - input.heldDemo : 0n;

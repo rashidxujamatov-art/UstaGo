@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { EllipsisVertical, Search } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { Check, EllipsisVertical, Flag, Search } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl, ScrollView, View } from 'react-native';
@@ -10,12 +11,16 @@ import type { CancelReason, Order } from '../api/types';
 import { useErrorText } from '../api/use-error-text';
 import { AppText } from '../components/AppText';
 import { BarHeader, BarIconButton } from '../components/ui/BarHeader';
+import { Button } from '../components/ui/Button';
 import { Card, Separator } from '../components/ui/Card';
 import { useTheme } from '../theme/ThemeProvider';
 import { CancelSheet } from './CancelSheet';
+import { DangerLink } from './ConfirmParts';
+import { DisputeSheet } from './DisputeSheet';
 import { DetailRow, Footer, PhotoStrip } from './OrderParts';
 import { PartyCard } from './PartyCard';
-import { canCancel } from './status';
+import { usePaymentActions } from './payment-actions';
+import { awaitsCustomerPaid, canCancel, canDispute } from './status';
 import { useOrderTexts } from './texts';
 import { Timeline } from './Timeline';
 import { showNotice } from '../lib/notice';
@@ -36,6 +41,8 @@ export function CustomerOrder({ order, refreshing, onRefresh }: CustomerOrderPro
   const texts = useOrderTexts();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [disputeOpen, setDisputeOpen] = useState(false);
+  const actions = usePaymentActions(order);
 
   const cancel = async (reason: CancelReason, note?: string) => {
     setCancelling(true);
@@ -52,6 +59,18 @@ export function CustomerOrder({ order, refreshing, onRefresh }: CustomerOrderPro
       setCancelling(false);
     }
   };
+
+  // Online payment (BY5, QR) arrives with stage 4; cash and Xolis are confirmed on BY9.
+  const footerText =
+    order.status === 'DONE_BY_EXECUTOR' && !awaitsCustomerPaid(order)
+      ? t('confirm.onlineNext')
+      : order.status === 'COMPLETED'
+        ? t('confirm.waitingExecutor')
+        : order.status === 'DISPUTED'
+          ? t('confirm.disputed')
+          : order.status === 'PAID'
+            ? t('confirm.closed')
+            : null;
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.bg2 }}>
@@ -140,13 +159,40 @@ export function CustomerOrder({ order, refreshing, onRefresh }: CustomerOrderPro
         <View style={{ height: insets.bottom }} />
       </ScrollView>
 
-      {order.status === 'DONE_BY_EXECUTOR' ? (
+      {footerText || awaitsCustomerPaid(order) ? (
         <Footer>
-          <AppText color="text2" style={{ textAlign: 'center', paddingBottom: insets.bottom }}>
-            {t('order.paymentNext')}
-          </AppText>
+          <View style={{ gap: theme.spacing.xs, paddingBottom: insets.bottom }}>
+            {awaitsCustomerPaid(order) ? (
+              <Button
+                icon={Check}
+                title={t('confirm.iPaid', { amount: texts.money(order.price) })}
+                onPress={() =>
+                  router.push({ pathname: '/order/[id]/confirm', params: { id: order.id } })
+                }
+              />
+            ) : (
+              <AppText color="text2" style={{ textAlign: 'center' }}>
+                {footerText}
+              </AppText>
+            )}
+            {canDispute(order.status) ? (
+              <DangerLink
+                icon={Flag}
+                label={t('confirm.problem')}
+                onPress={() => setDisputeOpen(true)}
+              />
+            ) : null}
+          </View>
         </Footer>
       ) : null}
+
+      <DisputeSheet
+        visible={disputeOpen}
+        executor={false}
+        busy={actions.busy === 'dispute'}
+        onClose={() => setDisputeOpen(false)}
+        onConfirm={(note) => void actions.dispute(note).then(() => setDisputeOpen(false))}
+      />
 
       <CancelSheet
         visible={cancelOpen}

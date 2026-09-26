@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { RealtimePublisher } from '../realtime/realtime.publisher.js';
-import { type PushType, pushText } from './push-texts.js';
+import { type PushParams, type PushType, pushText } from './push-texts.js';
 
 export interface PushMessage {
   token: string;
@@ -29,8 +29,11 @@ export class MockPushProvider implements PushProvider {
 
 export interface Notification {
   type: PushType;
-  orderId: string;
-  orderNumber: number;
+  /** Set for order events; the app opens the order when the push is tapped. */
+  orderId?: string;
+  orderNumber?: number;
+  /** Other text parameters ({fee}, {days}). */
+  params?: PushParams;
 }
 
 /**
@@ -48,11 +51,10 @@ export class NotificationsService {
   ) {}
 
   async notify(userId: string, notification: Notification): Promise<void> {
-    const data = {
-      type: notification.type,
-      order_id: notification.orderId,
-      order_number: String(notification.orderNumber),
-    };
+    const data: Record<string, string> = { type: notification.type };
+    if (notification.orderId) data.order_id = notification.orderId;
+    if (notification.orderNumber !== undefined)
+      data.order_number = String(notification.orderNumber);
     this.realtime.toUsers([userId], 'notification', data);
 
     try {
@@ -64,7 +66,10 @@ export class NotificationsService {
         },
       });
       if (!user || user.devices.length === 0) return;
-      const body = pushText(notification.type, user.lang, { order: notification.orderNumber });
+      const body = pushText(notification.type, user.lang, {
+        ...notification.params,
+        ...(notification.orderNumber !== undefined ? { order: notification.orderNumber } : {}),
+      });
       await this.push.send(
         user.devices.map((device) => ({ token: device.pushToken as string, body, data })),
       );

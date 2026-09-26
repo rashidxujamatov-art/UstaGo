@@ -52,7 +52,8 @@ export async function createHarness(): Promise<Harness> {
   const redis = realRedis ? new Redis(e2eRedisUrl!) : (new RedisMock() as unknown as Redis);
   await prisma.$executeRawUnsafe(
     `TRUNCATE users, invite_codes, audit_logs, settings, categories, orders, order_events,
-       messages, wallet_accounts, ledger_transactions, ledger_entries, wallet_holds, maps_usage
+       messages, wallet_accounts, ledger_transactions, ledger_entries, wallet_holds, withdrawals,
+       maps_usage
      RESTART IDENTITY CASCADE`,
   );
   await redis.flushdb();
@@ -105,14 +106,27 @@ export const device = (id: string) => ({
   platform: 'android',
 });
 
-/** A person who finished sign-up, MyID and role choice. */
+/**
+ * A person who finished sign-up, MyID and role choice. Registers with `referralCode` (a
+ * user's code: that user becomes L1) or with a fresh platform code (no L1).
+ */
 export async function fullUser(
   h: Harness,
   docNumber: string,
   role: 'CUSTOMER' | 'EXECUTOR',
-): Promise<{ id: string; phone: string; token: string; auth: { Authorization: string } }> {
-  const code = `P${(counter += 1).toString(36).toUpperCase()}`;
-  await h.prisma.inviteCode.create({ data: { code } });
+  referralCode?: string,
+): Promise<{
+  id: string;
+  phone: string;
+  token: string;
+  referralCode: string;
+  auth: { Authorization: string };
+}> {
+  let code = referralCode;
+  if (!code) {
+    code = `P${(counter += 1).toString(36).toUpperCase()}`;
+    await h.prisma.inviteCode.create({ data: { code } });
+  }
   const phone = nextPhone();
   const dev = device(phone.slice(-6));
   await h
@@ -154,5 +168,5 @@ export async function fullUser(
     .send({ session_id: session.body.session_id })
     .expect(200);
   const me = await h.api().post('/api/v1/me/role').set(auth).send({ role }).expect(200);
-  return { id: me.body.id as string, phone, token, auth };
+  return { id: me.body.id as string, phone, token, auth, referralCode: me.body.referral.code };
 }

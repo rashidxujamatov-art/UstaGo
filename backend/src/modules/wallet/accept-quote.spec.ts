@@ -67,4 +67,15 @@ describe('acceptQuote (docs/01-biznes-qoidalar.md §4, §6)', () => {
     expect(quote.fee).toBe(som(3_086n));
     expect(quote.required).toBe(som(3_087n));
   });
+
+  it('a debt blocks new jobs until it is repaid, even when demo would cover the fee', () => {
+    const quote = acceptQuote({
+      ...base,
+      price: som(100_000n),
+      real: som(-3_000n),
+      demo: som(20_000n),
+    });
+    // available 17 000 ≥ required 2 500, but REAL is 3 000 below zero (§5)
+    expect(quote).toMatchObject({ sufficient: false, shortfall: som(3_000n) });
+  });
 });

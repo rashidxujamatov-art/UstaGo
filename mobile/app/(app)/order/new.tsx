@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ApiError } from '../../../src/api/client';
 import { endpoints } from '../../../src/api/endpoints';
 import { queryKeys, useCategories, useConfig } from '../../../src/api/queries';
 import { useErrorText } from '../../../src/api/use-error-text';
@@ -27,6 +28,7 @@ import { formatAmount } from '../../../src/lib/format';
 import { priceDigits, somDigitsToTiyin } from '../../../src/lib/input';
 import { minutesLabel, tashkentDateTime } from '../../../src/lib/time';
 import { pickAndUploadPhoto } from '../../../src/lib/upload';
+import { ConfirmBlockSheet } from '../../../src/orders/ConfirmBlockSheet';
 import { PAYMENT_ICONS } from '../../../src/orders/PaymentTag';
 import { useOrderTexts } from '../../../src/orders/texts';
 import { TimeSheet } from '../../../src/orders/TimeSheet';
@@ -50,6 +52,7 @@ export default function NewOrderScreen() {
   const [timeOpen, setTimeOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [blockingOrder, setBlockingOrder] = useState<string | null>(null);
   /** Errors show after the first submit and then follow the input. */
   const [submitted, setSubmitted] = useState(false);
 
@@ -119,7 +122,16 @@ export default function NewOrderScreen() {
       void client.invalidateQueries({ queryKey: queryKeys.orders });
       router.replace({ pathname: '/order/[id]', params: { id: order.id } });
     } catch (error) {
-      showNotice(errorText(error));
+      if (
+        error instanceof ApiError &&
+        error.code === 'ORDER_CUSTOMER_CONFIRMATION_REQUIRED' &&
+        typeof error.params.order_id === 'string'
+      ) {
+        // BY10: the previous cash / Xolis order waits for "To'ladim" (§5.1).
+        setBlockingOrder(error.params.order_id);
+      } else {
+        showNotice(errorText(error));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -333,6 +345,7 @@ export default function NewOrderScreen() {
           setTimeOpen(false);
         }}
       />
+      <ConfirmBlockSheet orderId={blockingOrder} onClose={() => setBlockingOrder(null)} />
     </View>
   );
 }

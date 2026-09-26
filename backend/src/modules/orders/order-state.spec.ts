@@ -36,4 +36,23 @@ describe('order state machine (docs/01-biznes-qoidalar.md §3.3)', () => {
     expect(canTransition('EXPIRE', 'SYSTEM', 'ACCEPTED')).toBe(false);
     expect(canTransition('EXPIRE', 'CUSTOMER', 'PUBLISHED')).toBe(false);
   });
+
+  it('closes cash and Xolis jobs by the two confirmations (§5.1)', () => {
+    expect(canTransition('CUSTOMER_PAID', 'CUSTOMER', 'DONE_BY_EXECUTOR')).toBe(true);
+    expect(canTransition('CUSTOMER_PAID', 'CUSTOMER', 'IN_PROGRESS')).toBe(false);
+    expect(canTransition('CUSTOMER_PAID', 'EXECUTOR', 'DONE_BY_EXECUTOR')).toBe(false);
+
+    expect(canTransition('PAYMENT_RECEIVED', 'EXECUTOR', 'COMPLETED')).toBe(true);
+    // The executor who got the money may close the job before the customer confirms.
+    expect(canTransition('PAYMENT_RECEIVED', 'EXECUTOR', 'DONE_BY_EXECUTOR')).toBe(true);
+    expect(canTransition('PAYMENT_RECEIVED', 'CUSTOMER', 'COMPLETED')).toBe(false);
+    expect(ORDER_RULES.PAYMENT_RECEIVED.to).toBe('PAID');
+  });
+
+  it('lets either party open a dispute once the work is reported done', () => {
+    expect(canTransition('DISPUTE', 'EXECUTOR', 'DONE_BY_EXECUTOR')).toBe(true);
+    expect(canTransition('DISPUTE', 'CUSTOMER', 'COMPLETED')).toBe(true);
+    expect(canTransition('DISPUTE', 'CUSTOMER', 'IN_PROGRESS')).toBe(false);
+    expect(canTransition('DISPUTE', 'SYSTEM', 'COMPLETED')).toBe(false);
+  });
 });

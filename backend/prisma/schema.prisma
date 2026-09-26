@@ -164,6 +164,8 @@ model ExecutorProfile {
   freePeriodEnd   DateTime  @map("free_period_end") @db.Timestamptz(3)
   /// Tax method status (§9); after the free period only VERIFIED may take new jobs.
   taxStatus       TaxStatus @default(NONE) @map("tax_status")
+  /// free_period_reminder_days already pushed (§8).
+  remindedDays    Int[]     @default([]) @map("free_period_reminded_days")
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -359,6 +361,13 @@ model Order {
   /// Executor confirmed receiving the cash / Xolis payment.
   executorReceivedAt DateTime?                              @map("executor_received_at") @db.Timestamptz(3)
   paidAt             DateTime?                              @map("paid_at") @db.Timestamptz(3)
+  /// "Pul kelmadi" / "Muammo bor" (§5.1): who opened the dispute, when and why.
+  disputedAt         DateTime?                              @map("disputed_at") @db.Timestamptz(3)
+  disputedBy         String?                                @map("disputed_by") @db.Uuid
+  disputeNote        String?                                @map("dispute_note")
+  /// confirm_reminder_hours already pushed to the customer / executor (§5.1).
+  customerReminded   Int[]                                  @default([]) @map("customer_reminded_hours")
+  executorReminded   Int[]                                  @default([]) @map("executor_reminded_hours")
   cancelledAt        DateTime?                              @map("cancelled_at") @db.Timestamptz(3)
   /// Null when cancelled by the system.
   cancelledBy        String?                                @map("cancelled_by") @db.Uuid
@@ -517,6 +526,36 @@ model WalletHold {
 }
 
 /// Google Maps Platform requests, for the monthly free-limit view (SA6).
+enum WithdrawalStatus {
+  REQUESTED
+  PROCESSING
+  PAID
+  FAILED
+}
+
+/**
+ * Payout to the user's card (docs/01-biznes-qoidalar.md §7). The amount and the bank fee
+ * leave the REAL account when requested; FAILED returns both. Card and payout provider
+ * come with stage 4, behind the payout feature flag (§14).
+ */
+model Withdrawal {
+  id             String           @id @default(uuid(7)) @db.Uuid
+  userId         String           @map("user_id") @db.Uuid
+  /// Tiyin, whole so'm.
+  amount         BigInt
+  /// Bank transfer fee (withdraw_fee_bps), tiyin; goes to PAYOUT_PROVIDER_FEES.
+  fee            BigInt
+  feeBps         Int              @map("fee_bps")
+  status         WithdrawalStatus @default(REQUESTED)
+  idempotencyKey String           @unique @map("idempotency_key")
+  failureReason  String?          @map("failure_reason")
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([userId, createdAt])
+  @@map("withdrawals")
+}
+
 model MapsUsage {
   id   String   @id @default(uuid(7)) @db.Uuid
   kind String

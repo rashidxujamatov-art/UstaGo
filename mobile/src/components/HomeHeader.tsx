@@ -85,7 +85,7 @@ export function HomeHeader<T extends string>({
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t('menu.wallet')}
-            onPress={() => router.push('/soon')}
+            onPress={() => router.push('/wallet')}
             style={{
               minHeight: 40,
               flexDirection: 'row',

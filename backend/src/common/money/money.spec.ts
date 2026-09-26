@@ -1,4 +1,12 @@
-import { applyBps, divide, mulDivToSom, parseTiyin, somToTiyin, toBigIntRate } from './money.js';
+import {
+  applyBps,
+  divide,
+  formatSom,
+  mulDivToSom,
+  parseTiyin,
+  somToTiyin,
+  toBigIntRate,
+} from './money.js';
 
 const som = somToTiyin;
 
@@ -55,5 +63,16 @@ describe('parsing', () => {
     expect(toBigIntRate(250)).toBe(250n);
     expect(() => toBigIntRate(2.5)).toThrow(RangeError);
     expect(() => toBigIntRate(Number.MAX_SAFE_INTEGER + 1)).toThrow(RangeError);
+  });
+});
+
+describe('formatSom', () => {
+  const nbsp = String.fromCharCode(0xa0);
+
+  it('groups thousands with no-break spaces and drops tiyin', () => {
+    expect(formatSom(som(7_500n))).toBe(`7${nbsp}500`);
+    expect(formatSom(som(1_234_567n) + 99n)).toBe(`1${nbsp}234${nbsp}567`);
+    expect(formatSom(som(-3_000n))).toBe(`-3${nbsp}000`);
+    expect(formatSom(0n)).toBe('0');
   });
 });

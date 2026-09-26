@@ -45,6 +45,10 @@ const SYSTEM_CODES = [
   'WORK_STARTED',
   'WORK_FINISHED',
   'ORDER_CANCELLED',
+  'CUSTOMER_PAID',
+  'PAYMENT_RECEIVED',
+  'ORDER_PAID',
+  'DISPUTE_OPENED',
 ] as const;
 type SystemCode = (typeof SYSTEM_CODES)[number];
 const isSystemCode = (code: string | null): code is SystemCode =>

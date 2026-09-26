@@ -108,11 +108,13 @@ describe.skipIf(!e2eEnabled)('orders flow (e2e)', () => {
   it('gives a new executor the 25 000 demo bonus once (§8)', async () => {
     const executor = await fullUser(h, doc(), 'EXECUTOR');
     const wallet = await h.api().get('/api/v1/wallet').set(executor.auth).expect(200);
-    expect(wallet.body).toEqual({
+    expect(wallet.body).toMatchObject({
       real: '0',
       demo: som(25_000),
       holds: '0',
       available: som(25_000),
+      demo_granted: som(25_000),
+      free_period: { days_left: 30, active: true },
     });
 
     // Switching roles back and forth does not pay it again.
@@ -239,7 +241,7 @@ describe.skipIf(!e2eEnabled)('orders flow (e2e)', () => {
     const blockedCustomer = await postOrder(customer.auth).expect(409);
     expect(blockedCustomer.body).toEqual({
       code: 'ORDER_CUSTOMER_CONFIRMATION_REQUIRED',
-      params: { order: finished.body.number },
+      params: { order: finished.body.number, order_id: id },
     });
     // ...and the executor of a cash job cannot take another one (T13).
     const other = await fullUser(h, doc(), 'CUSTOMER');
@@ -251,7 +253,7 @@ describe.skipIf(!e2eEnabled)('orders flow (e2e)', () => {
       .expect(409);
     expect(blockedExecutor.body).toEqual({
       code: 'ORDER_EXECUTOR_CONFIRMATION_REQUIRED',
-      params: { order: finished.body.number },
+      params: { order: finished.body.number, order_id: id },
     });
   });
 

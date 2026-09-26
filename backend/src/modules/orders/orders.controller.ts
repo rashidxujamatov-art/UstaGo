@@ -30,6 +30,7 @@ const messageSchema = z
   })
   .refine((value) => Boolean(value.text) || Boolean(value.photo_key));
 const messagesQuery = z.object({ before: z.uuid().optional() });
+const disputeSchema = z.object({ note: z.string().trim().max(1000).optional() });
 
 const uuid = new ParseUUIDPipe();
 
@@ -69,6 +70,24 @@ export class OrdersController {
     @Body(new ZodPipe(cancelOrderSchema)) body: z.output<typeof cancelOrderSchema>,
   ) {
     return this.orders.cancel(auth.userId, id, body);
+  }
+
+  /** BY9 "To'ladim" (cash, Xolis QR). */
+  @Post(':id/paid')
+  @HttpCode(HttpStatus.OK)
+  paid(@Auth() auth: AuthContext, @Param('id', uuid) id: string) {
+    return this.orders.customerPaid(auth.userId, id);
+  }
+
+  /** "Muammo bor" (customer); either party may open a dispute (§3.3). */
+  @Post(':id/dispute')
+  @HttpCode(HttpStatus.OK)
+  dispute(
+    @Auth() auth: AuthContext,
+    @Param('id', uuid) id: string,
+    @Body(new ZodPipe(disputeSchema)) body: z.output<typeof disputeSchema>,
+  ) {
+    return this.orders.dispute(auth.userId, id, body.note);
   }
 
   // Executor actions.
@@ -116,6 +135,24 @@ export class OrdersController {
     @Body(new ZodPipe(finishSchema)) body: z.output<typeof finishSchema>,
   ) {
     return this.orders.step(auth.userId, id, 'FINISH', body.photo_keys);
+  }
+
+  /** BJ13 "Pulni qabul qildim" (cash, Xolis QR): closes and settles the job. */
+  @Post(':id/payment-received')
+  @HttpCode(HttpStatus.OK)
+  received(@Auth() auth: AuthContext, @Param('id', uuid) id: string) {
+    return this.orders.paymentReceived(auth.userId, id);
+  }
+
+  /** BJ13 "Pul kelmadi": the executor opens a dispute. */
+  @Post(':id/payment-not-received')
+  @HttpCode(HttpStatus.OK)
+  notReceived(
+    @Auth() auth: AuthContext,
+    @Param('id', uuid) id: string,
+    @Body(new ZodPipe(disputeSchema)) body: z.output<typeof disputeSchema>,
+  ) {
+    return this.orders.dispute(auth.userId, id, body.note);
   }
 
   // Chat (BY4).

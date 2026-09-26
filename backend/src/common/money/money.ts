@@ -75,3 +75,14 @@ export function mulDivToSom(
 export function applyBps(amountTiyin: bigint, bps: number | bigint, rounding: Rounding): bigint {
   return mulDivToSom(amountTiyin, bps, BPS_DENOMINATOR, rounding);
 }
+
+const NO_BREAK_SPACE = String.fromCharCode(0xa0);
+
+/** Whole so'm of a tiyin amount with no-break spaces between thousands ("7 500"). */
+export function formatSom(tiyin: bigint): string {
+  const som = tiyin / TIYIN_PER_SOM;
+  const digits = (som < 0n ? -som : som)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, NO_BREAK_SPACE);
+  return som < 0n ? `-${digits}` : digits;
+}

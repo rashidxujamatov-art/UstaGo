@@ -176,7 +176,42 @@
   "wallet": {
     "insufficientToAccept": "Bu ishni olish uchun yana {shortfall} so‘m to‘ldiring.",
     "insufficientFunds": "Hisobingizda mablag‘ yetarli emas.",
-    "withdrawMustKeep": "Hisobingizda ilova xizmati uchun {must_keep} so‘m qolishi kerak. Ko‘pi bilan {max} so‘m yechishingiz mumkin (bank o‘tkazma xizmati 1% — {fee} so‘m)."
+    "withdrawMustKeep": "Hisobingizda ilova xizmati uchun {must_keep} so‘m qolishi kerak. Ko‘pi bilan {max} so‘m yechishingiz mumkin (bank o‘tkazma xizmati 1% — {fee} so‘m).",
+    "title": "Hamyon",
+    "freeBadge": "Bepul oy · {days} kun",
+    "total": "Jami balans",
+    "real": "Asosiy hisob",
+    "realHint": "yechib olsa bo‘ladi",
+    "demo": "Demo bonus",
+    "demoOf": "/ {total}",
+    "topUp": "To‘ldirish",
+    "withdraw": "Pul yechish",
+    "demoInfo": "Bepul oyda xizmat haqi avval demo bonusdan yechiladi. Demo bonusni <b>yechib bo‘lmaydi</b> — u {date} gacha amal qiladi.",
+    "held": "Band qilingan xizmat haqi: {amount}",
+    "history": "Tarix",
+    "empty": "Hozircha amallar yo‘q",
+    "more": "Yana ko‘rsatish",
+    "demoBadge": "DEMO",
+    "demoPart": "shundan demo {amount}",
+    "tx": {
+      "ORDER_INCOME": "Daromad · #{number}",
+      "SERVICE_FEE": "Xizmat haqi · #{number}",
+      "REFERRAL_L1": "Referal bonusi · 1-qatlam",
+      "REFERRAL_L2": "Referal bonusi · 2-qatlam",
+      "TOPUP": "Hisob to‘ldirildi",
+      "WITHDRAWAL": "Pul yechish",
+      "WITHDRAWAL_FEE": "Bank xizmati",
+      "WITHDRAWAL_REFUND": "Pul yechish qaytarildi",
+      "WITHDRAWAL_FEE_REFUND": "Bank xizmati qaytarildi",
+      "DEMO_BONUS": "Demo bonus",
+      "DEMO_EXPIRE": "Demo bonus muddati tugadi"
+    },
+    "sub": {
+      "income": "{method} · {when}",
+      "fee": "{percent}% · {when}",
+      "feeCash": "Naqd buyurtma · {when}",
+      "referral": "{name} bajargan ish · {when}"
+    }
   },
   "tax": {
     "required": "Bepul oy tugadi. Ishni davom ettirish uchun soliq usulini tanlang."
@@ -278,7 +313,8 @@
     "started": "Ish boshlandi",
     "finished": "Usta ishni yakunladi",
     "checkAndAccept": "Ishni tekshirib, qabul qiling",
-    "payment": "To‘lov"
+    "payment": "To‘lov",
+    "disputed": "Nizo ochildi"
   },
   "newOrder": {
     "title": "Yangi buyurtma",
@@ -384,7 +420,11 @@
       "EXECUTOR_ARRIVED": "Usta yetib keldi",
       "WORK_STARTED": "Usta ishni boshladi",
       "WORK_FINISHED": "Usta ishni yakunladi",
-      "ORDER_CANCELLED": "Buyurtma bekor qilindi"
+      "ORDER_CANCELLED": "Buyurtma bekor qilindi",
+      "CUSTOMER_PAID": "Mijoz «To‘ladim»ni bosdi",
+      "PAYMENT_RECEIVED": "Usta pulni qabul qildi, buyurtma yopildi",
+      "ORDER_PAID": "To‘lov qabul qilindi, buyurtma yopildi",
+      "DISPUTE_OPENED": "Nizo ochildi, admin ko‘rib chiqadi"
     }
   },
   "errorsExtra": {
@@ -398,6 +438,72 @@
     "categoryInvalid": "Kategoriyani tanlang.",
     "paymentDisabled": "Bu to‘lov usuli hozir ishlamaydi.",
     "cancelReasonRequired": "Bekor qilish sababini tanlang.",
-    "chatClosed": "Bu buyurtma uchun chat yopiq."
+    "chatClosed": "Bu buyurtma uchun chat yopiq.",
+    "paymentMismatch": "Bu amal faqat naqd va Xolis to‘lovlari uchun."
+  },
+  "referral": {
+    "title": "Referal dasturi",
+    "heading": "Do‘stlaringizni taklif qiling",
+    "sub": "Siz taklif qilgan ustalar bajargan har bir ishdan bonus olasiz.",
+    "you": "Siz",
+    "level1": "1-qatlam",
+    "level2": "2-qatlam",
+    "people": "{count} kishi",
+    "total": "Jami bonusingiz",
+    "note": "Bonus platforma hisobidan to‘lanadi, bepul oyda ham — ustaning daromadi kamaymaydi.",
+    "linkTitle": "Sizning taklif havolangiz",
+    "copy": "Havoladan nusxa olish",
+    "copied": "Havoladan nusxa olindi",
+    "share": "Havolani ulashish",
+    "shareMessage": "{appName} — usta toping yoki ish oling. Mening taklif havolam: {link}",
+    "recent": "Oxirgi bonuslar",
+    "recentEmpty": "Siz taklif qilgan ustalar ish bajarganda bonuslar shu yerda ko‘rinadi.",
+    "recentSub": "{level} · {price} so‘mlik ish"
+  },
+  "confirm": {
+    "payTitle": "To‘lovni tasdiqlash",
+    "orderLine": "Buyurtma #{number} · {title}",
+    "finished": "Usta ishni tugatdi",
+    "finishedSub": "{name} · {when}",
+    "amountLabel": "Ustaga to‘lanadigan summa",
+    "amountNote": "Summa buyurtmada kelishilgan, o‘zgarmaydi.",
+    "howTitle": "Qanday tasdiqlanadi",
+    "stepCash": "Pulni ustaga naqd bering",
+    "stepXolis": "Ustaning Xolis QR-kodiga to‘lang",
+    "stepPress": "«To‘ladim» tugmasini bosing",
+    "stepExecutor": "Usta «Pulni qabul qildim»ni bosadi — buyurtma yopiladi",
+    "lockCustomer": "«To‘ladim»ni bosmaguningizcha yangi buyurtma joylay olmaysiz.",
+    "iPaid": "To‘ladim — {amount}",
+    "problem": "Muammo bor",
+    "receiveTitle": "To‘lovni tasdiqlang",
+    "receiveLine": "Buyurtma #{number} · {name}",
+    "customerPaid": "Mijoz «To‘ladim»ni bosdi",
+    "customerPaidSub": "{when} · {method}",
+    "customerNotYet": "Mijoz hali «To‘ladim»ni bosmagan",
+    "customerNotYetSub": "Pulni olgan bo‘lsangiz, tasdiqlashingiz mumkin",
+    "settlement": "Hisob-kitob",
+    "receivedCash": "Qo‘lingizga olgan pul",
+    "receivedXolis": "Xolis hamyoningizga tushgan pul",
+    "fee": "Xizmat haqi {percent}%",
+    "feeDemo": "Xizmat haqi {percent}%, demodan",
+    "net": "Sof daromadingiz",
+    "balance": "Hisobingiz",
+    "heldNote": "{fee} so‘m ishni olganingizda band qilingan edi — endi avtomatik yechiladi.",
+    "lockExecutor": "Tasdiqlamaguningizcha yangi ish ololmaysiz.",
+    "blockCustomerTitle": "Avval oldingi buyurtmani yoping",
+    "blockCustomerText": "#{number} buyurtma bo‘yicha usta ishni tugatdi. Pulni bergan bo‘lsangiz, «To‘ladim»ni bosing — shundan keyin yangi buyurtma joylaysiz.",
+    "blockExecutorTitle": "Avval to‘lovni tasdiqlang",
+    "blockExecutorPaid": "#{number} bo‘yicha mijoz {amount} so‘m to‘laganini aytdi. «Pulni qabul qildim»ni bosing — shundan keyin yangi ish olasiz.",
+    "blockExecutorWaiting": "#{number} bo‘yicha pulni olgan bo‘lsangiz, «Pulni qabul qildim»ni bosing — shundan keyin yangi ish olasiz.",
+    "feeAuto": "Xizmat haqi {fee} so‘m hisobingizdan avtomatik yechiladi.",
+    "disputeTitle": "Muammo bormi?",
+    "notReceivedTitle": "Pul kelmadimi?",
+    "disputeText": "Nizo ochiladi va admin ko‘rib chiqadi. Shu buyurtma sababli qo‘yilgan cheklov olib tashlanadi.",
+    "disputeNote": "Nima bo‘ldi? (ixtiyoriy)",
+    "disputeConfirm": "Nizo ochish",
+    "waitingExecutor": "Usta pulni qabul qilganini tasdiqlashini kutyapmiz",
+    "disputed": "Nizo ochilgan. Admin ko‘rib chiqadi",
+    "closed": "Buyurtma yopildi",
+    "onlineNext": "Online to‘lov keyingi bosqichda qo‘shiladi"
   }
 }

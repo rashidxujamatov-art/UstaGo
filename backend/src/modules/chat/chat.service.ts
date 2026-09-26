@@ -15,7 +15,11 @@ export type SystemMessageCode =
   | 'EXECUTOR_ARRIVED'
   | 'WORK_STARTED'
   | 'WORK_FINISHED'
-  | 'ORDER_CANCELLED';
+  | 'ORDER_CANCELLED'
+  | 'CUSTOMER_PAID'
+  | 'PAYMENT_RECEIVED'
+  | 'ORDER_PAID'
+  | 'DISPUTE_OPENED';
 
 export interface MessageView {
   id: string;
