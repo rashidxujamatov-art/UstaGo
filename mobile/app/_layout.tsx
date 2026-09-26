@@ -11,7 +11,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { bootstrapSession } from '../src/auth/session-actions';
 import { usePreferences } from '../src/store/preferences';
@@ -19,6 +19,14 @@ import { useSession } from '../src/store/session';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 
 void SplashScreen.preventAutoHideAsync();
+
+/** True once the saved preferences are loaded; no race with the subscription. */
+function usePreferencesHydrated(): boolean {
+  return useSyncExternalStore(
+    (onChange) => usePreferences.persist.onFinishHydration(onChange),
+    () => usePreferences.persist.hasHydrated(),
+  );
+}
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 60_000 } },
@@ -32,13 +40,11 @@ export default function RootLayout() {
     GolosText_600SemiBold,
     GolosText_700Bold,
   });
-  const [prefsReady, setPrefsReady] = useState(usePreferences.persist.hasHydrated());
+  const prefsReady = usePreferencesHydrated();
   const sessionStatus = useSession((state) => state.status);
 
   useEffect(() => {
-    const unsubscribe = usePreferences.persist.onFinishHydration(() => setPrefsReady(true));
     void bootstrapSession();
-    return unsubscribe;
   }, []);
 
   const ready = (fontsLoaded || fontError !== null) && prefsReady && sessionStatus !== 'loading';

@@ -28,7 +28,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     name: appName,
     slug: required('APP_SLUG'),
     version: '1.0.0',
-    platforms: ['ios', 'android'],
+    // Web is only a developer preview (EXPO_WEB_PREVIEW=1), not a product platform.
+    platforms:
+      process.env.EXPO_WEB_PREVIEW === '1' ? ['ios', 'android', 'web'] : ['ios', 'android'],
     orientation: 'portrait',
     scheme: bundleId,
     userInterfaceStyle: 'automatic',

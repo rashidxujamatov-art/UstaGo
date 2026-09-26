@@ -22,6 +22,7 @@ import {
   isValidDocNumber,
 } from '../../src/lib/input';
 import { useSession } from '../../src/store/session';
+import { useSignup } from '../../src/store/signup';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
 type DocType = 'ID_CARD' | 'PASSPORT';
@@ -61,7 +62,8 @@ export default function IdentityScreen() {
         birth_date: isoDate,
         device_id: (await deviceInfo()).id,
       });
-      router.push({ pathname: '/face', params: { session: session.session_id } });
+      useSignup.getState().setIdentitySession(session.session_id);
+      router.push('/face');
     } catch (error) {
       if (error instanceof ApiError && error.code === 'AUTH_IDENTITY_ALREADY_VERIFIED') {
         useSession.getState().setUser(await endpoints.me());

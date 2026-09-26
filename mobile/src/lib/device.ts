@@ -1,8 +1,8 @@
 import * as Crypto from 'expo-crypto';
 import * as Device from 'expo-device';
-import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import type { DeviceInfo } from '../api/types';
+import { secureStorage } from './secure-storage';
 
 const DEVICE_ID_KEY = 'device-id';
 let cached: DeviceInfo | null = null;
@@ -13,10 +13,10 @@ let cached: DeviceInfo | null = null;
  */
 export async function deviceInfo(): Promise<DeviceInfo> {
   if (cached) return cached;
-  let id = await SecureStore.getItemAsync(DEVICE_ID_KEY);
+  let id = await secureStorage.getItem(DEVICE_ID_KEY);
   if (!id) {
     id = Crypto.randomUUID();
-    await SecureStore.setItemAsync(DEVICE_ID_KEY, id);
+    await secureStorage.setItem(DEVICE_ID_KEY, id);
   }
   cached = {
     id,

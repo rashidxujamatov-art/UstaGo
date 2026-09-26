@@ -162,7 +162,7 @@ export default function SignScreen() {
     <Screen
       header={
         <StepHeader
-          step={1}
+          step={tab === 'register' ? 1 : undefined}
           onBack={() => (router.canGoBack() ? router.back() : router.replace('/welcome'))}
         />
       }
@@ -286,7 +286,7 @@ export default function SignScreen() {
               <Trans
                 i18nKey="auth.acceptTerms"
                 components={{
-                  link: <AppText weight="semibold" color="brandText" size="bodyLarge" />,
+                  em: <AppText weight="semibold" color="brandText" size="bodyLarge" />,
                 }}
               />
             </AppText>

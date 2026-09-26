@@ -72,6 +72,8 @@ export function TextField({ label, hint, error, prefix, secret, right, ...input 
           }}
           style={{
             flex: 1,
+            // Lets the input shrink so a right-hand button ("Tekshirish") keeps its width.
+            minWidth: 0,
             paddingHorizontal: theme.spacing.lg,
             paddingVertical: theme.spacing.md,
             fontFamily: theme.fontFamily.medium,
@@ -97,7 +99,7 @@ export function TextField({ label, hint, error, prefix, secret, right, ...input 
             )}
           </Pressable>
         ) : null}
-        {right}
+        {right ? <View style={{ flexShrink: 0 }}>{right}</View> : null}
       </View>
       {error ? (
         <AppText size="secondary" color="red">

@@ -37,6 +37,7 @@
   "role": {
     "customer": "Buyurtmachi",
     "executor": "Bajaruvchi (usta)",
+    "executorShort": "Bajaruvchi",
     "title": "Ilovadan kim sifatida foydalanasiz?",
     "subtitle": "Rolni keyinroq bosh menyudan istalgan vaqtda almashtirishingiz mumkin.",
     "customerTagline": "Ish joylayman va ishonchli usta topaman",
@@ -83,7 +84,7 @@
     "emailLabel": "Elektron pochta",
     "passwordLabel": "Parol",
     "passwordHint": "Kamida 8 ta belgi, harf va raqam",
-    "acceptTerms": "<link>Foydalanish shartlari</link> va <link>maxfiylik siyosati</link>ga roziman",
+    "acceptTerms": "<em>Foydalanish shartlari</em> va <em>maxfiylik siyosati</em>ga roziman",
     "getSmsCode": "SMS kod olish",
     "forgotPassword": "Parolni unutdingizmi?",
     "invalidPhone": "Raqamni to‘liq kiriting: 90 123 45 67",

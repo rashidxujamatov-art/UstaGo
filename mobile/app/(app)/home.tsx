@@ -68,7 +68,7 @@ export default function HomeScreen() {
             }}
           >
             <AppText weight="semibold" style={{ color: theme.colors.pillText }}>
-              {t(isExecutor ? 'role.executor' : 'role.customer')}
+              {t(isExecutor ? 'role.executorShort' : 'role.customer')}
             </AppText>
           </View>
         </View>

@@ -15,10 +15,13 @@ interface SignupState {
   otpSentAt: number | null;
   /** Existing account shown on K3d. */
   duplicate: DuplicatePersonParams | null;
+  /** Open MyID session between K3b and K3c (kept out of the URL). */
+  identitySession: string | null;
 
   setReferral: (code: string | null, invite: Invite | null) => void;
   startOtp: (phone: string, purpose: OtpPurpose, otp: OtpTicket) => void;
   setDuplicate: (duplicate: DuplicatePersonParams | null) => void;
+  setIdentitySession: (session: string | null) => void;
   clearOtp: () => void;
 }
 
@@ -31,8 +34,10 @@ export const useSignup = create<SignupState>()((set) => ({
   otp: null,
   otpSentAt: null,
   duplicate: null,
+  identitySession: null,
   setReferral: (referralCode, invite) => set({ referralCode, invite }),
   startOtp: (phone, purpose, otp) => set({ phone, purpose, otp, otpSentAt: Date.now() }),
   setDuplicate: (duplicate) => set({ duplicate }),
+  setIdentitySession: (identitySession) => set({ identitySession }),
   clearOtp: () => set({ phone: null, purpose: null, otp: null, otpSentAt: null }),
 }));

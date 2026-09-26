@@ -1,7 +1,7 @@
-import * as SecureStore from 'expo-secure-store';
 import { create } from 'zustand';
 import type { TokenStore } from '../api/client';
 import type { Me, TokenPair } from '../api/types';
+import { secureStorage } from '../lib/secure-storage';
 
 const REFRESH_TOKEN_KEY = 'refresh-token';
 
@@ -35,13 +35,13 @@ export const useSession = create<SessionState>()((set) => ({
 /** The access token lives in memory only; the refresh token in the OS secure storage. */
 export const sessionTokenStore: TokenStore = {
   accessToken: () => useSession.getState().accessToken,
-  refreshToken: () => SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
+  refreshToken: () => secureStorage.getItem(REFRESH_TOKEN_KEY),
   async save(tokens: TokenPair) {
-    await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, tokens.refresh_token);
+    await secureStorage.setItem(REFRESH_TOKEN_KEY, tokens.refresh_token);
     useSession.getState().setAccessToken(tokens.access_token);
   },
   async clear() {
-    await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+    await secureStorage.deleteItem(REFRESH_TOKEN_KEY);
     useSession.getState().reset();
   },
 };

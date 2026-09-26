@@ -1,4 +1,4 @@
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { Check, Glasses, Lock, ScanFace, Sun, UserRound } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,7 @@ export default function FaceScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
   const errorText = useErrorText();
-  const { session } = useLocalSearchParams<{ session?: string }>();
+  const session = useSignup((state) => state.identitySession);
   const setDuplicate = useSignup((state) => state.setDuplicate);
   const [phase, setPhase] = useState<'idle' | 'detected' | 'checking'>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +39,7 @@ export default function FaceScreen() {
     setPhase('checking');
     try {
       const me = await endpoints.completeIdentity(session);
+      useSignup.getState().setIdentitySession(null);
       useSession.getState().setUser(me);
       router.replace('/role');
     } catch (e) {

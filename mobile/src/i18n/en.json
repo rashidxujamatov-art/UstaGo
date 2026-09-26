@@ -37,6 +37,7 @@
   "role": {
     "customer": "Customer",
     "executor": "Specialist (pro)",
+    "executorShort": "Specialist",
     "title": "How will you use the app?",
     "subtitle": "You can switch roles any time from the main menu.",
     "customerTagline": "I post jobs and find a reliable pro",
@@ -83,7 +84,7 @@
     "emailLabel": "Email",
     "passwordLabel": "Password",
     "passwordHint": "At least 8 characters, letters and digits",
-    "acceptTerms": "I accept the <link>terms of use</link> and the <link>privacy policy</link>",
+    "acceptTerms": "I accept the <em>terms of use</em> and the <em>privacy policy</em>",
     "getSmsCode": "Get SMS code",
     "forgotPassword": "Forgot your password?",
     "invalidPhone": "Enter the full number: 90 123 45 67",
