@@ -5,6 +5,8 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module.js';
+import { RedisIoAdapter } from './infra/redis-io.adapter.js';
+import { REDIS } from './infra/redis/redis.module.js';
 import type { Env } from './config/env.js';
 
 const API_PREFIX = 'api/v1';
@@ -20,6 +22,7 @@ async function bootstrap(): Promise<void> {
   app.use(helmet());
   app.enableCors(corsOrigins.length > 0 ? { origin: corsOrigins } : { origin: false });
   app.setGlobalPrefix(API_PREFIX);
+  app.useWebSocketAdapter(new RedisIoAdapter(app, app.get(REDIS), corsOrigins));
   app.enableShutdownHooks();
 
   const port = config.get('PORT', { infer: true });

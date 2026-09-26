@@ -6,6 +6,7 @@ import type { Env } from '../../config/env.js';
 import type { Language, Prisma, Role, ThemeMode } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { SettingsService } from '../settings/settings.service.js';
+import { WalletService } from '../wallet/wallet.service.js';
 
 /** Which onboarding screen the user still has to pass (K3b → K4), or DONE. */
 export type OnboardingStep = 'IDENTITY' | 'ROLE' | 'DONE';
@@ -48,6 +49,7 @@ export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly settings: SettingsService,
+    private readonly wallet: WalletService,
     private readonly config: ConfigService<Env, true>,
   ) {}
 
@@ -94,8 +96,8 @@ export class UsersService {
 
   /**
    * Switches the active role (K4, U1). Needs a finished MyID check.
-   * The first switch to EXECUTOR starts the free period, once per person (§8);
-   * the demo bonus is credited by the wallet in stage 3.
+   * The first switch to EXECUTOR starts the free period and credits the demo bonus,
+   * both once per person (§8).
    */
   async setRole(userId: string, role: Role): Promise<MeView> {
     const { free_period_days: freeDays } = await this.settings.getAll();
@@ -104,22 +106,26 @@ export class UsersService {
       const user = await tx.user.findUnique({
         where: { id: userId },
         select: {
-          identity: { select: { userId: true } },
-          executorProfile: { select: { userId: true } },
+          identity: { select: { pinflHash: true } },
+          executorProfile: { select: { freePeriodEnd: true } },
         },
       });
       if (!user?.identity) {
         throw new AppError(ErrorCode.AUTH_IDENTITY_REQUIRED, {}, HttpStatus.FORBIDDEN);
       }
-      if (role === 'EXECUTOR' && !user.executorProfile) {
-        const start = new Date();
-        await tx.executorProfile.create({
-          data: {
-            userId,
-            freePeriodStart: start,
-            freePeriodEnd: new Date(start.getTime() + freeDays * 24 * 3600 * 1000),
-          },
-        });
+      if (role === 'EXECUTOR') {
+        let freePeriodEnd = user.executorProfile?.freePeriodEnd;
+        if (!freePeriodEnd) {
+          const start = new Date();
+          freePeriodEnd = new Date(start.getTime() + freeDays * 24 * 3600 * 1000);
+          await tx.executorProfile.create({
+            data: { userId, freePeriodStart: start, freePeriodEnd },
+          });
+        }
+        // Idempotent per PINFL; also covers executors registered before the wallet existed.
+        if (freePeriodEnd > new Date()) {
+          await this.wallet.grantDemoBonus(tx, userId, user.identity.pinflHash);
+        }
       }
       await tx.user.update({ where: { id: userId }, data: { activeRole: role } });
       return this.me(userId, tx);
@@ -143,6 +149,19 @@ export class UsersService {
       last_seen_at: device.lastSeenAt.toISOString(),
       current: device.id === current?.deviceRowId,
     }));
+  }
+
+  /** FCM token of the device behind the current session (null turns pushes off). */
+  async setPushToken(sessionId: string, token: string | null): Promise<void> {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
+      select: { deviceRowId: true },
+    });
+    if (!session) throw new AppError(ErrorCode.UNAUTHORIZED, {}, HttpStatus.UNAUTHORIZED);
+    await this.prisma.device.update({
+      where: { id: session.deviceRowId },
+      data: { pushToken: token },
+    });
   }
 
   /** Signs a device out: closes its sessions and forgets it, so it needs SMS next time. */

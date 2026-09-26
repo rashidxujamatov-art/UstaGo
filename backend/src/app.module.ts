@@ -13,10 +13,16 @@ import { AuditModule } from './modules/audit/audit.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 import { IdentityModule } from './modules/identity/identity.module.js';
+import { MapsModule } from './modules/maps/maps.module.js';
+import { NotificationsModule } from './modules/notifications/notifications.module.js';
+import { OrdersModule } from './modules/orders/orders.module.js';
+import { RealtimeModule } from './modules/realtime/realtime.module.js';
 import { ReferralsModule } from './modules/referrals/referrals.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
 import { SmsModule } from './modules/sms/sms.module.js';
+import { StorageModule } from './modules/storage/storage.module.js';
 import { UsersModule } from './modules/users/users.module.js';
+import { WalletModule } from './modules/wallet/wallet.module.js';
 
 @Module({
   imports: [
@@ -40,6 +46,12 @@ import { UsersModule } from './modules/users/users.module.js';
     UsersModule,
     AuthModule,
     IdentityModule,
+    NotificationsModule,
+    StorageModule,
+    MapsModule,
+    WalletModule,
+    OrdersModule,
+    RealtimeModule,
     HealthModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: AppExceptionFilter }],

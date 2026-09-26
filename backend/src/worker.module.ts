@@ -1,12 +1,23 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
+import { CommonModule } from './common/common.module.js';
 import { type Env, validateEnv } from './config/env.js';
 import { loggerParams } from './config/logger.js';
 import { PrismaModule } from './infra/prisma/prisma.module.js';
 import { QueuesModule } from './infra/queues/queues.module.js';
 import { RedisModule } from './infra/redis/redis.module.js';
+import { AuditModule } from './modules/audit/audit.module.js';
+import { NotificationsModule } from './modules/notifications/notifications.module.js';
+import {
+  ORDERS_QUEUE,
+  OrderExpiryProcessor,
+  OrderExpiryScheduler,
+} from './modules/orders/order-expiry.processor.js';
+import { OrdersModule } from './modules/orders/orders.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
+import { StorageModule } from './modules/storage/storage.module.js';
 
 /**
  * Background worker (BullMQ). Same code base as the API, different entry point.
@@ -26,7 +37,14 @@ import { SettingsModule } from './modules/settings/settings.module.js';
     PrismaModule,
     RedisModule,
     QueuesModule,
+    BullModule.registerQueue({ name: ORDERS_QUEUE }),
+    CommonModule,
+    AuditModule,
+    NotificationsModule,
+    StorageModule,
     SettingsModule,
+    OrdersModule,
   ],
+  providers: [OrderExpiryScheduler, OrderExpiryProcessor],
 })
 export class WorkerModule {}

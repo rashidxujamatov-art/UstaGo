@@ -51,6 +51,9 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       PINFL_HMAC_KEY: 'e2e-hmac-key-e2e-hmac-key-e2e-hmac-key',
       SMS_PROVIDER: 'mock',
       IDENTITY_PROVIDER: 'mock',
+      MAPS_PROVIDER: 'mock',
+      STORAGE_PROVIDER: 'mock',
+      PUSH_PROVIDER: 'mock',
       OTP_TEST_MODE: 'false',
       LOG_LEVEL: 'fatal',
     });

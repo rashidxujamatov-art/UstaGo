@@ -43,6 +43,7 @@ export const settingsShape = {
   login_attempt_window_sec: positiveInt,
   min_age_years: z.number().int().min(0).max(120),
   order_photos_max: positiveInt,
+  feed_nearby_radius_m: positiveInt,
   upload_max_mb: positiveInt,
   qr_payment_ttl_sec: positiveInt,
   location_interval_sec: positiveInt,
