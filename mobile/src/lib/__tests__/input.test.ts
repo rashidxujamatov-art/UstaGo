@@ -1,5 +1,8 @@
 import {
   birthDateToIso,
+  cardDigits,
+  formatCardExpiry,
+  formatCardNumber,
   formatBirthDateInput,
   formatCountdown,
   formatDocNumber,
@@ -92,5 +95,16 @@ describe('price input (BY2)', () => {
   it('sends the price in tiyin', () => {
     expect(somDigitsToTiyin('500000')).toBe('50000000');
     expect(somDigitsToTiyin('')).toBeNull();
+  });
+});
+
+describe('card input', () => {
+  it('groups the number by four and masks the expiry', () => {
+    expect(cardDigits('8600 1234-5678 90123456')).toBe('8600123456789012');
+    expect(formatCardNumber('860012345')).toBe('8600 1234 5');
+    expect(formatCardNumber('')).toBe('');
+    expect(formatCardExpiry('1')).toBe('1');
+    expect(formatCardExpiry('1230')).toBe('12/30');
+    expect(formatCardExpiry('12/305')).toBe('12/30');
   });
 });

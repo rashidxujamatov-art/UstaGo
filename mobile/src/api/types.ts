@@ -55,6 +55,9 @@ export interface PublicConfig {
   payment_methods_enabled: PaymentMethod[];
   order_photos_max: number;
   feed_nearby_radius_m: number;
+  /** Tiyin. */
+  topup_min: string;
+  withdraw_fee_bps: number;
 }
 
 export interface DeviceInfo {
@@ -177,6 +180,7 @@ export type LedgerTxType =
   | 'DEMO_EXPIRE'
   | 'ORDER_INCOME'
   | 'TOPUP'
+  | 'TOPUP_REFUND'
   | 'SERVICE_FEE'
   | 'REFERRAL_L1'
   | 'REFERRAL_L2'
@@ -202,11 +206,65 @@ export interface WalletTransaction {
     fee_bps: number | null;
   } | null;
   from: { first_name: string; last_initial: string } | null;
+  /** Top-ups: PAYME, CLICK or CARD. */
+  provider: PaymentProviderName | null;
 }
 
 export interface WalletTransactionsPage {
   items: WalletTransaction[];
   next: string | null;
+}
+
+// ---------------------------------------------------------------- stage 4
+
+export type PaymentProviderName = 'PAYME' | 'CLICK' | 'CARD';
+export type PaymentStatus = 'CREATED' | 'PENDING' | 'PAID' | 'CANCELLED' | 'REFUNDED' | 'EXPIRED';
+
+/** A top-up or order payment through Payme, Click or a saved card. */
+export interface PaymentInfo {
+  id: string;
+  provider: PaymentProviderName;
+  purpose: 'TOPUP' | 'ORDER';
+  /** Tiyin. */
+  amount: string;
+  status: PaymentStatus;
+  order_id: string | null;
+  /** Click / Payme link; also the BJ4 QR content. */
+  checkout_url: string | null;
+  expires_at: string;
+  /** Development: the payment may be finished without the provider app. */
+  test_mode: boolean;
+}
+
+export type CardBrand = 'UZCARD' | 'HUMO' | 'VISA' | 'MASTERCARD';
+
+export interface SavedCard {
+  id: string;
+  masked_pan: string;
+  last4: string;
+  brand: CardBrand;
+  expire: string;
+}
+
+/** BJ7. */
+export interface WithdrawPreview {
+  real: string;
+  must_keep: string;
+  max: string;
+  max_fee: string;
+  fee_bps: number;
+  fee: string | null;
+  holds: { order_number: number; price: string; fee: string; fee_bps: number | null }[];
+  enabled: boolean;
+}
+
+export interface WithdrawalInfo {
+  id: string;
+  amount: string;
+  fee: string;
+  status: 'REQUESTED' | 'PROCESSING' | 'PAID' | 'FAILED';
+  card_id: string | null;
+  created_at: string;
 }
 
 /** U2 "Referal dasturi". */

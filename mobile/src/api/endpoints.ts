@@ -12,14 +12,18 @@ import type {
   OtpTicket,
   NewOrderInput,
   Order,
+  PaymentInfo,
   PlaceSuggestion,
   PublicConfig,
   ReferralSummary,
+  SavedCard,
   Role,
   SignedIn,
   ThemeModeApi,
   Wallet,
   WalletTransactionsPage,
+  WithdrawalInfo,
+  WithdrawPreview,
 } from './types';
 
 /** Typed calls to /api/v1 (docs/02-arxitektura.md §6). */
@@ -168,4 +172,28 @@ export const endpoints = {
     api.post<Order>(`/orders/${id}/payment-not-received`, { note }),
   /** BY9 "Muammo bor". */
   dispute: (id: string, note?: string) => api.post<Order>(`/orders/${id}/dispute`, { note }),
+
+  // ---------------------------------------------------------------- stage 4
+
+  /** BY5: pays with the order's method (balance at once, card, Click / Payme link). */
+  payOrder: (id: string, cardId?: string) =>
+    api.post<{ payment: PaymentInfo | null; order: Order | null }>(`/orders/${id}/pay`, {
+      card_id: cardId,
+    }),
+  /** BJ4: the executor's QR. */
+  paymentSession: (id: string) => api.post<PaymentInfo>(`/orders/${id}/payment-session`),
+  payment: (id: string) => api.get<PaymentInfo>(`/payments/${id}`),
+  testCompletePayment: (id: string) => api.post<PaymentInfo>(`/payments/${id}/test-complete`),
+  topup: (input: { amount: string; method: 'CLICK' | 'PAYME' | 'CARD'; card_id?: string }) =>
+    api.post<PaymentInfo>('/wallet/topup', input),
+  cards: () => api.get<SavedCard[]>('/wallet/cards'),
+  addCard: (input: { number: string; expire: string }) =>
+    api.post<{ card_id: string; phone_masked: string | null }>('/wallet/cards', input),
+  verifyCard: (id: string, code: string) =>
+    api.post<SavedCard>(`/wallet/cards/${id}/verify`, { code }),
+  removeCard: (id: string) => api.delete<void>(`/wallet/cards/${id}`),
+  withdrawPreview: (amount?: string) =>
+    api.post<WithdrawPreview>('/wallet/withdraw/preview', { amount }),
+  withdraw: (input: { amount: string; card_id: string; idempotency_key: string }) =>
+    api.post<WithdrawalInfo>('/wallet/withdraw', input),
 };

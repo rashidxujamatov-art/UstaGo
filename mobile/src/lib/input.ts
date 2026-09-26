@@ -75,6 +75,26 @@ export function formatCountdown(seconds: number): string {
   return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 }
 
+/** Card number digits (up to 16) from whatever was typed or pasted. */
+export function cardDigits(text: string): string {
+  return text.replace(/\D/g, '').slice(0, 16);
+}
+
+/** "8600123412341234" → "8600 1234 1234 1234" (partial input as far as it goes). */
+export function formatCardNumber(text: string): string {
+  return (
+    cardDigits(text)
+      .match(/.{1,4}/g)
+      ?.join(' ') ?? ''
+  );
+}
+
+/** Masks the card expiry as MM/YY while typing. */
+export function formatCardExpiry(text: string): string {
+  const digits = text.replace(/\D/g, '').slice(0, 4);
+  return digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+}
+
 /** Longest price the BY2 field accepts, in whole so‘m digits (999 999 999 999). */
 const PRICE_MAX_DIGITS = 12;
 

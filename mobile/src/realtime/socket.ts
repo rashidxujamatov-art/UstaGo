@@ -4,7 +4,8 @@ import { API_URL } from '../api';
 import { useSession } from '../store/session';
 
 /** Events the backend sends (docs/02-arxitektura.md §7). */
-export type RealtimeEvent = 'order.status' | 'chat.message' | 'chat.read' | 'notification';
+export type RealtimeEvent =
+  'order.status' | 'payment.status' | 'chat.message' | 'chat.read' | 'notification';
 
 let socket: Socket | null = null;
 let socketToken: string | null = null;

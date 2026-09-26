@@ -87,6 +87,22 @@ export function awaitsExecutorReceived(order: Pick<Order, 'status' | 'payment_me
   );
 }
 
+/** BY5 / BJ4: a finished job paid online (balance, card, Click, Payme). */
+export function awaitsOnlinePayment(order: Pick<Order, 'status' | 'payment_method'>): boolean {
+  return (
+    (order.status === 'DONE_BY_EXECUTOR' || order.status === 'COMPLETED') &&
+    paymentKind(order.payment_method) === 'online'
+  );
+}
+
+/** BJ4: jobs the executor takes by showing a Click / Payme QR. */
+export function hasPaymentQr(order: Pick<Order, 'status' | 'payment_method'>): boolean {
+  return (
+    awaitsOnlinePayment(order) &&
+    (order.payment_method === 'CLICK' || order.payment_method === 'PAYME')
+  );
+}
+
 /** "Muammo bor" / "Pul kelmadi" open a dispute once the work is reported done. */
 export function canDispute(status: OrderStatus): boolean {
   return status === 'DONE_BY_EXECUTOR' || status === 'COMPLETED';

@@ -31,6 +31,8 @@ const light = {
   wall: '#DFE7EF',
   scrim: 'rgba(15,23,32,0.45)',
   destinationPin: '#E0483F',
+  /** BJ4: the payment QR stays dark on white in both themes (scanners need it). */
+  qrBg: '#FFFFFF',
 } as const;
 
 /** Every light token must have a dark counterpart and vice versa. */
@@ -62,6 +64,8 @@ const dark = {
   wall: '#0E151D',
   scrim: 'rgba(0,0,0,0.55)',
   destinationPin: '#E0483F',
+  /** BJ4: the payment QR stays dark on white in both themes (scanners need it). */
+  qrBg: '#FFFFFF',
 } as const satisfies Record<keyof typeof light, string>;
 
 export const palette = { light, dark } as const;

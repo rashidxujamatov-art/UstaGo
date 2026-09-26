@@ -25,6 +25,7 @@ const LOOK: Record<LedgerTxType, { icon: LucideIcon; bg: ColorToken; fg: ColorTo
   REFERRAL_L2: { icon: Users, bg: 'greenSoft', fg: 'green' },
   SERVICE_FEE: { icon: Percent, bg: 'orangeSoft', fg: 'orange' },
   TOPUP: { icon: Plus, bg: 'brandSoft', fg: 'brandText' },
+  TOPUP_REFUND: { icon: RotateCcw, bg: 'surface2', fg: 'text2' },
   WITHDRAWAL: { icon: ArrowUpRight, bg: 'surface2', fg: 'text2' },
   WITHDRAWAL_FEE: { icon: Landmark, bg: 'surface2', fg: 'text2' },
   WITHDRAWAL_REFUND: { icon: RotateCcw, bg: 'brandSoft', fg: 'brandText' },
@@ -47,7 +48,9 @@ export function TransactionRow({ item }: { item: WalletTransaction }) {
   const order = item.order;
 
   let subtitle = when;
-  if (item.type === 'ORDER_INCOME' && order) {
+  if ((item.type === 'TOPUP' || item.type === 'TOPUP_REFUND') && item.provider) {
+    subtitle = t('wallet.sub.topup', { provider: t(`wallet.providers.${item.provider}`), when });
+  } else if (item.type === 'ORDER_INCOME' && order) {
     subtitle = t('wallet.sub.income', {
       method: t(`payment.method.${order.payment_method}`),
       when,

@@ -204,13 +204,20 @@
       "WITHDRAWAL_REFUND": "Pul yechish qaytarildi",
       "WITHDRAWAL_FEE_REFUND": "Bank xizmati qaytarildi",
       "DEMO_BONUS": "Demo bonus",
-      "DEMO_EXPIRE": "Demo bonus muddati tugadi"
+      "DEMO_EXPIRE": "Demo bonus muddati tugadi",
+      "TOPUP_REFUND": "To‘ldirish qaytarildi"
     },
     "sub": {
       "income": "{method} · {when}",
       "fee": "{percent}% · {when}",
       "feeCash": "Naqd buyurtma · {when}",
-      "referral": "{name} bajargan ish · {when}"
+      "referral": "{name} bajargan ish · {when}",
+      "topup": "{provider} · {when}"
+    },
+    "providers": {
+      "PAYME": "Payme",
+      "CLICK": "Click",
+      "CARD": "Karta"
     }
   },
   "tax": {
@@ -258,7 +265,8 @@
       "OTHER": "Boshqa sabab"
     },
     "paymentNext": "To‘lov keyingi bosqichda qo‘shiladi",
-    "noExecutor": "Buyurtmangiz ustalarga ko‘rsatilmoqda"
+    "noExecutor": "Buyurtmangiz ustalarga ko‘rsatilmoqda",
+    "payAccept": "Qabul qilish va to‘lash"
   },
   "errors": {
     "internal": "Nimadir xato ketdi. Keyinroq qayta urinib ko‘ring.",
@@ -397,7 +405,9 @@
     "declineConfirm": "Buyurtmadan voz kechasizmi? U boshqa ustalarga qayta ko‘rsatiladi.",
     "openInMaps": "Google Maps’da ochish",
     "waitingPayment": "Buyurtmachi to‘lovni tasdiqlashini kuting",
-    "customer": "Buyurtmachi"
+    "customer": "Buyurtmachi",
+    "takePayment": "To‘lovni qabul qilish",
+    "waitingOnline": "Buyurtmachi to‘lovini kutyapmiz"
   },
   "insufficient": {
     "title": "Mablag‘ yetarli emas",
@@ -505,5 +515,107 @@
     "disputed": "Nizo ochilgan. Admin ko‘rib chiqadi",
     "closed": "Buyurtma yopildi",
     "onlineNext": "Online to‘lov keyingi bosqichda qo‘shiladi"
+  },
+  "pay": {
+    "title": "To‘lov",
+    "subtitle": "Buyurtma #{number}",
+    "doneChip": "Usta ishni yakunladi",
+    "proLine": "{name} · {when}",
+    "methodTitle": "To‘lov usuli",
+    "balance": "{appName} hisobidan",
+    "balanceSub": "Hisobingizda {balance} · keyin {after} qoladi",
+    "balanceShort": "Hisobingizda {balance} — yana {shortfall} kerak",
+    "clickSub": "Ilovada to‘lang yoki ustaning telefonidagi QR kodni skanerlang",
+    "paymeSub": "Ilovada to‘lang yoki ustaning telefonidagi QR kodni skanerlang",
+    "card": "Bank kartasi",
+    "cardSub": "{brand} · •••• {last4}",
+    "addCard": "Yangi karta qo‘shish",
+    "note": "Pul ustaning {appName} hisobiga o‘tadi. Xizmat haqi usta hisobidan olinadi.",
+    "payBalance": "Hisobdan {amount} o‘tkazish",
+    "payWith": "{provider} orqali to‘lash",
+    "payCard": "Kartadan {amount} to‘lash",
+    "topUp": "Hisobni to‘ldirish",
+    "waiting": "To‘lov kutilmoqda…",
+    "waitingHint": "To‘lovni {provider} ilovasida yakunlang. Tasdiq kelishi bilan buyurtma yopiladi.",
+    "openAgain": "{provider} ilovasini qayta ochish",
+    "testComplete": "Test: to‘lovni tasdiqlash",
+    "paid": "To‘lov qabul qilindi",
+    "failed": "To‘lov o‘tmadi. Qaytadan urinib ko‘ring."
+  },
+  "qr": {
+    "title": "To‘lovni qabul qilish",
+    "subtitle": "Buyurtma #{number} · {name}",
+    "amountLabel": "To‘lov summasi",
+    "scanHint": "Buyurtmachi kodni {provider} ilovasi bilan skanerlasin",
+    "waiting": "To‘lov kutilmoqda · {time}",
+    "expired": "QR kod muddati tugadi",
+    "refresh": "Yangi QR kod",
+    "orderPrice": "Buyurtma narxi",
+    "fee": "Xizmat haqi {percent}%",
+    "feeDemo": "{amount} · demo bonusdan",
+    "toAccount": "Hisobingizga tushadi",
+    "paid": "To‘lov qabul qilindi",
+    "notConfigured": "To‘lov tizimi hali ulanmagan. Test rejimida tasdiqlashingiz mumkin."
+  },
+  "topup": {
+    "title": "Hisobni to‘ldirish",
+    "amount": "Summa",
+    "current": "Hozirgi balans",
+    "after": "To‘ldirgandan keyin",
+    "enoughFor": "#{number} buyurtmani olish uchun yetadi",
+    "method": "To‘lov usuli",
+    "appOrQr": "Ilova yoki QR orqali",
+    "localCard": "Uzcard / Humo",
+    "foreignCard": "Visa / Mastercard",
+    "secure": "To‘lov rasmiy to‘lov tizimi orqali xavfsiz amalga oshiriladi",
+    "submit": "{amount} to‘ldirish",
+    "min": "Eng kam summa: {min}",
+    "done": "Hisob to‘ldirildi",
+    "waitingHint": "To‘lovni {provider} ilovasida yakunlang. Tasdiq kelishi bilan hisobingiz to‘ldiriladi."
+  },
+  "withdraw": {
+    "title": "Pul yechish",
+    "have": "Hisobingizda",
+    "holdLine": "#{number} · {price} so‘mlik ish",
+    "bankFee": "Bank o‘tkazma xizmati",
+    "how": "Qancha yechasiz?",
+    "mustKeepTitle": "Hisobingizda ilova xizmati uchun {must_keep} qolishi kerak.",
+    "maxLine": "Ko‘pi bilan {max} yechishingiz mumkin (bank o‘tkazma xizmati {percent}% — {fee}).",
+    "useMax": "{amount} kiritish",
+    "to": "Qayerga",
+    "chooseCard": "Kartani tanlang",
+    "info": "Ish tugab, xizmat haqi yechilgach, qolgan pulni to‘liq yechib olasiz.",
+    "submit": "Yechib olish",
+    "disabled": "Pul yechish hali yoqilmagan.",
+    "done": "So‘rov qabul qilindi. Pul kartangizga o‘tkaziladi."
+  },
+  "cards": {
+    "title": "Karta qo‘shish",
+    "number": "Karta raqami",
+    "expire": "Amal qilish muddati",
+    "expireHint": "OO/YY",
+    "next": "Davom etish",
+    "codeTitle": "SMS kodni kiriting",
+    "codeSent": "Kod {phone} raqamiga yuborildi",
+    "codeSentAny": "Kod kartaga ulangan raqamga yuborildi",
+    "confirm": "Tasdiqlash",
+    "remove": "Kartani o‘chirish",
+    "brands": {
+      "UZCARD": "Uzcard",
+      "HUMO": "Humo",
+      "VISA": "Visa",
+      "MASTERCARD": "Mastercard"
+    }
+  },
+  "payErrors": {
+    "amountInvalid": "Eng kam summa — {min} so‘m.",
+    "providerUnavailable": "To‘lov tizimi hozir ishlamayapti. Keyinroq urinib ko‘ring.",
+    "notAvailable": "Bu to‘lovni endi bajarib bo‘lmaydi.",
+    "cardInvalid": "Karta raqami yoki muddati noto‘g‘ri.",
+    "cardNotSupported": "Bu karta turi hozircha qo‘llab-quvvatlanmaydi.",
+    "cardCodeInvalid": "SMS kod noto‘g‘ri.",
+    "cardDeclined": "Karta to‘lovni rad etdi.",
+    "cardNotFound": "Karta topilmadi.",
+    "withdrawalsDisabled": "Pul yechish hali yoqilmagan."
   }
 }

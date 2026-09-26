@@ -160,6 +160,8 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       min_age_years: 16,
       order_photos_max: 5,
       feed_nearby_radius_m: 5000,
+      topup_min: '100000',
+      withdraw_fee_bps: 100,
     });
   });
 

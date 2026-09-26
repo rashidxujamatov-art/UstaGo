@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { ArrowRight, Banknote, Check, CircleX, Clock } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +10,7 @@ import { BarHeader } from '../components/ui/BarHeader';
 import { Button } from '../components/ui/Button';
 import { Card, Separator } from '../components/ui/Card';
 import { formatPercent } from '../lib/format';
+import { leave } from '../lib/navigation';
 import { useTheme } from '../theme/ThemeProvider';
 import { netIncome } from './amounts';
 import { DangerLink, LockNote, MoneyLine, StatusBanner } from './ConfirmParts';
@@ -126,7 +126,7 @@ export function ReceiveConfirm({ order }: { order: Order }) {
             disabled={actions.busy !== null}
             onPress={() =>
               void actions.received().then((done) => {
-                if (done) router.back();
+                if (done) leave({ pathname: '/order/[id]', params: { id: order.id } });
               })
             }
           />
@@ -147,7 +147,7 @@ export function ReceiveConfirm({ order }: { order: Order }) {
         onConfirm={(note) =>
           void actions.dispute(note).then((done) => {
             setDisputeOpen(false);
-            if (done) router.back();
+            if (done) leave({ pathname: '/order/[id]', params: { id: order.id } });
           })
         }
       />

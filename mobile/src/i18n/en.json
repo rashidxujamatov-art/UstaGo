@@ -204,13 +204,20 @@
       "WITHDRAWAL_REFUND": "Withdrawal returned",
       "WITHDRAWAL_FEE_REFUND": "Bank fee returned",
       "DEMO_BONUS": "Demo bonus",
-      "DEMO_EXPIRE": "Demo bonus expired"
+      "DEMO_EXPIRE": "Demo bonus expired",
+      "TOPUP_REFUND": "Top-up returned"
     },
     "sub": {
       "income": "{method} · {when}",
       "fee": "{percent}% · {when}",
       "feeCash": "Cash job · {when}",
-      "referral": "Job done by {name} · {when}"
+      "referral": "Job done by {name} · {when}",
+      "topup": "{provider} · {when}"
+    },
+    "providers": {
+      "PAYME": "Payme",
+      "CLICK": "Click",
+      "CARD": "Card"
     }
   },
   "tax": {
@@ -258,7 +265,8 @@
       "OTHER": "Other reason"
     },
     "paymentNext": "Payment comes in the next stage",
-    "noExecutor": "Your job is being shown to pros"
+    "noExecutor": "Your job is being shown to pros",
+    "payAccept": "Accept and pay"
   },
   "errors": {
     "internal": "Something went wrong. Please try again later.",
@@ -397,7 +405,9 @@
     "declineConfirm": "Withdraw from this job? It will be shown to other pros again.",
     "openInMaps": "Open in Google Maps",
     "waitingPayment": "Waiting for the customer to confirm payment",
-    "customer": "Customer"
+    "customer": "Customer",
+    "takePayment": "Take payment",
+    "waitingOnline": "Waiting for the customer to pay"
   },
   "insufficient": {
     "title": "Not enough balance",
@@ -505,5 +515,107 @@
     "disputed": "A dispute is open. An admin will review it",
     "closed": "The order is closed",
     "onlineNext": "Online payment comes in the next stage"
+  },
+  "pay": {
+    "title": "Payment",
+    "subtitle": "Order #{number}",
+    "doneChip": "The pro finished the work",
+    "proLine": "{name} · {when}",
+    "methodTitle": "Payment method",
+    "balance": "From your {appName} balance",
+    "balanceSub": "Balance {balance} · {after} left after",
+    "balanceShort": "Balance {balance} — {shortfall} short",
+    "clickSub": "Pay in the app or scan the QR code on the pro’s phone",
+    "paymeSub": "Pay in the app or scan the QR code on the pro’s phone",
+    "card": "Bank card",
+    "cardSub": "{brand} · •••• {last4}",
+    "addCard": "Add a card",
+    "note": "The money goes to the pro’s {appName} balance. The service fee is taken from the pro’s balance.",
+    "payBalance": "Transfer {amount} from balance",
+    "payWith": "Pay with {provider}",
+    "payCard": "Pay {amount} by card",
+    "topUp": "Top up balance",
+    "waiting": "Waiting for payment…",
+    "waitingHint": "Finish the payment in the {provider} app. The order closes as soon as it is confirmed.",
+    "openAgain": "Open {provider} again",
+    "testComplete": "Test: confirm the payment",
+    "paid": "Payment received",
+    "failed": "The payment did not go through. Please try again."
+  },
+  "qr": {
+    "title": "Take payment",
+    "subtitle": "Order #{number} · {name}",
+    "amountLabel": "Amount",
+    "scanHint": "Ask the customer to scan the code with the {provider} app",
+    "waiting": "Waiting for payment · {time}",
+    "expired": "The QR code has expired",
+    "refresh": "New QR code",
+    "orderPrice": "Order price",
+    "fee": "Service fee {percent}%",
+    "feeDemo": "{amount} · from demo bonus",
+    "toAccount": "Goes to your balance",
+    "paid": "Payment received",
+    "notConfigured": "The payment system is not connected yet. In test mode you can confirm it by hand."
+  },
+  "topup": {
+    "title": "Top up",
+    "amount": "Amount",
+    "current": "Current balance",
+    "after": "After top-up",
+    "enoughFor": "Enough to take order #{number}",
+    "method": "Payment method",
+    "appOrQr": "In the app or by QR",
+    "localCard": "Uzcard / Humo",
+    "foreignCard": "Visa / Mastercard",
+    "secure": "Payments go through an official payment system",
+    "submit": "Top up {amount}",
+    "min": "Minimum: {min}",
+    "done": "Balance topped up",
+    "waitingHint": "Finish the payment in the {provider} app. Your balance is topped up as soon as it is confirmed."
+  },
+  "withdraw": {
+    "title": "Withdraw",
+    "have": "Your balance",
+    "holdLine": "#{number} · {price} UZS job",
+    "bankFee": "Bank transfer fee",
+    "how": "How much?",
+    "mustKeepTitle": "{must_keep} must stay in your balance for the app service fee.",
+    "maxLine": "You can withdraw up to {max} (bank fee {percent}% — {fee}).",
+    "useMax": "Enter {amount}",
+    "to": "To",
+    "chooseCard": "Choose a card",
+    "info": "Once the job is done and the fee is charged, you can withdraw the rest in full.",
+    "submit": "Withdraw",
+    "disabled": "Withdrawals are not switched on yet.",
+    "done": "Request accepted. The money will be sent to your card."
+  },
+  "cards": {
+    "title": "Add a card",
+    "number": "Card number",
+    "expire": "Expiry date",
+    "expireHint": "MM/YY",
+    "next": "Continue",
+    "codeTitle": "Enter the SMS code",
+    "codeSent": "The code was sent to {phone}",
+    "codeSentAny": "The code was sent to the phone linked to the card",
+    "confirm": "Confirm",
+    "remove": "Remove card",
+    "brands": {
+      "UZCARD": "Uzcard",
+      "HUMO": "Humo",
+      "VISA": "Visa",
+      "MASTERCARD": "Mastercard"
+    }
+  },
+  "payErrors": {
+    "amountInvalid": "The minimum is {min} UZS.",
+    "providerUnavailable": "The payment system is unavailable right now. Please try later.",
+    "notAvailable": "This payment can no longer be made.",
+    "cardInvalid": "The card number or expiry date is wrong.",
+    "cardNotSupported": "This card type is not supported yet.",
+    "cardCodeInvalid": "The SMS code is wrong.",
+    "cardDeclined": "The card declined the payment.",
+    "cardNotFound": "Card not found.",
+    "withdrawalsDisabled": "Withdrawals are not switched on yet."
   }
 }
