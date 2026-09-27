@@ -58,6 +58,7 @@ export async function createHarness(): Promise<Harness> {
     CARD_PROVIDER: 'mock',
     CARD_TOKEN_ENC_KEY: Buffer.alloc(32, 5).toString('base64'),
     PAYOUT_PROVIDER: 'mock',
+    TAX_PROVIDER: 'mock',
     FEATURE_PAYOUTS_ENABLED: 'true',
     PAYMENT_TEST_MODE: 'false',
   });
@@ -67,7 +68,7 @@ export async function createHarness(): Promise<Harness> {
   await prisma.$executeRawUnsafe(
     `TRUNCATE users, invite_codes, audit_logs, settings, categories, orders, order_events,
        messages, wallet_accounts, ledger_transactions, ledger_entries, wallet_holds, withdrawals,
-       payments, cards, maps_usage
+       payments, cards, tax_verifications, maps_usage
      RESTART IDENTITY CASCADE`,
   );
   await redis.flushdb();

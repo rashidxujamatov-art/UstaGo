@@ -396,6 +396,10 @@ Hal qilingan savollar (2026-09-26, 4-bosqich):
 
 - To‘lov usulini ish tugagach almashtirib bo‘lmaydi: buyurtma joylanganda tanlangan usulda to‘lanadi. BY5 faqat shu usulni ko‘rsatadi; BJ4 (QR) faqat Click yoki Payme buyurtmasida, o‘sha provayder bilan ochiladi. Online buyurtmani naqdga o‘tkazish ("Naqd pulni qabul qildim") yo‘q.
 
+Hal qilingan savollar (2026-09-26, 5-bosqich):
+
+- `XOLIS_QR` buyurtma joylashda alohida usul emas. Buyurtmachi "Naqd"ni tanlaydi; ishni olgan usta Paynet Xolis usulida tasdiqlangan bo‘lsa, to‘lov paytida naqd o‘rniga ustaning Xolis QR-kodiga ham to‘lash mumkin (BY9). Ikkalasi bir xil tasdiqlanadi (§5.1); buyurtmaga amalda ishlatilgan usul (`CASH` yoki `XOLIS_QR`) yoziladi.
+
 ## 14. Yuridik talablar (real pul bilan ishga tushirishdan oldin)
 
 - **Elektron pul**: O‘zbekistonda elektron pulni faqat tijorat banklari va Markaziy bank chiqara oladi. Ilovadagi balans, uni to‘ldirish, hisobdan hisobga o‘tkazish va pul yechish shu toifaga kirishi mumkin. Litsenziyali bank yoki to‘lov tashkiloti bilan hamkorlik sxemasini yurist tasdiqlasin. Ungacha ledger yoziladi, lekin payout feature flag ortida turadi.

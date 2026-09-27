@@ -24,6 +24,8 @@ export class PublicConfigController {
       order_photos_max: s.order_photos_max,
       feed_nearby_radius_m: s.feed_nearby_radius_m,
       topup_min: s.topup_min.toString(),
+      fee_bps: s.fee_bps,
+      tax_methods_enabled: s.tax_methods_enabled,
       withdraw_fee_bps: s.withdraw_fee_bps,
     };
   }

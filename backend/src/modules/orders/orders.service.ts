@@ -11,6 +11,7 @@ import { RealtimePublisher } from '../realtime/realtime.publisher.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { UploadsService } from '../storage/uploads.service.js';
 import { acceptQuote } from '../wallet/accept-quote.js';
+import { effectiveStatus } from '../tax/tax.service.js';
 import { SettlementService } from '../wallet/settlement.service.js';
 import { type WalletBalances, WalletService } from '../wallet/wallet.service.js';
 import {
@@ -447,17 +448,29 @@ export class OrdersService {
   // ---------------------------------------------------------------- payment (§5.1)
 
   /** BY9 "To'ladim": the customer says they paid cash or to the pro's Xolis QR. */
-  async customerPaid(userId: string, orderId: string): Promise<OrderView> {
+  async customerPaid(
+    userId: string,
+    orderId: string,
+    via: 'CASH' | 'XOLIS_QR' = 'CASH',
+  ): Promise<OrderView> {
     const order = await this.findForParty(orderId, userId);
     if (order.customerId !== userId) throw this.notFound();
     this.assertPartyConfirmed(order.paymentMethod);
     const rule = ORDER_RULES.CUSTOMER_PAID;
     if (!rule.from.includes(order.status)) throw this.conflict(order.status);
+    // A cash job may be paid to the pro's Paynet Xolis QR instead (stage 5 decision).
+    if (via === 'XOLIS_QR' && !(await this.xolisQrFor(order.executorId))) {
+      throw new AppError(ErrorCode.XOLIS_NOT_AVAILABLE, {}, HttpStatus.CONFLICT);
+    }
 
     await this.prisma.$transaction(async (tx) => {
       const { count } = await tx.order.updateMany({
         where: { id: orderId, status: order.status },
-        data: { status: rule.to, customerPaidAt: new Date() },
+        data: {
+          status: rule.to,
+          customerPaidAt: new Date(),
+          ...(via === 'XOLIS_QR' ? { paymentMethod: 'XOLIS_QR' as const } : {}),
+        },
       });
       if (count === 0) throw this.conflict(order.status);
       await this.event(tx, orderId, order.status, rule.to, userId);
@@ -739,7 +752,9 @@ export class OrdersService {
         status: true,
         activeRole: true,
         identity: { select: { userId: true } },
-        executorProfile: { select: { freePeriodEnd: true, taxStatus: true } },
+        executorProfile: {
+          select: { freePeriodEnd: true, taxStatus: true, taxValidUntil: true },
+        },
       },
     });
     if (!user) throw new AppError(ErrorCode.UNAUTHORIZED, {}, HttpStatus.UNAUTHORIZED);
@@ -776,10 +791,28 @@ export class OrdersService {
     }
 
     const profile = user.executorProfile;
-    const freePeriodOver = !profile || profile.freePeriodEnd <= new Date();
-    if (freePeriodOver && profile?.taxStatus !== 'VERIFIED') {
+    const now = new Date();
+    const freePeriodOver = !profile || profile.freePeriodEnd <= now;
+    if (freePeriodOver && (!profile || effectiveStatus(profile, now) !== 'VERIFIED')) {
       throw new AppError(ErrorCode.TAX_METHOD_REQUIRED, {}, HttpStatus.FORBIDDEN);
     }
+  }
+
+  /** The executor's Xolis QR when they are verified on Paynet Xolis and Xolis is enabled. */
+  private async xolisQrFor(executorId: string | null): Promise<string | null> {
+    if (!executorId) return null;
+    const [profile, s] = await Promise.all([
+      this.prisma.executorProfile.findUnique({
+        where: { userId: executorId },
+        select: { taxMethod: true, taxStatus: true, taxValidUntil: true, xolisQr: true },
+      }),
+      this.settings.getAll(),
+    ]);
+    const ok =
+      profile?.taxMethod === 'XOLIS' &&
+      effectiveStatus(profile, new Date()) === 'VERIFIED' &&
+      s.payment_methods_enabled.includes('XOLIS_QR');
+    return ok ? (profile.xolisQr ?? null) : null;
   }
 
   private assertPartyConfirmed(method: PaymentMethod): void {
@@ -883,10 +916,17 @@ export class OrdersService {
   }
 
   private async view(order: OrderWithParties, userId: string, distanceM?: number | null) {
+    const xolisQr =
+      order.customerId === userId &&
+      order.paymentMethod === 'CASH' &&
+      order.status === 'DONE_BY_EXECUTOR'
+        ? await this.xolisQrFor(order.executorId)
+        : null;
     return toOrderView(
       order,
       { userId },
       {
+        xolisQr,
         photoUrls: await this.uploads.viewUrls(order.photoKeys),
         finishPhotoUrls: await this.uploads.viewUrls(order.finishPhotoKeys),
         distanceM: distanceM === null || distanceM === undefined ? null : Math.round(distanceM),

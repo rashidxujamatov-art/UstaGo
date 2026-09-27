@@ -5,7 +5,12 @@ import { ErrorCode } from '../../common/errors/error-codes.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { STORAGE_PROVIDER, type StorageProvider } from './storage.provider.js';
 
-export const UPLOAD_PURPOSES = ['ORDER_PHOTO', 'FINISH_PHOTO', 'CHAT_PHOTO'] as const;
+export const UPLOAD_PURPOSES = [
+  'ORDER_PHOTO',
+  'FINISH_PHOTO',
+  'CHAT_PHOTO',
+  'TAX_CERTIFICATE',
+] as const;
 export type UploadPurpose = (typeof UPLOAD_PURPOSES)[number];
 
 const CONTENT_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' } as const;

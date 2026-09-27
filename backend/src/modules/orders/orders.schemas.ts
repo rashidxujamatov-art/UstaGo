@@ -31,7 +31,9 @@ export const createOrderSchema = z.object({
   time_from: z.iso.datetime({ offset: true }),
   time_to: z.iso.datetime({ offset: true }),
   price: priceTiyin,
-  payment_method: z.enum(['BALANCE', 'CLICK', 'PAYME', 'CARD', 'CASH', 'XOLIS_QR']),
+  // Xolis QR is not chosen when posting: a cash job may be paid to a Xolis pro's QR
+  // (decision of 2026-09-26, stage 5).
+  payment_method: z.enum(['BALANCE', 'CLICK', 'PAYME', 'CARD', 'CASH']),
 });
 export type CreateOrderInput = z.output<typeof createOrderSchema>;
 
