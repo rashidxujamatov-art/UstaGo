@@ -14,10 +14,13 @@ interface PreferencesState {
   textSize: TextSize;
   /** The language screen (Main) was passed at least once. */
   welcomed: boolean;
+  /** BJ11 was shown at least once, so later departs skip straight to the permission request. */
+  departIntroShown: boolean;
   setLanguage: (language: Language) => void;
   setThemeMode: (mode: ThemeMode) => void;
   setTextSize: (size: TextSize) => void;
   setWelcomed: () => void;
+  setDepartIntroShown: () => void;
 }
 
 /**
@@ -31,19 +34,22 @@ export const usePreferences = create<PreferencesState>()(
       themeMode: 'auto',
       textSize: 'normal',
       welcomed: false,
+      departIntroShown: false,
       setLanguage: (language) => set({ language }),
       setThemeMode: (themeMode) => set({ themeMode }),
       setTextSize: (textSize) => set({ textSize }),
       setWelcomed: () => set({ welcomed: true }),
+      setDepartIntroShown: () => set({ departIntroShown: true }),
     }),
     {
       name: 'preferences',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: ({ language, themeMode, textSize, welcomed }) => ({
+      partialize: ({ language, themeMode, textSize, welcomed, departIntroShown }) => ({
         language,
         themeMode,
         textSize,
         welcomed,
+        departIntroShown,
       }),
     },
   ),

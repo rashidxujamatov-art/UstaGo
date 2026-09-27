@@ -62,6 +62,12 @@ export interface PublicConfig {
   /** BJ9: the certificate expiry reminder is sent this many days before. */
   self_employed_reminder_days: number;
   withdraw_fee_bps: number;
+  /** Stage 6: how often the executor's app posts a location point while sharing. */
+  location_interval_sec: number;
+  /** Stage 6: distance to the destination that auto-stops sharing (`NEAR_DESTINATION`). */
+  auto_stop_radius_m: number;
+  /** Stage 6: a trip older than this is force-stopped (`MAX_DURATION`). */
+  max_trip_minutes: number;
 }
 
 export interface DeviceInfo {
@@ -368,4 +374,72 @@ export interface TaxMethodsOverview {
   enabled: TaxMethod[];
   counts: { SELF_EMPLOYED: number; XOLIS: number };
   without_method: number;
+}
+
+// ---------------------------------------------------------------- stage 6
+
+/** Why a trip stopped sending location (docs/01 §10). */
+export type TripEndReason =
+  'ARRIVED' | 'NEAR_DESTINATION' | 'CANCELLED' | 'DECLINED' | 'MAX_DURATION' | 'STOPPED';
+
+export interface TripPosition {
+  lat: number;
+  lng: number;
+  heading: number | null;
+  at: string;
+}
+
+/** `GET /orders/:id/trip`: both parties may read it, only the pro's app posts to it. */
+export interface TripView {
+  /** NONE: the pro did not share (or has not departed yet). */
+  status: 'NONE' | 'ACTIVE' | 'ENDED';
+  /** Only while ACTIVE. */
+  position: TripPosition | null;
+  eta_sec: number | null;
+  distance_m: number | null;
+  end_reason: TripEndReason | null;
+  started_at: string | null;
+  destination: { lat: number; lng: number };
+}
+
+/** One point the background location task batches up before posting. */
+export interface TripPointInput {
+  lat: number;
+  lng: number;
+  at: string;
+  accuracy_m?: number;
+  speed?: number;
+  heading?: number;
+}
+
+/** `POST /orders/:id/trip/points` response: tells the app whether to keep tracking. */
+export interface TripPointsResult {
+  active: boolean;
+  end_reason: TripEndReason | null;
+  eta_sec: number | null;
+  distance_m: number | null;
+}
+
+/** SA6 "Xarita va joylashuv": editable through `PUT /sa/maps`. */
+export interface MapsSettings {
+  location_interval_sec: number;
+  eta_refresh_sec: number;
+  route_deviation_m: number;
+  auto_stop_radius_m: number;
+  max_trip_minutes: number;
+  track_retention_days: number;
+}
+
+export interface MapsUsage {
+  geocode: number;
+  places: number;
+  routes: number;
+}
+
+export interface MapsOverview {
+  provider: 'mock' | 'google';
+  /** The server key itself is never returned, only whether one is configured. */
+  server_key_configured: boolean;
+  usage_this_month: MapsUsage;
+  settings: MapsSettings;
 }

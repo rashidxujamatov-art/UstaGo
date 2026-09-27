@@ -17,7 +17,7 @@ import { RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ApiError } from '../api/client';
 import { endpoints } from '../api/endpoints';
-import { invalidateOrder, queryKeys, useAcceptPreview } from '../api/queries';
+import { invalidateOrder, queryKeys, useAcceptPreview, useConfig } from '../api/queries';
 import type { Order } from '../api/types';
 import { useErrorText } from '../api/use-error-text';
 import { AppText } from '../components/AppText';
@@ -29,10 +29,14 @@ import { ConfirmSheet } from '../components/ui/ConfirmSheet';
 import { categoryIcon } from '../lib/categories';
 import { formatPercent } from '../lib/format';
 import { openDirections } from '../lib/maps';
+import { requestShareLocationPermissions } from '../lib/location';
+import { startTripTracking } from '../location/trip-task';
+import { usePreferences } from '../store/preferences';
 import { useTheme } from '../theme/ThemeProvider';
 import { netIncome } from './amounts';
 import { ConfirmBlockSheet } from './ConfirmBlockSheet';
 import { DangerLink } from './ConfirmParts';
+import { DepartSheet } from './DepartSheet';
 import { DisputeSheet } from './DisputeSheet';
 import { FinishSheet } from './FinishSheet';
 import { InsufficientSheet, type Shortfall } from './InsufficientSheet';
@@ -73,11 +77,15 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
   const mine = order.viewer_role === 'EXECUTOR';
   const open = !mine && order.status === 'PUBLISHED';
   const preview = useAcceptPreview(order.id, open);
+  const config = useConfig();
+  const departIntroShown = usePreferences((state) => state.departIntroShown);
+  const setDepartIntroShown = usePreferences((state) => state.setDepartIntroShown);
   const [busy, setBusy] = useState<Busy>(null);
   const [shortfall, setShortfall] = useState<Shortfall | null>(null);
   const [declineOpen, setDeclineOpen] = useState(false);
   const [finishOpen, setFinishOpen] = useState(false);
   const [disputeOpen, setDisputeOpen] = useState(false);
+  const [departOpen, setDepartOpen] = useState(false);
   const [blockingOrder, setBlockingOrder] = useState<string | null>(null);
   const actions = usePaymentActions(order);
 
@@ -122,6 +130,37 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
   const feeBps = mine ? order.fee?.fee_bps : preview.data?.fee_bps;
   const Icon = categoryIcon(order.category.icon);
 
+  /** BJ11 "Ha, yo'lga chiqdim": permission request, then depart, then the BJ12 live map. */
+  const doDepart = async () => {
+    // The send interval is a setting (CLAUDE.md rule 7): load it, never guess it.
+    const cfg = config.data ?? (await config.refetch()).data;
+    if (!cfg) {
+      showNotice(errorText(config.error));
+      return;
+    }
+    const granted = await requestShareLocationPermissions();
+    const done = await run('depart', () =>
+      endpoints.orderStep(order.id, 'depart', { share_location: granted }),
+    );
+    if (done && granted) {
+      await startTripTracking(order.id, {
+        intervalSec: cfg.location_interval_sec,
+        notificationTitle: t('trip.notification.title'),
+        notificationBody: t('trip.notification.body'),
+      });
+    }
+    if (done) router.push({ pathname: '/order/[id]/trip', params: { id: order.id } });
+  };
+
+  /** BJ11 is shown once ever; later departs go straight to the permission request. */
+  const startDepart = () => {
+    if (departIntroShown) void doDepart();
+    else {
+      setDepartIntroShown();
+      setDepartOpen(true);
+    }
+  };
+
   const stepButton = (value: ExecutorStep) => {
     const labels = {
       depart: 'job.depart',
@@ -137,6 +176,7 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
         disabled={busy !== null}
         onPress={() => {
           if (value === 'finish') setFinishOpen(true);
+          else if (value === 'depart') startDepart();
           else void run(value, () => endpoints.orderStep(order.id, value));
         }}
       />
@@ -345,6 +385,16 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
         </View>
       </Footer>
 
+      <DepartSheet
+        visible={departOpen}
+        customerName={texts.customerName(order.customer)}
+        busy={busy === 'depart'}
+        onClose={() => setDepartOpen(false)}
+        onConfirm={() => {
+          setDepartOpen(false);
+          void doDepart();
+        }}
+      />
       <InsufficientSheet value={shortfall} onClose={() => setShortfall(null)} />
       <ConfirmBlockSheet orderId={blockingOrder} onClose={() => setBlockingOrder(null)} />
       {mine && canDispute(order.status) ? (

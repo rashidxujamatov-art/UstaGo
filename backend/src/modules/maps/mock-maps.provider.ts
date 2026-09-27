@@ -1,4 +1,8 @@
-import type { MapsProvider, PlaceLocation, PlaceSuggestion } from './maps.provider.js';
+import { haversineMeters, type LatLng } from '../../common/geo/distance.js';
+import type { MapsProvider, PlaceLocation, PlaceSuggestion, RouteResult } from './maps.provider.js';
+
+/** 30 km/h, in meters per second (docs/01 §10: the mock's straight-line ETA). */
+const MOCK_SPEED_M_PER_SEC = 30_000 / 3_600;
 
 const PLACES: (PlaceLocation & { id: string })[] = [
   {
@@ -46,5 +50,15 @@ export class MockMapsProvider implements MapsProvider {
     return Promise.resolve(
       found ? { lat: found.lat, lng: found.lng, address: found.address } : null,
     );
+  }
+
+  /** No network, no billing: a straight line between the two points at 30 km/h. */
+  route(origin: LatLng, destination: LatLng): Promise<RouteResult | null> {
+    const distanceM = haversineMeters(origin, destination);
+    return Promise.resolve({
+      durationSec: Math.round(distanceM / MOCK_SPEED_M_PER_SEC),
+      distanceM: Math.round(distanceM),
+      polyline: [origin, destination],
+    });
   }
 }

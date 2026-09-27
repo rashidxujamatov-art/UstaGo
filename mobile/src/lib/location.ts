@@ -58,3 +58,63 @@ export function useDeviceLocation() {
 
   return { coords, permission, request };
 }
+
+/**
+ * BJ11 "Ha, yo'lga chiqdim": foreground first, then background (Android 11+ requires the
+ * two-step request). Sharing is optional (docs/01 §10): a decline just depart with
+ * `share_location: false`, it never blocks the job.
+ */
+export async function requestShareLocationPermissions(): Promise<boolean> {
+  try {
+    const foreground = await Location.requestForegroundPermissionsAsync();
+    if (!foreground.granted) return false;
+    const background = await Location.requestBackgroundPermissionsAsync();
+    return background.granted;
+  } catch {
+    return false;
+  }
+}
+
+export interface LivePosition {
+  lat: number;
+  lng: number;
+  heading: number | null;
+}
+
+/**
+ * The pro's own position for BJ12's map, watched in the foreground while the screen is open.
+ * Separate from the background task (`src/location/trip-task.ts`), which keeps posting to the
+ * server whether or not this screen is on top.
+ */
+export function useLiveDeviceLocation(active: boolean): LivePosition | null {
+  const [position, setPosition] = useState<LivePosition | null>(null);
+
+  useEffect(() => {
+    if (!active) return undefined;
+    let alive = true;
+    let subscription: Location.LocationSubscription | null = null;
+    Location.watchPositionAsync(
+      { accuracy: Location.Accuracy.High, timeInterval: 3000, distanceInterval: 5 },
+      (update) => {
+        if (!alive) return;
+        setPosition({
+          lat: update.coords.latitude,
+          lng: update.coords.longitude,
+          heading: update.coords.heading ?? null,
+        });
+      },
+    )
+      .then((sub) => {
+        if (alive) subscription = sub;
+        else sub.remove();
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+      subscription?.remove();
+    };
+  }, [active]);
+
+  // Stale while inactive rather than resetting state from inside the effect (react-hooks/set-state-in-effect).
+  return active ? position : null;
+}

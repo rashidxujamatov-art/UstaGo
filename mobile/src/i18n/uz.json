@@ -77,7 +77,8 @@
     "logoutConfirm": "Hisobdan chiqasizmi?",
     "taxStatus": "Soliq holati",
     "verifications": "Hujjat murojaatlari",
-    "taxMethods": "Soliq usullari"
+    "taxMethods": "Soliq usullari",
+    "mapsSettings": "Xarita va joylashuv"
   },
   "auth": {
     "haveAccount": "Hisobingiz bormi?",
@@ -296,7 +297,42 @@
   },
   "trip": {
     "sharing": "Joylashuvingiz mijozga ko‘rinmoqda",
-    "eta": "{min} daqiqada yetib keladi"
+    "notSharing": "Ulashilmayapti",
+    "stopSharing": "To‘xtatish",
+    "stopConfirmTitle": "Joylashuvni ulashishni to‘xtatasizmi?",
+    "notShared": "Usta joylashuvini ulashmagan",
+    "eta": "{min} daqiqada yetib keladi",
+    "etaSub": "{km} qoldi · taxminan {time} da",
+    "freshness": "Jonli · {sec} sek oldin yangilandi",
+    "proEta": "{min} daqiqa · {km}",
+    "proEtaSub": "Taxminan {time} da yetib borasiz",
+    "enRouteHeader": "Usta yo‘lda",
+    "arrivedHeader": "Usta yetib keldi",
+    "arrivedSub": "{name} · {when}",
+    "trackingStoppedNote": "Kuzatuv to‘xtadi — ustaning joylashuvi endi ko‘rinmaydi.",
+    "autoStopNote": "Usta yetib kelgach kuzatuv o‘zi to‘xtaydi.",
+    "backToOrder": "Buyurtmaga qaytish",
+    "bannerEnRoute": "Usta yo‘lda — xaritada ko‘rish",
+    "bannerArrived": "Usta yetib keldi — xaritada ko‘rish",
+    "step": {
+      "accepted": "Qabul qildi",
+      "enroute": "Yo‘lda",
+      "arrived": "Yetib keldi"
+    },
+    "intro": {
+      "title": "Yo‘lga chiqyapsizmi?",
+      "body": "{name} kelayotganingizni xaritada jonli ko‘radi va sizni kutib oladi.",
+      "bullet1": "Faqat shu buyurtma davomida",
+      "bullet2": "Yetib kelganingizda o‘zi to‘xtaydi",
+      "bullet3": "Boshqa paytda hech kim ko‘rmaydi",
+      "permissionHint": "Telefon ruxsat so‘rasa, «Ruxsat berish»ni bosing.",
+      "confirm": "Ha, yo‘lga chiqdim",
+      "later": "Hali emas"
+    },
+    "notification": {
+      "title": "{appName}",
+      "body": "{appName} joylashuvingizni mijozga ko‘rsatmoqda"
+    }
   },
   "payment": {
     "iPaid": "To‘ladim",
@@ -720,6 +756,45 @@
     "withoutMethod": "Usul tanlamagan: {count} usta",
     "withoutMethodSub": "Bepul oyi tugagan, yangi ish ololmaydi",
     "remindButton": "Eslatma yuborish",
-    "remindSent": "{count} ustaga eslatma yuborildi"
+    "remindSent": "{count} ustaga eslatma yuborildi",
+    "mapsTitle": "Xarita va joylashuv",
+    "mapsServiceSection": "Xarita xizmati",
+    "mapsProviderName": "Google Maps Platform",
+    "mapsProviderDesc": "xarita, marshrut, manzil qidirish",
+    "mapsConnected": "Ulangan",
+    "mapsMock": "Mock (test rejimi)",
+    "mapsApiKeyLabel": "API kalit",
+    "mapsApiKeyHint": "Google Cloud kabinetidan olinadi",
+    "mapsApiKeyConfigured": "Sozlangan",
+    "mapsApiKeyMissing": "Sozlanmagan",
+    "mapsUsageSection": "Bepul limit (oyiga)",
+    "mapsUsageRoutes": "Marshrut va vaqt",
+    "mapsUsageGeocode": "Manzilni aniqlash",
+    "mapsUsagePlaces": "Manzil qidirish",
+    "mapsLiveSection": "Jonli joylashuv",
+    "mapsIntervalLabel": "Yangilanish oralig‘i",
+    "mapsIntervalHint": "usta joylashuvi yuboriladi",
+    "mapsEtaRefreshLabel": "ETA yangilanish oralig‘i",
+    "mapsEtaRefreshHint": "marshrut qayta hisoblanadi",
+    "mapsDeviationLabel": "Yo‘ldan chetga chiqish",
+    "mapsDeviationHint": "shuncha chetlasa ETA qayta hisoblanadi",
+    "mapsAutoStopLabel": "Avtomatik to‘xtash",
+    "mapsAutoStopHint": "manzilga shuncha qolganda",
+    "mapsMaxTripLabel": "Eng uzun safar",
+    "mapsMaxTripHint": "shundan uzoq davom etsa to‘xtaydi",
+    "mapsSharingStartsLabel": "Ulashish boshlanadi",
+    "mapsSharingStartsValue": "Usta «Yo‘lga chiqdim»ni bosganda",
+    "mapsAddressVisibleLabel": "Manzil ish olinishidan oldin ko‘rinadi",
+    "mapsPrivacySection": "Maxfiylik",
+    "mapsRetentionLabel": "Yo‘l tarixini saqlash",
+    "mapsRetentionHint": "faqat shikoyatni ko‘rish uchun",
+    "mapsAdminsHideLabel": "Adminlar jonli joylashuvni ko‘rmaydi",
+    "mapsSeconds": "soniya",
+    "mapsMeters": "metr",
+    "mapsMinutes": "daqiqa",
+    "mapsDays": "kun",
+    "mapsSave": "Saqlash",
+    "mapsSaved": "Sozlamalar saqlandi",
+    "mapsInvalid": "Musbat butun son kiriting"
   }
 }

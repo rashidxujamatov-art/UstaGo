@@ -10,6 +10,7 @@ import {
   Landmark,
   LogOut,
   type LucideIcon,
+  Map,
   Moon,
   Percent,
   Settings,
@@ -88,7 +89,13 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
   };
 
   const open = (
-    path: '/wallet' | '/referral' | '/tax' | '/admin/verifications' | '/admin/tax-methods',
+    path:
+      | '/wallet'
+      | '/referral'
+      | '/tax'
+      | '/admin/verifications'
+      | '/admin/tax-methods'
+      | '/admin/maps',
   ) => {
     onClose();
     router.push(path);
@@ -192,6 +199,13 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
                 icon={Landmark}
                 label={t('menu.taxMethods')}
                 onPress={() => open('/admin/tax-methods')}
+              />
+            ) : null}
+            {isSuperAdmin ? (
+              <MenuRow
+                icon={Map}
+                label={t('menu.mapsSettings')}
+                onPress={() => open('/admin/maps')}
               />
             ) : null}
             <MenuRow

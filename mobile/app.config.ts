@@ -54,8 +54,16 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       // Same value as palette.light.brand (src/theme/tokens.ts); app config cannot import TS modules.
       ['expo-splash-screen', { backgroundColor: '#2461C2' }],
       ['react-native-maps', mapsKeys],
-      // Foreground only; background tracking (BJ12) comes with stage 6.
-      ['expo-location', { isAndroidBackgroundLocationEnabled: false }],
+      // Stage 6 (BJ11/BJ12): the pro's location keeps posting while the app is backgrounded,
+      // with an Android foreground service notification and the iOS background location mode.
+      [
+        'expo-location',
+        {
+          isIosBackgroundLocationEnabled: true,
+          isAndroidBackgroundLocationEnabled: true,
+          isAndroidForegroundServiceEnabled: true,
+        },
+      ],
       ['expo-image-picker', { cameraPermission: false, microphonePermission: false }],
       // BJ10: scanning the executor's Paynet Xolis QR. No audio is needed.
       ['expo-camera', { microphonePermission: false, recordAudioAndroid: false }],

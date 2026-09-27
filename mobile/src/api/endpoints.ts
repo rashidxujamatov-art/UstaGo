@@ -8,6 +8,8 @@ import type {
   Invite,
   Language,
   LoginResult,
+  MapsOverview,
+  MapsSettings,
   Me,
   OtpTicket,
   NewOrderInput,
@@ -24,6 +26,9 @@ import type {
   TaxStatus,
   TaxVerification,
   ThemeModeApi,
+  TripPointInput,
+  TripPointsResult,
+  TripView,
   Wallet,
   WalletTransactionsPage,
   WithdrawalInfo,
@@ -153,8 +158,12 @@ export const endpoints = {
   acceptPreview: (id: string) => api.get<AcceptPreview>(`/orders/${id}/accept-preview`),
   acceptOrder: (id: string) => api.post<Order>(`/orders/${id}/accept`),
   declineOrder: (id: string) => api.post<Order>(`/orders/${id}/decline`),
-  orderStep: (id: string, step: 'depart' | 'arrive' | 'start') =>
-    api.post<Order>(`/orders/${id}/${step}`),
+  /** `depart` optionally shares live location (BJ11): `{ share_location }`. */
+  orderStep: (
+    id: string,
+    step: 'depart' | 'arrive' | 'start',
+    body?: { share_location?: boolean },
+  ) => api.post<Order>(`/orders/${id}/${step}`, body),
   finishOrder: (id: string, photoKeys: string[]) =>
     api.post<Order>(`/orders/${id}/finish`, { photo_keys: photoKeys }),
 
@@ -235,4 +244,18 @@ export const endpoints = {
   setTaxMethodsEnabled: (enabled: TaxMethod[]) =>
     api.put<TaxMethodsOverview>('/sa/tax-methods', { enabled }),
   remindTaxMethods: () => api.post<{ sent: number }>('/sa/tax-methods/remind'),
+
+  // ---------------------------------------------------------------- stage 6
+
+  /** Both parties of the order; anyone else 404s. */
+  trip: (id: string) => api.get<TripView>(`/orders/${id}/trip`),
+  /** The background location task posts here; 1..50 points, sorted by `at`. */
+  tripPoints: (id: string, points: TripPointInput[]) =>
+    api.post<TripPointsResult>(`/orders/${id}/trip/points`, { points }),
+  /** BJ12: the pro stops sharing (sharing is optional, docs/01 §10). */
+  tripStop: (id: string) => api.post<TripView>(`/orders/${id}/trip/stop`),
+
+  /** SA6 "Xarita va joylashuv" (super admin only). */
+  mapsOverview: () => api.get<MapsOverview>('/sa/maps'),
+  setMapsSettings: (input: Partial<MapsSettings>) => api.put<MapsOverview>('/sa/maps', input),
 };

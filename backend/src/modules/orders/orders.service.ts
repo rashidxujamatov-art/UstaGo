@@ -12,6 +12,7 @@ import { SettingsService } from '../settings/settings.service.js';
 import { UploadsService } from '../storage/uploads.service.js';
 import { acceptQuote } from '../wallet/accept-quote.js';
 import { effectiveStatus } from '../tax/tax.service.js';
+import { TripsService } from '../trips/trips.service.js';
 import { SettlementService } from '../wallet/settlement.service.js';
 import { type WalletBalances, WalletService } from '../wallet/wallet.service.js';
 import {
@@ -80,6 +81,7 @@ export class OrdersService {
     private readonly chat: ChatService,
     private readonly notifications: NotificationsService,
     private readonly realtime: RealtimePublisher,
+    private readonly trips: TripsService,
   ) {}
 
   // ---------------------------------------------------------------- customer
@@ -182,7 +184,7 @@ export class OrdersService {
     }
 
     const executorId = order.executorId;
-    await this.prisma.$transaction(async (tx) => {
+    const endedTrip = await this.prisma.$transaction(async (tx) => {
       const { count } = await tx.order.updateMany({
         where: { id: orderId, status: order.status },
         data: {
@@ -199,7 +201,9 @@ export class OrdersService {
         reason: input.reason ?? null,
       });
       await this.chat.system(tx, order, 'ORDER_CANCELLED');
+      return this.trips.endTripInTx(tx, orderId, 'CANCELLED');
     });
+    await this.trips.notifyTripEnded(orderId, 'CANCELLED', endedTrip);
 
     await this.afterChange(
       orderId,
@@ -383,7 +387,10 @@ export class OrdersService {
     if (order.executorId !== userId) throw this.notFound();
     if (!ORDER_RULES.DECLINE.from.includes(order.status)) throw this.conflict(order.status);
 
-    await this.prisma.$transaction(async (tx) => {
+    const endedTrip = await this.prisma.$transaction(async (tx) => {
+      // Ends the trip while the order still names its executor: the update below clears
+      // executorId, and the pro who just declined still needs the trip.ended event.
+      const ended = await this.trips.endTripInTx(tx, orderId, 'DECLINED');
       const { count } = await tx.order.updateMany({
         where: { id: orderId, executorId: userId, status: order.status },
         data: {
@@ -402,7 +409,9 @@ export class OrdersService {
       if (count === 0) throw this.conflict(order.status);
       await this.wallet.releaseHold(tx, orderId);
       await this.event(tx, orderId, order.status, 'PUBLISHED', userId, { declined: true });
+      return ended;
     });
+    await this.trips.notifyTripEnded(orderId, 'DECLINED', endedTrip);
 
     await this.afterChange(
       orderId,
@@ -413,12 +422,16 @@ export class OrdersService {
     return this.get(userId, orderId);
   }
 
-  /** "Yo'lga chiqdim", "Yetib keldim", "Ishni boshladim", "Ishni tugatdim". */
+  /**
+   * "Yo'lga chiqdim", "Yetib keldim", "Ishni boshladim", "Ishni tugatdim". `depart` starts
+   * a trip when the pro opted to share their location (§10); `arrive` ends it (ARRIVED).
+   */
   async step(
     userId: string,
     orderId: string,
     action: ExecutorStep,
     finishPhotoKeys: string[] = [],
+    depart?: { shareLocation: boolean; sessionId: string },
   ): Promise<OrderView> {
     const rule = ORDER_RULES[action];
     const effects = STEP_EFFECTS[action];
@@ -427,7 +440,7 @@ export class OrdersService {
     if (!rule.from.includes(order.status)) throw this.conflict(order.status);
     if (action === 'FINISH') await this.uploads.verify(userId, 'FINISH_PHOTO', finishPhotoKeys);
 
-    await this.prisma.$transaction(async (tx) => {
+    const endedTrip = await this.prisma.$transaction(async (tx) => {
       const { count } = await tx.order.updateMany({
         where: { id: orderId, executorId: userId, status: { in: [...rule.from] } },
         data: {
@@ -439,7 +452,12 @@ export class OrdersService {
       if (count === 0) throw this.conflict(order.status);
       await this.event(tx, orderId, order.status, rule.to, userId);
       await this.chat.system(tx, order, effects.chat);
+      if (action === 'DEPART' && depart?.shareLocation) {
+        await this.trips.startTrip(tx, { id: orderId }, userId, depart.sessionId);
+      }
+      return action === 'ARRIVE' ? this.trips.endTripInTx(tx, orderId, 'ARRIVED') : null;
     });
+    if (action === 'ARRIVE') await this.trips.notifyTripEnded(orderId, 'ARRIVED', endedTrip);
 
     await this.afterChange(orderId, rule.to, { userId: order.customerId, push: effects.push });
     return this.get(userId, orderId);

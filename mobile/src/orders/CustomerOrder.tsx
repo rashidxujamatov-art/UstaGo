@@ -1,9 +1,17 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { Check, EllipsisVertical, Flag, Search } from 'lucide-react-native';
+import {
+  Check,
+  ChevronRight,
+  CircleCheck,
+  EllipsisVertical,
+  Flag,
+  Navigation2,
+  Search,
+} from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { endpoints } from '../api/endpoints';
 import { invalidateOrder, queryKeys } from '../api/queries';
@@ -113,6 +121,32 @@ export function CustomerOrder({ order, refreshing, onRefresh }: CustomerOrderPro
               </AppText>
             </View>
           </Card>
+        ) : null}
+
+        {order.status === 'EN_ROUTE' || order.status === 'ARRIVED' ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push({ pathname: '/order/[id]/trip', params: { id: order.id } })}
+          >
+            <Card
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: theme.spacing.md,
+                backgroundColor: theme.colors.brandSoft,
+              }}
+            >
+              {order.status === 'ARRIVED' ? (
+                <CircleCheck size={24} color={theme.colors.green} />
+              ) : (
+                <Navigation2 size={24} color={theme.colors.brand} />
+              )}
+              <AppText size="bodyLarge" weight="bold" style={{ flex: 1 }}>
+                {t(order.status === 'ARRIVED' ? 'trip.bannerArrived' : 'trip.bannerEnRoute')}
+              </AppText>
+              <ChevronRight size={20} color={theme.colors.text2} />
+            </Card>
+          </Pressable>
         ) : null}
 
         <Timeline

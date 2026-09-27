@@ -38,6 +38,10 @@ const disputeSchema = z.object({ note: z.string().trim().max(1000).optional() })
 const paidSchema = z
   .object({ via: z.enum(['CASH', 'XOLIS_QR']).default('CASH') })
   .default({ via: 'CASH' });
+/** BJ11: whether the pro shares their live location on this trip (§10, optional). */
+const departSchema = z
+  .object({ share_location: z.boolean().default(false) })
+  .default({ share_location: false });
 
 const uuid = new ParseUUIDPipe();
 
@@ -122,8 +126,15 @@ export class OrdersController {
 
   @Post(':id/depart')
   @HttpCode(HttpStatus.OK)
-  depart(@Auth() auth: AuthContext, @Param('id', uuid) id: string) {
-    return this.orders.step(auth.userId, id, 'DEPART');
+  depart(
+    @Auth() auth: AuthContext,
+    @Param('id', uuid) id: string,
+    @Body(new ZodPipe(departSchema)) body: z.output<typeof departSchema>,
+  ) {
+    return this.orders.step(auth.userId, id, 'DEPART', [], {
+      shareLocation: body.share_location,
+      sessionId: auth.sessionId,
+    });
   }
 
   @Post(':id/arrive')

@@ -165,6 +165,9 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       withdraw_fee_bps: 100,
       fee_bps: 250,
       self_employed_reminder_days: 7,
+      location_interval_sec: 5,
+      auto_stop_radius_m: 50,
+      max_trip_minutes: 180,
     });
   });
 
