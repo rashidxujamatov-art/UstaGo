@@ -31,8 +31,13 @@ const messageSchema = z
   .refine((value) => Boolean(value.text) || Boolean(value.photo_key));
 const messagesQuery = z.object({ before: z.uuid().optional() });
 const disputeSchema = z.object({ note: z.string().trim().max(1000).optional() });
-/** "To‘ladim": cash, or the pro's Xolis QR (stage 5 decision). */
-const paidSchema = z.object({ via: z.enum(['CASH', 'XOLIS_QR']).default('CASH') });
+/**
+ * "To‘ladim": cash, or the pro's Xolis QR (stage 5 decision). The body is optional:
+ * a request without one (Express 5 leaves req.body undefined) means cash.
+ */
+const paidSchema = z
+  .object({ via: z.enum(['CASH', 'XOLIS_QR']).default('CASH') })
+  .default({ via: 'CASH' });
 
 const uuid = new ParseUUIDPipe();
 

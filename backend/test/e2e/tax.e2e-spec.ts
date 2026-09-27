@@ -6,6 +6,7 @@
  */
 import { createHash } from 'node:crypto';
 import { TaxService } from '../../src/modules/tax/tax.service.js';
+import { LedgerService, PLATFORM } from '../../src/modules/wallet/ledger.service.js';
 import { createHarness, e2eEnabled, fullUser, type Harness } from './harness.js';
 
 const som = (value: number) => (BigInt(value) * 100n).toString();
@@ -52,6 +53,24 @@ describe.skipIf(!e2eEnabled)('tax methods (e2e)', () => {
     await h.prisma.executorProfile.update({
       where: { userId: user.id },
       data: { freePeriodEnd: new Date(Date.now() - 1_000) },
+    });
+  }
+
+  /** After the free month demo money pays no fees (§8), so the pro needs real money. */
+  async function creditReal(userId: string, amount: number) {
+    const ledger = h.app.get(LedgerService);
+    await h.prisma.$transaction(async (tx) => {
+      await ledger.post(tx, {
+        type: 'TOPUP',
+        idempotencyKey: `test-topup:${userId}:${Date.now()}:${Math.random()}`,
+        entries: [
+          {
+            accountId: await ledger.accountId(tx, PLATFORM, 'PAYMENT_CLEARING'),
+            amount: -BigInt(som(amount)),
+          },
+          { accountId: await ledger.accountId(tx, userId, 'REAL'), amount: BigInt(som(amount)) },
+        ],
+      });
     });
   }
 
@@ -114,6 +133,7 @@ describe.skipIf(!e2eEnabled)('tax methods (e2e)', () => {
     });
 
     await endFreePeriod(pro);
+    await creditReal(pro.id, 50_000);
     const customer = await fullUser(h, doc(), 'CUSTOMER');
     const job = (await postJob(customer).expect(201)).body.id as string;
     await h.api().post(`/api/v1/orders/${job}/accept`).set(pro.auth).expect(200);
