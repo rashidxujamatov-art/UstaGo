@@ -1,5 +1,12 @@
 import { type QueryClient, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { endpoints } from './endpoints';
+import type {
+  AdminOrderListFilter,
+  AdminUserListFilter,
+  DisputeListFilter,
+  FinancePeriod,
+  PermissionRequestStatus,
+} from './types';
 
 /** TanStack Query keys and hooks for server data (docs/02-arxitektura.md §11). */
 
@@ -35,6 +42,28 @@ export const queryKeys = {
   taxMethodsOverview: ['tax-methods-overview'] as const,
   trip: (id: string) => ['trip', id] as const,
   mapsOverview: ['maps-overview'] as const,
+  adminDashboard: ['admin-dashboard'] as const,
+  adminUsers: (filter: AdminUserListFilter) => ['admin-users', filter] as const,
+  adminUser: (id: string) => ['admin-user', id] as const,
+  adminDisputes: (status: DisputeListFilter | undefined) =>
+    ['admin-disputes', status ?? null] as const,
+  adminDispute: (id: string) => ['admin-dispute', id] as const,
+  adminDisputeTrack: (id: string) => ['admin-dispute-track', id] as const,
+  saDisputesPendingApproval: ['sa-disputes-pending'] as const,
+  adminOrders: (filter: AdminOrderListFilter) => ['admin-orders', filter] as const,
+  adminOrder: (id: string) => ['admin-order', id] as const,
+  adminCategories: ['admin-categories'] as const,
+  adminBroadcasts: ['admin-broadcasts'] as const,
+  adminBroadcast: (id: string) => ['admin-broadcast', id] as const,
+  saDashboard: (period: FinancePeriod, range?: { from: string; to: string }) =>
+    ['sa-dashboard', period, range ?? null] as const,
+  saSettings: ['sa-settings'] as const,
+  saStaff: ['sa-staff'] as const,
+  saPermissionRequests: (status: PermissionRequestStatus) =>
+    ['sa-permission-requests', status] as const,
+  saFinanceSummary: (period: FinancePeriod, range?: { from: string; to: string }) =>
+    ['sa-finance-summary', period, range ?? null] as const,
+  saFinanceOrders: (range: { from: string; to: string }) => ['sa-finance-orders', range] as const,
 };
 
 export const useConfig = () => useQuery({ queryKey: queryKeys.config, queryFn: endpoints.config });
@@ -149,6 +178,115 @@ export const useOrderTrip = (id: string, enabled: boolean) =>
 /** SA6 "Xarita va joylashuv". */
 export const useMapsOverview = () =>
   useQuery({ queryKey: queryKeys.mapsOverview, queryFn: endpoints.mapsOverview });
+
+// ---------------------------------------------------------------- stage 7
+
+/** AD1 "Admin paneli". */
+export const useAdminDashboard = () =>
+  useQuery({ queryKey: queryKeys.adminDashboard, queryFn: endpoints.adminDashboard });
+
+/** AD2 "Foydalanuvchilar", page by page. */
+export const useAdminUsers = (filter: AdminUserListFilter) =>
+  useInfiniteQuery({
+    queryKey: queryKeys.adminUsers(filter),
+    queryFn: ({ pageParam }) => endpoints.adminUsers(filter, pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next ?? undefined,
+  });
+
+export const useAdminUser = (id: string) =>
+  useQuery({ queryKey: queryKeys.adminUser(id), queryFn: () => endpoints.adminUser(id) });
+
+/** AD3 "Shikoyatlar", page by page. */
+export const useAdminDisputes = (status: DisputeListFilter | undefined) =>
+  useInfiniteQuery({
+    queryKey: queryKeys.adminDisputes(status),
+    queryFn: ({ pageParam }) => endpoints.adminDisputes(status, pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next ?? undefined,
+  });
+
+export const useAdminDispute = (id: string) =>
+  useQuery({ queryKey: queryKeys.adminDispute(id), queryFn: () => endpoints.adminDispute(id) });
+
+/** AD3 stored track: fetched only when the admin opens the map (audited on every read). */
+export const useAdminDisputeTrack = (id: string, enabled: boolean) =>
+  useQuery({
+    queryKey: queryKeys.adminDisputeTrack(id),
+    queryFn: () => endpoints.adminDisputeTrack(id),
+    enabled,
+    staleTime: 60_000,
+  });
+
+/** SA "Tasdiqlash kutilmoqda" inbox, page by page. */
+export const useSaDisputesPendingApproval = () =>
+  useInfiniteQuery({
+    queryKey: queryKeys.saDisputesPendingApproval,
+    queryFn: ({ pageParam }) => endpoints.pendingApprovalDisputes(pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next ?? undefined,
+  });
+
+/** Orders moderation list, page by page. */
+export const useAdminOrders = (filter: AdminOrderListFilter) =>
+  useInfiniteQuery({
+    queryKey: queryKeys.adminOrders(filter),
+    queryFn: ({ pageParam }) => endpoints.adminOrders(filter, pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next ?? undefined,
+  });
+
+export const useAdminOrder = (id: string) =>
+  useQuery({ queryKey: queryKeys.adminOrder(id), queryFn: () => endpoints.adminOrder(id) });
+
+export const useAdminCategories = () =>
+  useQuery({ queryKey: queryKeys.adminCategories, queryFn: endpoints.adminCategories });
+
+/** Broadcast history, page by page. */
+export const useAdminBroadcasts = () =>
+  useInfiniteQuery({
+    queryKey: queryKeys.adminBroadcasts,
+    queryFn: ({ pageParam }) => endpoints.broadcasts(pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next ?? undefined,
+  });
+
+/** SA1 "Boshqaruv". */
+export const useSaDashboard = (period: FinancePeriod, range?: { from: string; to: string }) =>
+  useQuery({
+    queryKey: queryKeys.saDashboard(period, range),
+    queryFn: () => endpoints.saDashboard(period, range),
+  });
+
+/** SA2 "Komissiya va to'lovlar". */
+export const useSaSettings = () =>
+  useQuery({ queryKey: queryKeys.saSettings, queryFn: endpoints.saSettings });
+
+/** SA3 "Rollar va ruxsatlar". */
+export const useSaStaff = () =>
+  useQuery({ queryKey: queryKeys.saStaff, queryFn: endpoints.saStaff });
+
+export const useSaPermissionRequests = (status: PermissionRequestStatus = 'PENDING') =>
+  useQuery({
+    queryKey: queryKeys.saPermissionRequests(status),
+    queryFn: () => endpoints.saPermissionRequests(status),
+  });
+
+/** SA4 "Moliya hisobi" totals. */
+export const useSaFinanceSummary = (period: FinancePeriod, range?: { from: string; to: string }) =>
+  useQuery({
+    queryKey: queryKeys.saFinanceSummary(period, range),
+    queryFn: () => endpoints.saFinanceSummary(period, range),
+  });
+
+/** SA4 per-order breakdown, page by page. */
+export const useSaFinanceOrders = (range: { from: string; to: string }) =>
+  useInfiniteQuery({
+    queryKey: queryKeys.saFinanceOrders(range),
+    queryFn: ({ pageParam }) => endpoints.saFinanceOrders(range, pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next ?? undefined,
+  });
 
 /** Everything that shows an order, its lists or the balance it holds. */
 export function invalidateOrder(client: QueryClient, orderId: string): void {

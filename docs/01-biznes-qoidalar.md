@@ -350,6 +350,8 @@ Super admin o‘zgartiradi (SA2, SA5, SA6 ekranlari). Har bir o‘zgarish `audit
 | `address_visible_before_accept` | `true` | Manzil e’londa ko‘rinadi; telefon — qabul qilgandan keyin |
 | `confirm_reminder_hours` | 2, 24 | "To‘ladim" / "Pulni qabul qildim" eslatmalari |
 | `confirm_admin_task_hours` | 48 | Tasdiqlanmagan to‘lov adminga vazifa bo‘ladi |
+| `dispute_partial_bps` | 5000 (50%) | 7-bosqich: nizoda "qisman" qarorda narx shu foizga kamayadi (§3.3, §13) |
+| `broadcast_min_interval_sec` | 300 | 7-bosqich: ikkita bildirishnoma (`notifications.broadcast`) orasidagi eng kam vaqt |
 
 ## 13. Ochiq savollar (javob kelguncha standart qiymat ishlatiladi)
 
@@ -399,6 +401,15 @@ Hal qilingan savollar (2026-09-26, 4-bosqich):
 Hal qilingan savollar (2026-09-26, 5-bosqich):
 
 - `XOLIS_QR` buyurtma joylashda alohida usul emas. Buyurtmachi "Naqd"ni tanlaydi; ishni olgan usta Paynet Xolis usulida tasdiqlangan bo‘lsa, to‘lov paytida naqd o‘rniga ustaning Xolis QR-kodiga ham to‘lash mumkin (BY9). Ikkalasi bir xil tasdiqlanadi (§5.1); buyurtmaga amalda ishlatilgan usul (`CASH` yoki `XOLIS_QR`) yoziladi.
+
+Hal qilingan savollar (2026-09-27, 7-bosqich):
+
+- Nizo (dispute) faqat to‘lovdan oldin ochiladi — hisob-kitob bo‘lib bo‘lgan buyurtmada nizo yo‘q, pul qaytarish (refund) ham yo‘q (7-bosqichda). `DONE_BY_EXECUTOR`/`COMPLETED` holatidan tashqari nizo ochilmaydi, §3.3'dagi jadval o‘zgarmaydi.
+- Naqd va Xolis nizosida faqat ikkita qaror bor: to‘liq (usta pulni oladi, xizmat haqi yechiladi) yoki bekor qilish (hold bo‘shatiladi). "Qisman (50%)" bu ikkalasida yo‘q.
+- Onlayn (hisobdan, Click, Payme, karta) buyurtmada "qisman" qaror narxning o‘zini kamaytiradi: yangi narx = `narx × dispute_partial_bps / 10000` (standart 5000 = 50%), xizmat haqi va referal shu yangi narxdan, buyurtmaning eski stavkalari bilan qayta hisoblanadi (§6), band qilingan summa ham shunga moslashtiriladi. Buyurtmachi hali to‘lamagan bo‘lgani uchun "qaytarish" kerak emas — u shunchaki kamroq to‘laydi. To‘liq qaror — buyurtma eski narxda to‘lovni kutishga qaytadi.
+- Qaror ijro etilguncha (qisman yoki bekor qilishda) buyurtmachi yangi buyurtma joylay olmaydi — xuddi §5.1'dagi tasdiqlanmagan to‘lov holatidagidek (`ORDER_CUSTOMER_CONFIRMATION_REQUIRED`).
+- "To‘liq" qaror darhol ijro etiladi. "Qisman" va "bekor qilish" — super admin tasdig‘idan keyin ijro etiladi (super admin o‘zi qaror qilsa, shu zahoti o‘zi tasdiqlagan hisoblanadi).
+- "Yordam chatlari" (support chat) hozircha ishlamaydi — AD1'da "tez orada" deb ko‘rsatiladi, backend yo‘q.
 
 ## 14. Yuridik talablar (real pul bilan ishga tushirishdan oldin)
 

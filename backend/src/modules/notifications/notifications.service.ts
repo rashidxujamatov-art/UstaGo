@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import type { Language } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { RealtimePublisher } from '../realtime/realtime.publisher.js';
 import { type PushParams, type PushType, pushText } from './push-texts.js';
@@ -70,6 +71,34 @@ export class NotificationsService {
         ...notification.params,
         ...(notification.orderNumber !== undefined ? { order: notification.orderNumber } : {}),
       });
+      await this.push.send(
+        user.devices.map((device) => ({ token: device.pushToken as string, body, data })),
+      );
+    } catch (error) {
+      this.logger.warn(`Push failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Broadcast (stage 7, AD1 "Bildirishnoma"): admin-authored text in all four languages,
+   * not a `PushType` from the fixed catalog above. Used only by `notifications.broadcast`.
+   */
+  async notifyCustom(
+    userId: string,
+    text: Record<Language, string>,
+    data: Record<string, string>,
+  ): Promise<void> {
+    this.realtime.toUsers([userId], 'notification', data);
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          lang: true,
+          devices: { where: { pushToken: { not: null } }, select: { pushToken: true } },
+        },
+      });
+      if (!user || user.devices.length === 0) return;
+      const body = text[user.lang];
       await this.push.send(
         user.devices.map((device) => ({ token: device.pushToken as string, body, data })),
       );

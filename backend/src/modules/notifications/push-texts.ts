@@ -138,6 +138,62 @@ export const PUSH_TEXTS = {
     en: 'Order #{order}: new message',
     tg: 'Фармоиши #{order}: паёми нав',
   },
+
+  // Stage 7 (admin).
+  USER_BLOCKED: {
+    uz: 'Hisobingiz bloklandi. Sabab: {reason}',
+    ru: 'Ваш аккаунт заблокирован. Причина: {reason}',
+    en: 'Your account was blocked. Reason: {reason}',
+    tg: 'Ҳисоби шумо баста шуд. Сабаб: {reason}',
+  },
+  USER_UNBLOCKED: {
+    uz: 'Hisobingiz blokdan chiqarildi',
+    ru: 'Блокировка вашего аккаунта снята',
+    en: 'Your account was unblocked',
+    tg: 'Басти ҳисоби шумо бардошта шуд',
+  },
+  DISPUTE_RESOLVED_FULL: {
+    uz: 'Buyurtma #{order} bo‘yicha nizo hal qilindi: to‘liq to‘lash kerak',
+    ru: 'Спор по заказу #{order} решён: нужно оплатить полностью',
+    en: 'Order #{order}: the dispute was resolved — please pay in full',
+    tg: 'Баҳс оид ба фармоиши #{order} ҳал шуд: бояд пурра пардохт кунед',
+  },
+  DISPUTE_RESOLVED_PARTIAL: {
+    uz: 'Buyurtma #{order}: nizo hal qilindi, narx {price} so‘mgacha kamaytirildi. To‘lang',
+    ru: 'Спор по заказу #{order} решён, цена снижена до {price} сум. Оплатите',
+    en: 'Order #{order}: the dispute was resolved, the price is now {price} UZS. Please pay',
+    tg: 'Баҳс оид ба фармоиши #{order} ҳал шуд, нарх то {price} сӯм кам карда шуд. Пардохт кунед',
+  },
+  DISPUTE_RESOLVED_CANCELLED: {
+    uz: 'Buyurtma #{order} bekor qilindi (nizo)',
+    ru: 'Заказ #{order} отменён (спор)',
+    en: 'Order #{order} was cancelled (dispute)',
+    tg: 'Фармоиши #{order} бекор шуд (баҳс)',
+  },
+  DISPUTE_APPROVAL_REQUESTED: {
+    uz: 'Yangi nizo qarori tasdiqlashingizni kutmoqda',
+    ru: 'Новое решение по спору ждёт вашего подтверждения',
+    en: 'A dispute decision is waiting for your approval',
+    tg: 'Қарори нави баҳс тасдиқи шуморо интизор аст',
+  },
+  PERMISSION_REQUESTED: {
+    uz: 'Admin yangi ruxsat so‘radi',
+    ru: 'Админ запросил новое право',
+    en: 'An admin requested a new permission',
+    tg: 'Админ ҳуқуқи нав дархост кард',
+  },
+  PERMISSION_REQUEST_APPROVED: {
+    uz: 'So‘ragan ruxsatingiz berildi',
+    ru: 'Запрошенное право предоставлено',
+    en: 'Your requested permission was granted',
+    tg: 'Ҳуқуқи дархостшудаи шумо дода шуд',
+  },
+  PERMISSION_REQUEST_REJECTED: {
+    uz: 'So‘ragan ruxsatingiz rad etildi',
+    ru: 'В запрошенном праве отказано',
+    en: 'Your requested permission was rejected',
+    tg: 'Дар ҳуқуқи дархостшуда рад карда шуд',
+  },
 } as const satisfies Record<string, Record<Language, string>>;
 
 export type PushType = keyof typeof PUSH_TEXTS;

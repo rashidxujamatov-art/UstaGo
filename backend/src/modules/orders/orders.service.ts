@@ -17,13 +17,20 @@ import { SettlementService } from '../wallet/settlement.service.js';
 import { type WalletBalances, WalletService } from '../wallet/wallet.service.js';
 import {
   ACTIVE_STATUSES,
+  ADMIN_CANCELLABLE_STATUSES,
   cancelNeedsReason,
   FINISHED_STATUSES,
   HOLDING_STATUSES,
   ORDER_RULES,
   PARTY_CONFIRMED_METHODS,
 } from './order-state.js';
-import { orderInclude, type OrderView, type OrderWithParties, toOrderView } from './order-view.js';
+import {
+  orderInclude,
+  type OrderView,
+  type OrderWithParties,
+  toAdminOrderView,
+  toOrderView,
+} from './order-view.js';
 import type { CancelOrderInput, CreateOrderInput, FeedQuery } from './orders.schemas.js';
 
 type Tx = Prisma.TransactionClient;
@@ -211,6 +218,60 @@ export class OrdersService {
       executorId ? { userId: executorId, push: 'ORDER_CANCELLED' } : null,
     );
     return this.get(userId, orderId);
+  }
+
+  /**
+   * Orders moderation (`orders.moderate`, stage 7): an admin cancels any order that is not
+   * `DISPUTED` (that has its own resolution flow) and not already terminal. Reason is always
+   * required — this is an exceptional, non-customer-initiated cancel.
+   */
+  async adminCancel(adminId: string, orderId: string, reason: string): Promise<OrderView> {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      select: { id: true, number: true, status: true, customerId: true, executorId: true },
+    });
+    if (!order) throw this.notFound();
+    if (!ADMIN_CANCELLABLE_STATUSES.includes(order.status)) {
+      throw new AppError(ErrorCode.ORDER_MODERATE_NOT_CANCELLABLE, { status: order.status });
+    }
+
+    const endedTrip = await this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.order.updateMany({
+        where: { id: orderId, status: order.status },
+        data: {
+          status: 'CANCELLED',
+          cancelledAt: new Date(),
+          cancelledBy: null,
+          cancelReason: 'ADMIN',
+          cancelNote: reason,
+        },
+      });
+      if (count === 0) throw this.conflict(order.status);
+      await this.wallet.releaseHold(tx, orderId);
+      await this.event(tx, orderId, order.status, 'CANCELLED', adminId, { reason, admin: true });
+      await this.chat.system(tx, order, 'ORDER_CANCELLED');
+      return this.trips.endTripInTx(tx, orderId, 'CANCELLED');
+    });
+    await this.trips.notifyTripEnded(orderId, 'CANCELLED', endedTrip);
+
+    // Neither party initiated this one — both get a push, unlike the customer's own cancel.
+    await this.afterChange(orderId, 'CANCELLED', null);
+    for (const recipient of [order.customerId, order.executorId]) {
+      if (recipient) {
+        await this.notifications.notify(recipient, {
+          type: 'ORDER_CANCELLED',
+          orderId,
+          orderNumber: order.number,
+        });
+      }
+    }
+    // Not `this.get()`: the admin is neither party, and the order is no longer PUBLISHED, so
+    // that visibility check would (wrongly) 404 an admin looking at the order they just acted on.
+    const cancelled = await this.prisma.order.findUniqueOrThrow({
+      where: { id: orderId },
+      include: orderInclude,
+    });
+    return toAdminOrderView(cancelled);
   }
 
   // ---------------------------------------------------------------- shared
@@ -644,6 +705,18 @@ export class OrdersService {
           disputedAt: new Date(),
           disputedBy: userId,
           disputeNote: note ?? null,
+          // A fresh dispute cycle starts clean (stage 7): an earlier resolution on this same
+          // order (e.g. a reopened online job disputed again) must not carry over.
+          disputeDecision: null,
+          disputeDecisionNote: null,
+          disputeDecidedBy: null,
+          disputeDecidedAt: null,
+          disputeApproval: 'NONE',
+          disputeApprovedBy: null,
+          disputeApprovedAt: null,
+          disputeRejectReason: null,
+          disputeOriginalPrice: null,
+          disputeExecutedAt: null,
         },
       });
       if (count === 0) throw this.conflict(order.status);

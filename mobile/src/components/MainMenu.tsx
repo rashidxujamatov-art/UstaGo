@@ -7,6 +7,7 @@ import {
   ClipboardList,
   FileCheck,
   Globe,
+  LayoutDashboard,
   Landmark,
   LogOut,
   type LucideIcon,
@@ -14,6 +15,7 @@ import {
   Moon,
   Percent,
   Settings,
+  ShieldCheck,
   Users,
   Wallet,
   Wrench,
@@ -56,6 +58,7 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
   const canManageVerifications =
     user.staff !== null &&
     (user.staff.role === 'SUPER_ADMIN' || user.staff.permissions.includes('users.manage'));
+  const isStaff = user.staff !== null;
   const isSuperAdmin = user.staff?.role === 'SUPER_ADMIN';
   const name = user.identity
     ? `${user.identity.first_name} ${user.identity.last_name}`
@@ -93,9 +96,11 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
       | '/wallet'
       | '/referral'
       | '/tax'
+      | '/admin'
       | '/admin/verifications'
       | '/admin/tax-methods'
-      | '/admin/maps',
+      | '/admin/maps'
+      | '/admin/sa',
   ) => {
     onClose();
     router.push(path);
@@ -187,11 +192,25 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
               <MenuRow icon={Percent} label={t('menu.taxStatus')} onPress={() => open('/tax')} />
             ) : null}
             <MenuRow icon={Settings} label={t('menu.settings')} onPress={soon} />
+            {isStaff ? (
+              <MenuRow
+                icon={LayoutDashboard}
+                label={t('menu.adminPanel')}
+                onPress={() => open('/admin')}
+              />
+            ) : null}
             {canManageVerifications ? (
               <MenuRow
                 icon={FileCheck}
                 label={t('menu.verifications')}
                 onPress={() => open('/admin/verifications')}
+              />
+            ) : null}
+            {isSuperAdmin ? (
+              <MenuRow
+                icon={ShieldCheck}
+                label={t('menu.superAdminPanel')}
+                onPress={() => open('/admin/sa')}
               />
             ) : null}
             {isSuperAdmin ? (

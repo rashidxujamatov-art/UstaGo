@@ -105,6 +105,8 @@ model User {
   sessions        Session[]
   customerOrders  Order[]          @relation("CustomerOrders")
   executorOrders  Order[]          @relation("ExecutorOrders")
+  permissionRequests PermissionRequest[]
+  broadcasts         Broadcast[]
 
   @@index([referrerId])
   @@map("users")
@@ -339,7 +341,8 @@ enum PaymentMethod {
   XOLIS_QR
 }
 
-/// Why an order was cancelled. EXPIRED is set by the system (§3.3).
+/// Why an order was cancelled. EXPIRED is set by the system (§3.3); DISPUTE by an admin's
+/// dispute decision (stage 7); ADMIN by a plain moderation cancel.
 enum CancelReason {
   NOT_NEEDED
   FOUND_OTHER
@@ -347,6 +350,24 @@ enum CancelReason {
   NO_AGREEMENT
   OTHER
   EXPIRED
+  DISPUTE
+  ADMIN
+}
+
+/// Stage 7 dispute resolution (docs/01 §5, AD3). No refunds: PARTIAL shrinks the order's own
+/// price before anything has been charged; nothing is reversed.
+enum DisputeDecision {
+  FULL
+  PARTIAL
+  CANCEL
+}
+
+/// FULL executes at once (nothing to review). PARTIAL / CANCEL wait for a super admin.
+enum DisputeApproval {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 /// Service types (Elektrik, Santexnik, ...). Names in four languages.
@@ -419,6 +440,19 @@ model Order {
   disputedAt         DateTime?                              @map("disputed_at") @db.Timestamptz(3)
   disputedBy         String?                                @map("disputed_by") @db.Uuid
   disputeNote        String?                                @map("dispute_note")
+  /// Stage 7 (AD3): the admin's proposal and its outcome. Reset to null whenever a fresh
+  /// dispute is opened, so a later cycle on the same order starts clean.
+  disputeDecision     DisputeDecision? @map("dispute_decision")
+  disputeDecisionNote String?          @map("dispute_decision_note")
+  disputeDecidedBy    String?          @map("dispute_decided_by") @db.Uuid
+  disputeDecidedAt    DateTime?        @map("dispute_decided_at") @db.Timestamptz(3)
+  disputeApproval     DisputeApproval  @default(NONE) @map("dispute_approval")
+  disputeApprovedBy   String?          @map("dispute_approved_by") @db.Uuid
+  disputeApprovedAt   DateTime?        @map("dispute_approved_at") @db.Timestamptz(3)
+  disputeRejectReason String?          @map("dispute_reject_reason")
+  /// Snapshot of `price` before a PARTIAL decision shrank it (display only, AD3).
+  disputeOriginalPrice BigInt?         @map("dispute_original_price")
+  disputeExecutedAt   DateTime?        @map("dispute_executed_at") @db.Timestamptz(3)
   /// confirm_reminder_hours already pushed to the customer / executor (§5.1).
   customerReminded   Int[]                                  @default([]) @map("customer_reminded_hours")
   executorReminded   Int[]                                  @default([]) @map("executor_reminded_hours")
@@ -774,4 +808,59 @@ model TripPoint {
 
   @@index([tripId, at])
   @@map("trip_points")
+}
+
+enum PermissionRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// AD1 "Ruxsat so'rash" → SA3 inbox (stage 7). An admin asks for one more permission key.
+model PermissionRequest {
+  id          String                  @id @default(uuid(7)) @db.Uuid
+  requestedBy String                  @map("requested_by") @db.Uuid
+  permission  String
+  note        String?
+  status      PermissionRequestStatus @default(PENDING)
+  decidedBy   String?                 @map("decided_by") @db.Uuid
+  decidedAt   DateTime?               @map("decided_at") @db.Timestamptz(3)
+  reason      String?
+  createdAt   DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  requester User @relation(fields: [requestedBy], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("permission_requests")
+}
+
+enum BroadcastTarget {
+  ALL
+  CUSTOMER
+  EXECUTOR
+}
+
+enum BroadcastStatus {
+  QUEUED
+  SENDING
+  DONE
+}
+
+/// A push + in-app broadcast sent from AD1/§7 (notifications.broadcast). `title`/`body`
+/// carry all four languages, supplied by the admin — not an i18n key (there is no fixed
+/// catalog entry for free-form admin text).
+model Broadcast {
+  id              String          @id @default(uuid(7)) @db.Uuid
+  target          BroadcastTarget
+  title           Json
+  body            Json
+  createdBy       String          @map("created_by") @db.Uuid
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  recipientsCount Int             @default(0) @map("recipients_count")
+  status          BroadcastStatus @default(QUEUED)
+
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@map("broadcasts")
 }
