@@ -12,6 +12,7 @@ export const ADMIN_PERMISSIONS = [
   'finance.view',
   'notifications.broadcast',
 ] as const;
+export type AdminPermission = (typeof ADMIN_PERMISSIONS)[number];
 
 /**
  * Staff roles. SUPER_ADMIN is never created through the app, only from the server CLI

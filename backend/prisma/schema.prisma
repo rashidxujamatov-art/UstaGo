@@ -159,14 +159,26 @@ model StaffPermission {
 
 /// Created the first time the EXECUTOR role is activated; starts the free period (§8).
 model ExecutorProfile {
-  userId          String    @id @map("user_id") @db.Uuid
-  freePeriodStart DateTime  @map("free_period_start") @db.Timestamptz(3)
-  freePeriodEnd   DateTime  @map("free_period_end") @db.Timestamptz(3)
+  userId          String     @id @map("user_id") @db.Uuid
+  freePeriodStart DateTime   @map("free_period_start") @db.Timestamptz(3)
+  freePeriodEnd   DateTime   @map("free_period_end") @db.Timestamptz(3)
   /// Tax method status (§9); after the free period only VERIFIED may take new jobs.
-  taxStatus       TaxStatus @default(NONE) @map("tax_status")
+  taxStatus       TaxStatus  @default(NONE) @map("tax_status")
+  /// The method the status refers to (the verified one, or the one waiting for a check).
+  taxMethod       TaxMethod? @map("tax_method")
+  /// Self-employed certificate end; null for Xolis (docs/01 §9).
+  taxValidUntil   DateTime?  @map("tax_valid_until") @db.Timestamptz(3)
+  taxCheckedAt    DateTime?  @map("tax_checked_at") @db.Timestamptz(3)
+  /// BJ9 "Muddat tugashidan 7 kun oldin eslatish".
+  taxReminders    Boolean    @default(true) @map("tax_reminders")
+  /// taxValidUntil the expiry reminder was sent for (one reminder per certificate).
+  taxRemindedFor  DateTime?  @map("tax_reminded_for") @db.Timestamptz(3)
+  /// Paynet Xolis QR the customers pay to (BY9) and the phone registered in Xolis (BJ10).
+  xolisQr         String?    @map("xolis_qr")
+  xolisPhone      String?    @map("xolis_phone")
   /// free_period_reminder_days already pushed (§8).
-  remindedDays    Int[]     @default([]) @map("free_period_reminded_days")
-  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  remindedDays    Int[]      @default([]) @map("free_period_reminded_days")
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -257,6 +269,48 @@ enum TaxStatus {
   VERIFIED
   REJECTED
   EXPIRED
+}
+
+enum TaxMethod {
+  SELF_EMPLOYED
+  XOLIS
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum VerificationSource {
+  AUTO
+  MANUAL
+}
+
+/**
+ * One tax-method request (BJ8-BJ10): checked automatically against the tax system, or
+ * queued for an admin (AD1 "Hujjat murojaatlari"). Xolis has no API, so it is always manual.
+ */
+model TaxVerification {
+  id         String             @id @default(uuid(7)) @db.Uuid
+  userId     String             @map("user_id") @db.Uuid
+  method     TaxMethod
+  status     VerificationStatus @default(PENDING)
+  source     VerificationSource
+  /// Photo of the self-employed certificate (manual check).
+  fileKey    String?            @map("file_key")
+  xolisQr    String?            @map("xolis_qr")
+  xolisPhone String?            @map("xolis_phone")
+  validUntil DateTime?          @map("valid_until") @db.Timestamptz(3)
+  reviewerId String?            @map("reviewer_id") @db.Uuid
+  /// Why an admin rejected it; shown to the executor.
+  reason     String?
+  checkedAt  DateTime?          @map("checked_at") @db.Timestamptz(3)
+  createdAt  DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+  @@map("tax_verifications")
 }
 
 // ---------------------------------------------------------------------------

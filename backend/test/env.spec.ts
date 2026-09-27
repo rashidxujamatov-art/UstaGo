@@ -17,6 +17,7 @@ const valid = {
   CARD_PROVIDER: 'mock',
   CARD_TOKEN_ENC_KEY: Buffer.alloc(32, 2).toString('base64'),
   PAYOUT_PROVIDER: 'mock',
+  TAX_PROVIDER: 'mock',
 };
 
 describe('validateEnv', () => {

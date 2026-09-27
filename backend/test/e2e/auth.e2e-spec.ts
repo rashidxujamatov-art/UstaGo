@@ -59,6 +59,7 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       CARD_PROVIDER: 'mock',
       CARD_TOKEN_ENC_KEY: Buffer.alloc(32, 5).toString('base64'),
       PAYOUT_PROVIDER: 'mock',
+      TAX_PROVIDER: 'mock',
       LOG_LEVEL: 'fatal',
     });
 
@@ -162,6 +163,7 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       feed_nearby_radius_m: 5000,
       topup_min: '100000',
       withdraw_fee_bps: 100,
+      fee_bps: 250,
     });
   });
 

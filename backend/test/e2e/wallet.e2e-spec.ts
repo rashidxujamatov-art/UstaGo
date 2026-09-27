@@ -120,7 +120,7 @@ describe.skipIf(!e2eEnabled)('wallet and settlement (e2e)', () => {
         time_from: new Date(now + 3_600_000).toISOString(),
         time_to: new Date(now + 3 * 3_600_000).toISOString(),
         price: str(price),
-        payment_method: method,
+        payment_method: method === 'XOLIS_QR' ? 'CASH' : method,
       })
       .expect(201);
     const id = created.body.id as string;
@@ -140,7 +140,19 @@ describe.skipIf(!e2eEnabled)('wallet and settlement (e2e)', () => {
   /** Cash / Xolis: both confirmations; online: the stage-4 payment hook. */
   async function pay(customer: User, pro: User, id: string, method: Method) {
     if (method === 'CASH' || method === 'XOLIS_QR') {
-      await h.api().post(`/api/v1/orders/${id}/paid`).set(customer.auth).expect(200);
+      if (method === 'XOLIS_QR') {
+        // A cash job paid to the pro's Xolis QR: the pro must be verified on Xolis (stage 5).
+        await h.prisma.executorProfile.update({
+          where: { userId: pro.id },
+          data: { taxMethod: 'XOLIS', taxStatus: 'VERIFIED', xolisQr: 'xolis://pay/e2e' },
+        });
+      }
+      await h
+        .api()
+        .post(`/api/v1/orders/${id}/paid`)
+        .set(customer.auth)
+        .send({ via: method })
+        .expect(200);
       const paid = await h
         .api()
         .post(`/api/v1/orders/${id}/payment-received`)

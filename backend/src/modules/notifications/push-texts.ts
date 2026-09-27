@@ -96,6 +96,42 @@ export const PUSH_TEXTS = {
     en: 'Your free month ends in {days} days. After that you will need a tax method to take jobs',
     tg: 'То анҷоми моҳи ройгон {days} рӯз монд. Баъд барои гирифтани кор усули андоз лозим мешавад',
   },
+  FREE_PERIOD_ENDED: {
+    uz: 'Bepul oyingiz tugadi. Yangi ish olish uchun soliq usulini tanlang',
+    ru: 'Бесплатный месяц закончился. Чтобы брать заказы, выберите способ уплаты налога',
+    en: 'Your free month has ended. Choose a tax method to keep taking jobs',
+    tg: 'Моҳи ройгон ба охир расид. Барои гирифтани кор усули андозро интихоб кунед',
+  },
+  TAX_METHOD_REMINDER: {
+    uz: 'Soliq usulini tanlamaguningizcha yangi ish ololmaysiz',
+    ru: 'Пока вы не выберете способ уплаты налога, новые заказы недоступны',
+    en: 'You cannot take new jobs until you choose a tax method',
+    tg: 'То усули андозро интихоб накунед, кори нав гирифта наметавонед',
+  },
+  TAX_VERIFIED: {
+    uz: 'Soliq usulingiz tasdiqlandi. Yangi ish olishingiz mumkin',
+    ru: 'Ваш способ уплаты налога подтверждён. Можно брать заказы',
+    en: 'Your tax method is confirmed. You can take jobs',
+    tg: 'Усули андози шумо тасдиқ шуд. Метавонед кор гиред',
+  },
+  TAX_REJECTED: {
+    uz: 'Soliq usuli tasdiqlanmadi. Ilovada sababini ko‘ring',
+    ru: 'Способ уплаты налога не подтверждён. Причина — в приложении',
+    en: 'Your tax method was not confirmed. See the reason in the app',
+    tg: 'Усули андоз тасдиқ нашуд. Сабабашро дар барнома бинед',
+  },
+  TAX_EXPIRING: {
+    uz: 'O‘zini o‘zi band guvohnomangiz {days} kundan keyin tugaydi. Uni yangilang',
+    ru: 'Справка самозанятого истекает через {days} дн. Обновите её',
+    en: 'Your self-employed certificate ends in {days} days. Please renew it',
+    tg: 'Шаҳодатномаи худкорфармоии шумо пас аз {days} рӯз ба охир мерасад. Онро нав кунед',
+  },
+  TAX_EXPIRED: {
+    uz: 'Guvohnomangiz muddati tugadi. Yangilamaguningizcha yangi ish ololmaysiz',
+    ru: 'Срок справки истёк. Пока вы её не обновите, новые заказы недоступны',
+    en: 'Your certificate has expired. You cannot take new jobs until you renew it',
+    tg: 'Мӯҳлати шаҳодатнома тамом шуд. То онро нав накунед, кори нав гирифта наметавонед',
+  },
   CHAT_MESSAGE: {
     uz: 'Buyurtma #{order}: yangi xabar',
     ru: 'Заказ #{order}: новое сообщение',

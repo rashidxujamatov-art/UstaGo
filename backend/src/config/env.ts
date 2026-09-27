@@ -69,6 +69,12 @@ export const envSchema = z
     S3_ACCESS_KEY: z.string().optional(),
     S3_SECRET_KEY: z.string().optional(),
 
+    /**
+     * Self-employed status check in the state tax system (docs/01 §9). No public API yet:
+     * manual sends every request to the admin queue (AD1); mock verifies locally.
+     */
+    TAX_PROVIDER: z.enum(['mock', 'manual']),
+
     /** Push notifications (FCM). The mock only logs. */
     PUSH_PROVIDER: z.enum(['mock']),
 
@@ -121,6 +127,7 @@ export const envSchema = z
         'STORAGE_PROVIDER',
         'PUSH_PROVIDER',
         'CARD_PROVIDER',
+        'TAX_PROVIDER',
       ] as const) {
         if (env[key] === 'mock') {
           ctx.addIssue({

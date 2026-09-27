@@ -31,6 +31,8 @@ const messageSchema = z
   .refine((value) => Boolean(value.text) || Boolean(value.photo_key));
 const messagesQuery = z.object({ before: z.uuid().optional() });
 const disputeSchema = z.object({ note: z.string().trim().max(1000).optional() });
+/** "To‘ladim": cash, or the pro's Xolis QR (stage 5 decision). */
+const paidSchema = z.object({ via: z.enum(['CASH', 'XOLIS_QR']).default('CASH') });
 
 const uuid = new ParseUUIDPipe();
 
@@ -75,8 +77,12 @@ export class OrdersController {
   /** BY9 "To'ladim" (cash, Xolis QR). */
   @Post(':id/paid')
   @HttpCode(HttpStatus.OK)
-  paid(@Auth() auth: AuthContext, @Param('id', uuid) id: string) {
-    return this.orders.customerPaid(auth.userId, id);
+  paid(
+    @Auth() auth: AuthContext,
+    @Param('id', uuid) id: string,
+    @Body(new ZodPipe(paidSchema)) body: z.output<typeof paidSchema>,
+  ) {
+    return this.orders.customerPaid(auth.userId, id, body.via);
   }
 
   /** "Muammo bor" (customer); either party may open a dispute (§3.3). */

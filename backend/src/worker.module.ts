@@ -26,6 +26,7 @@ import { PaymentsModule } from './modules/payments/payments.module.js';
 import { PAYOUTS_QUEUE } from './modules/payments/payouts.service.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
+import { TAX_QUEUE, TaxModule, TaxProcessor, TaxScheduler } from './modules/tax/tax.module.js';
 import {
   FreePeriodProcessor,
   FreePeriodScheduler,
@@ -56,6 +57,7 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
       { name: WALLET_QUEUE },
       { name: PAYMENTS_QUEUE },
       { name: PAYOUTS_QUEUE },
+      { name: TAX_QUEUE },
     ),
     CommonModule,
     AuditModule,
@@ -65,6 +67,7 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
     OrdersModule,
     WalletModule,
     PaymentsModule,
+    TaxModule,
   ],
   providers: [
     OrderExpiryScheduler,
@@ -74,6 +77,8 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
     PaymentsScheduler,
     PaymentsProcessor,
     PayoutsProcessor,
+    TaxScheduler,
+    TaxProcessor,
   ],
 })
 export class WorkerModule {}

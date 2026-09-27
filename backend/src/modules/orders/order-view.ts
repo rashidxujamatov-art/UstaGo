@@ -70,6 +70,8 @@ export interface OrderView {
   dispute: { by_me: boolean } | null;
   cancel: { reason: string | null; by_me: boolean; by_system: boolean } | null;
   finish_photos: string[];
+  /** BY9: the pro's Paynet Xolis QR, offered instead of cash when they use Xolis. */
+  xolis_qr: string | null;
   distance_m: number | null;
   viewer_role: 'CUSTOMER' | 'EXECUTOR' | 'OTHER';
 }
@@ -84,7 +86,12 @@ const iso = (date: Date | null) => (date ? date.toISOString() : null);
 export function toOrderView(
   order: OrderWithParties,
   viewer: Viewer,
-  extras: { photoUrls: string[]; finishPhotoUrls: string[]; distanceM?: number | null },
+  extras: {
+    photoUrls: string[];
+    finishPhotoUrls: string[];
+    distanceM?: number | null;
+    xolisQr?: string | null;
+  },
 ): OrderView {
   const isCustomer = order.customerId === viewer.userId;
   const isExecutor = order.executorId !== null && order.executorId === viewer.userId;
@@ -162,6 +169,7 @@ export function toOrderView(
           }
         : null,
     finish_photos: extras.finishPhotoUrls,
+    xolis_qr: extras.xolisQr ?? null,
     distance_m: extras.distanceM ?? null,
     viewer_role: isCustomer ? 'CUSTOMER' : isExecutor ? 'EXECUTOR' : 'OTHER',
   };
