@@ -57,6 +57,10 @@ export interface PublicConfig {
   feed_nearby_radius_m: number;
   /** Tiyin. */
   topup_min: string;
+  fee_bps: number;
+  tax_methods_enabled: TaxMethod[];
+  /** BJ9: the certificate expiry reminder is sent this many days before. */
+  self_employed_reminder_days: number;
   withdraw_fee_bps: number;
 }
 
@@ -147,6 +151,8 @@ export interface Order {
   dispute: { by_me: boolean } | null;
   cancel: { reason: string | null; by_me: boolean; by_system: boolean } | null;
   finish_photos: string[];
+  /** BY9: the pro's Paynet Xolis QR, offered instead of cash when they use Xolis. */
+  xolis_qr: string | null;
   distance_m: number | null;
   viewer_role: 'CUSTOMER' | 'EXECUTOR' | 'OTHER';
 }
@@ -321,4 +327,45 @@ export interface PlaceSuggestion {
   place_id: string;
   primary: string;
   secondary: string;
+}
+
+// ---------------------------------------------------------------- stage 5
+
+export type TaxMethod = 'SELF_EMPLOYED' | 'XOLIS';
+export type TaxStatusValue = 'NONE' | 'PENDING' | 'VERIFIED' | 'REJECTED' | 'EXPIRED';
+
+/** BJ8-BJ10, the "Soliq holati" screen (docs/01 §9). */
+export interface TaxStatus {
+  method: TaxMethod | null;
+  /** A verified certificate past its `valid_until` reads EXPIRED even before the daily job runs. */
+  status: TaxStatusValue;
+  valid_until: string | null;
+  checked_at: string | null;
+  reminders: boolean;
+  xolis_phone: string | null;
+  /** A request waiting for an admin (AD1). */
+  pending: { id: string; method: TaxMethod; created_at: string } | null;
+  /** The latest request, when an admin rejected it. */
+  rejected: { method: TaxMethod; reason: string | null } | null;
+  methods_enabled: TaxMethod[];
+  free_period: { ends_at: string; active: boolean };
+}
+
+/** AD1 "Hujjat murojaatlari" queue item. */
+export interface TaxVerification {
+  id: string;
+  method: TaxMethod;
+  status: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  created_at: string;
+  user: { id: string; first_name: string; last_name: string; phone_masked: string };
+  certificate_url: string | null;
+  xolis_qr: string | null;
+  xolis_phone: string | null;
+}
+
+/** SA5 "Soliq usullari" overview. */
+export interface TaxMethodsOverview {
+  enabled: TaxMethod[];
+  counts: { SELF_EMPLOYED: number; XOLIS: number };
+  without_method: number;
 }

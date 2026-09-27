@@ -104,6 +104,9 @@ export function ExecutorJob({ order, refreshing, onRefresh }: ExecutorJobProps) 
       ) {
         // BJ14: the previous cash / Xolis job must be confirmed first (§5.1).
         setBlockingOrder(error.params.order_id);
+      } else if (error instanceof ApiError && error.code === 'TAX_METHOD_REQUIRED') {
+        // BJ8: the free month is over and no tax method is verified yet.
+        router.push('/tax');
       } else {
         showNotice(errorText(error));
         if (error instanceof ApiError && error.status === 409) invalidateOrder(client, order.id);

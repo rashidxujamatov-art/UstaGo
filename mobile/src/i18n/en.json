@@ -74,7 +74,10 @@
     "nightMode": "Night mode",
     "help": "Help",
     "logout": "Log out",
-    "logoutConfirm": "Log out of your account?"
+    "logoutConfirm": "Log out of your account?",
+    "taxStatus": "Tax status",
+    "verifications": "Document requests",
+    "taxMethods": "Tax methods"
   },
   "auth": {
     "haveAccount": "Have an account?",
@@ -221,7 +224,75 @@
     }
   },
   "tax": {
-    "required": "Your free month has ended. Choose a tax method to keep working."
+    "required": "Your free month has ended. Choose a tax method to keep working.",
+    "methodDisabled": "This tax method is currently disabled.",
+    "certificateRequired": "Could not verify automatically. Upload a certificate photo.",
+    "verificationPending": "Your request is already being reviewed.",
+    "alreadyDecided": "This request has already been decided.",
+    "xolisNotAvailable": "The Xolis QR is not available right now. Choose cash.",
+    "title": "Tax status",
+    "pickerTitle": "Your free month has ended",
+    "pickerSubtitle": "Choose one of the two methods to take new jobs",
+    "method": {
+      "SELF_EMPLOYED": "Self-employed",
+      "XOLIS": "Paynet Xolis"
+    },
+    "methodDesc": {
+      "SELF_EMPLOYED": "Your document is checked in the state tax system. You pay the tax yourself.",
+      "XOLIS": "The customer pays your Xolis QR code. Xolis pays the 1% turnover tax itself."
+    },
+    "autoBadge": "Tax automatic",
+    "exampleLine": "From a {amount} UZS job:",
+    "exampleFee": "{appName} takes",
+    "exampleTaxSelf": "You pay the tax",
+    "exampleTaxXolis": "Xolis pays the tax",
+    "pickerNote": "With either method {appName} takes only a {percent}% service fee. You can change the method later from Settings → Tax status.",
+    "chooseSelfEmployed": "Mark as self-employed",
+    "connectXolis": "Connect Paynet Xolis",
+    "rejectedTitle": "Request rejected",
+    "rejectedGeneric": "An admin rejected the request.",
+    "expiredTitle": "Expired",
+    "expiredSubtitle": "The certificate has expired. Upload a new one or change the method.",
+    "verifiedTitle": "Tax method verified",
+    "verifiedSubtitle": "You can now take new jobs.",
+    "pendingTitle": "Under review",
+    "pendingSubtitle": "An admin is reviewing your request.",
+    "statusMethod": "Method",
+    "statusValidUntil": "Valid until",
+    "validUntilValue": "until {date}",
+    "statusChecked": "Checked",
+    "statusRequested": "Requested",
+    "noWithholding": "{appName} does not withhold tax",
+    "noWithholdingSelf": "You pay the tax yourself. {appName} only takes a {percent}% service fee.",
+    "noWithholdingXolis": "Xolis automatically pays the 1% turnover tax. {appName} only takes a {percent}% service fee.",
+    "remindersLabel": "Remind {days} days before it expires",
+    "changeMethod": "Change method",
+    "retry": "Try again",
+    "renew": "Renew",
+    "xolisTitle": "Connect Paynet Xolis",
+    "xolisIntro": "Xolis is Paynet's app for sole proprietors and the self-employed. It automatically withholds 1% tax from payments it receives.",
+    "xolisStep1Title": "Sign up in Xolis",
+    "xolisStep1Subtitle": "In the Paynet Xolis app, with Face ID",
+    "xolisOpenApp": "Open the Xolis app",
+    "xolisStep2Title": "Connect your QR code",
+    "xolisStep2Subtitle": "Customers will pay you through this code",
+    "scan": "Scan",
+    "fromPhoto": "From photo",
+    "xolisPhoneLabel": "Phone number in Xolis",
+    "xolisQrHint": "Scan the code or pick it from a photo",
+    "xolisQrConnected": "QR code connected",
+    "xolisQrRequired": "Connect a QR code",
+    "xolisQrNotFound": "No QR code found in the photo. Choose another one.",
+    "cameraDenied": "Camera access is needed. Turn it on in Settings.",
+    "xolisStep3Title": "Check in the tax system",
+    "xolisStep3Subtitle": "Sole proprietor or self-employed status is checked by PINFL",
+    "xolisSecureNote": "The money goes straight to your Xolis wallet. {appName} takes its service fee from your balance.",
+    "xolisSubmit": "Connect and check",
+    "certificateTitle": "Upload the document",
+    "certificateIntro": "Could not verify automatically. Upload a certificate photo — an admin will check it.",
+    "certificatePick": "Choose a photo",
+    "certificateSubmit": "Submit",
+    "certificateUploadFailed": "The photo did not upload. Please try again."
   },
   "trip": {
     "sharing": "Your location is visible to the customer",
@@ -514,7 +585,8 @@
     "waitingExecutor": "Waiting for the pro to confirm the money",
     "disputed": "A dispute is open. An admin will review it",
     "closed": "The order is closed",
-    "onlineNext": "Online payment comes in the next stage"
+    "onlineNext": "Online payment comes in the next stage",
+    "chooseMethod": "Choose a payment method"
   },
   "pay": {
     "title": "Payment",
@@ -617,5 +689,37 @@
     "cardDeclined": "The card declined the payment.",
     "cardNotFound": "Card not found.",
     "withdrawalsDisabled": "Withdrawals are not switched on yet."
+  },
+  "admin": {
+    "verificationsTitle": "Document requests",
+    "verificationsEmpty": "No requests yet",
+    "verificationTitle": "Review request",
+    "verificationSubmitted": "Submitted",
+    "verificationStatus": "Status",
+    "verificationStatusValue": {
+      "PENDING": "Pending",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected"
+    },
+    "certificateTitle": "Certificate",
+    "certificateMissing": "Photo not found",
+    "xolisTitle": "Xolis QR",
+    "validUntilLabel": "Valid until",
+    "validUntilInvalid": "The date must be in the future: dd.mm.yyyy",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectTitle": "Why are you rejecting it?",
+    "rejectReasonLabel": "Reason",
+    "rejectConfirm": "Reject"
+  },
+  "sa": {
+    "taxMethodsTitle": "Tax methods",
+    "taxMethodsIntro": "After the free month a pro chooses one of these two methods. {appName} does not withhold tax, only the service fee.",
+    "acceptShare": "Balance needed to take jobs: {percent}%",
+    "chosenBy": "Chosen by",
+    "withoutMethod": "No method chosen: {count} pros",
+    "withoutMethodSub": "Their free month has ended, they cannot take new jobs",
+    "remindButton": "Send a reminder",
+    "remindSent": "Reminder sent to {count} pros"
   }
 }

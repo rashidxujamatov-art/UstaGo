@@ -74,7 +74,10 @@
     "nightMode": "Реҷаи шабона",
     "help": "Кумак",
     "logout": "Баромадан",
-    "logoutConfirm": "Аз ҳисоб мебароед?"
+    "logoutConfirm": "Аз ҳисоб мебароед?",
+    "taxStatus": "Ҳолати андоз",
+    "verifications": "Мурожиатҳои ҳуҷҷат",
+    "taxMethods": "Усулҳои андоз"
   },
   "auth": {
     "haveAccount": "Ҳисоб доред?",
@@ -221,7 +224,75 @@
     }
   },
   "tax": {
-    "required": "Моҳи ройгон ба охир расид. Барои идомаи кор усули андозро интихоб кунед."
+    "required": "Моҳи ройгон ба охир расид. Барои идомаи кор усули андозро интихоб кунед.",
+    "methodDisabled": "Ин усули андоз ҳоло хомӯш аст.",
+    "certificateRequired": "Худкор тафтиш карда нашуд. Акси гувоҳномаро бор кунед.",
+    "verificationPending": "Дархости шумо аллакай баррасӣ мешавад.",
+    "alreadyDecided": "Ин дархост аллакай ҳал шудааст.",
+    "xolisNotAvailable": "QR-коди Xolis ҳоло дастрас нест. Нақдро интихоб кунед.",
+    "title": "Ҳолати андоз",
+    "pickerTitle": "Моҳи ройгон ба охир расид",
+    "pickerSubtitle": "Барои гирифтани кори нав яке аз ду усулро интихоб кунед",
+    "method": {
+      "SELF_EMPLOYED": "Худшуғлдор",
+      "XOLIS": "Paynet Xolis"
+    },
+    "methodDesc": {
+      "SELF_EMPLOYED": "Ҳуҷҷат дар низоми андози давлатӣ санҷида мешавад. Андозро худатон месупоред.",
+      "XOLIS": "Мизоҷ ба QR-коди Xolis-и шумо пардохт мекунад. 1%-и гардишро худи Xolis ҳамчун андоз месупорад."
+    },
+    "autoBadge": "Андоз худкор",
+    "exampleLine": "Аз кори {amount} сӯм:",
+    "exampleFee": "{appName} мегирад",
+    "exampleTaxSelf": "Андозро худатон месупоред",
+    "exampleTaxXolis": "Андозро Xolis месупорад",
+    "pickerNote": "Дар ҳар ду усул ҳам {appName} танҳо {percent}% ҳаққи хизмат мегирад. Усулро баъдтар аз Танзимот → Ҳолати андоз иваз кардан мумкин аст.",
+    "chooseSelfEmployed": "Ҳамчун худшуғлдор қайд кардан",
+    "connectXolis": "Пайваст кардани Paynet Xolis",
+    "rejectedTitle": "Дархост рад шуд",
+    "rejectedGeneric": "Админ дархостро рад кард.",
+    "expiredTitle": "Мӯҳлат гузашт",
+    "expiredSubtitle": "Мӯҳлати амал тамом шудааст. Ҳуҷҷати нав бор кунед ё усулро иваз кунед.",
+    "verifiedTitle": "Усули андоз тасдиқ шуд",
+    "verifiedSubtitle": "Акнун кори нав гирифта метавонед.",
+    "pendingTitle": "Дар баррасӣ",
+    "pendingSubtitle": "Дархости шуморо админ баррасӣ мекунад.",
+    "statusMethod": "Усул",
+    "statusValidUntil": "Амал мекунад",
+    "validUntilValue": "то {date}",
+    "statusChecked": "Санҷида шуд",
+    "statusRequested": "Дархост фиристода шуд",
+    "noWithholding": "{appName} андоз нигоҳ намедорад",
+    "noWithholdingSelf": "Андозро худатон месупоред. {appName} танҳо {percent}% ҳаққи хизмат мегирад.",
+    "noWithholdingXolis": "Андози 1%-и гардишро Xolis худкор месупорад. {appName} танҳо {percent}% ҳаққи хизмат мегирад.",
+    "remindersLabel": "{days} рӯз пеш аз тамом шудани мӯҳлат ёдрасон кардан",
+    "changeMethod": "Иваз кардани усул",
+    "retry": "Аз нав кӯшиш кардан",
+    "renew": "Нав кардан",
+    "xolisTitle": "Пайваст кардани Paynet Xolis",
+    "xolisIntro": "Xolis — барномаи Paynet барои соҳибкорони инфиродӣ ва худшуғлдорон. Аз пардохтҳои воридшуда 1% андоз худкор гирифта мешавад.",
+    "xolisStep1Title": "Дар Xolis сабти ном кунед",
+    "xolisStep1Subtitle": "Дар барномаи Paynet Xolis, тавассути Face ID",
+    "xolisOpenApp": "Кушодани барномаи Xolis",
+    "xolisStep2Title": "QR-коди худро пайваст кунед",
+    "xolisStep2Subtitle": "Мизоҷон тавассути ҳамин код ба шумо пардохт мекунанд",
+    "scan": "Скан кардан",
+    "fromPhoto": "Аз акс",
+    "xolisPhoneLabel": "Рақами телефон дар Xolis",
+    "xolisQrHint": "Кодро скан кунед ё аз акс интихоб кунед",
+    "xolisQrConnected": "QR-код пайваст шуд",
+    "xolisQrRequired": "QR-кодро пайваст кунед",
+    "xolisQrNotFound": "Дар акс QR-код ёфт нашуд. Акси дигар интихоб кунед.",
+    "cameraDenied": "Дастрасӣ ба камера лозим аст. Онро дар танзимот фаъол кунед.",
+    "xolisStep3Title": "Санҷиш дар низоми андоз",
+    "xolisStep3Subtitle": "Мақоми соҳибкори инфиродӣ ё худшуғлдор аз рӯи РМШ санҷида мешавад",
+    "xolisSecureNote": "Пул рост ба ҳамёни Xolis-и шумо мерасад. {appName} ҳаққи хизматро аз тавозуни шумо мегирад.",
+    "xolisSubmit": "Пайваст ва санҷидан",
+    "certificateTitle": "Боркунии ҳуҷҷат",
+    "certificateIntro": "Худкор тафтиш карда нашуд. Акси гувоҳномаро бор кунед — админ онро месанҷад.",
+    "certificatePick": "Интихоби акс",
+    "certificateSubmit": "Фиристодан",
+    "certificateUploadFailed": "Акс бор нашуд. Аз нав кӯшиш кунед."
   },
   "trip": {
     "sharing": "Ҷойгиршавии шумо ба мизоҷ намоён аст",
@@ -514,7 +585,8 @@
     "waitingExecutor": "Интизорем, ки усто гирифтани пулро тасдиқ кунад",
     "disputed": "Баҳс кушода шуд. Админ баррасӣ мекунад",
     "closed": "Фармоиш пӯшида шуд",
-    "onlineNext": "Пардохти онлайн дар марҳилаи оянда илова мешавад"
+    "onlineNext": "Пардохти онлайн дар марҳилаи оянда илова мешавад",
+    "chooseMethod": "Усули пардохтро интихоб кунед"
   },
   "pay": {
     "title": "Пардохт",
@@ -617,5 +689,37 @@
     "cardDeclined": "Корт пардохтро рад кард.",
     "cardNotFound": "Корт ёфт нашуд.",
     "withdrawalsDisabled": "Гирифтани пул ҳанӯз фаъол нашудааст."
+  },
+  "admin": {
+    "verificationsTitle": "Мурожиатҳои ҳуҷҷат",
+    "verificationsEmpty": "Ҳоло мурожиат нест",
+    "verificationTitle": "Баррасии мурожиат",
+    "verificationSubmitted": "Фиристода шуд",
+    "verificationStatus": "Ҳолат",
+    "verificationStatusValue": {
+      "PENDING": "Дар баррасӣ",
+      "VERIFIED": "Тасдиқшуда",
+      "REJECTED": "Радшуда"
+    },
+    "certificateTitle": "Гувоҳнома",
+    "certificateMissing": "Акс ёфт нашуд",
+    "xolisTitle": "QR-коди Xolis",
+    "validUntilLabel": "Мӯҳлати амал",
+    "validUntilInvalid": "Сана бояд дар оянда бошад: рр.мм.сссс",
+    "approve": "Тасдиқ кардан",
+    "reject": "Рад кардан",
+    "rejectTitle": "Чаро рад мекунед?",
+    "rejectReasonLabel": "Сабаб",
+    "rejectConfirm": "Рад кардан"
+  },
+  "sa": {
+    "taxMethodsTitle": "Усулҳои андоз",
+    "taxMethodsIntro": "Пас аз моҳи ройгон усто яке аз ин ду усулро интихоб мекунад. {appName} андоз нигоҳ намедорад, танҳо ҳаққи хизмат мегирад.",
+    "acceptShare": "Барои гирифтани кор тавозун лозим аст: {percent}%",
+    "chosenBy": "Интихоб кардаанд",
+    "withoutMethod": "Усул интихоб накардаанд: {count} усто",
+    "withoutMethodSub": "Моҳи ройгонашон тамом шуд, кори нав гирифта наметавонанд",
+    "remindButton": "Фиристодани ёдрасон",
+    "remindSent": "Ба {count} усто ёдрасон фиристода шуд"
   }
 }

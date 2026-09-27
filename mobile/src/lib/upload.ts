@@ -2,7 +2,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { endpoints } from '../api/endpoints';
 
-export type UploadPurpose = 'ORDER_PHOTO' | 'FINISH_PHOTO' | 'CHAT_PHOTO';
+export type UploadPurpose = 'ORDER_PHOTO' | 'FINISH_PHOTO' | 'CHAT_PHOTO' | 'TAX_CERTIFICATE';
 
 export interface UploadedPhoto {
   key: string;

@@ -21,7 +21,7 @@ export interface TokenStore {
   clear(): Promise<void>;
 }
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+type Method = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
 interface RequestOptions {
   body?: unknown;
@@ -50,6 +50,9 @@ export class ApiClient {
   }
   patch<T>(path: string, body?: unknown, options?: RequestOptions) {
     return this.request<T>('PATCH', path, { ...options, body });
+  }
+  put<T>(path: string, body?: unknown, options?: RequestOptions) {
+    return this.request<T>('PUT', path, { ...options, body });
   }
   delete<T>(path: string, options?: RequestOptions) {
     return this.request<T>('DELETE', path, options);

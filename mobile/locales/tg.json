@@ -1,6 +1,7 @@
 {
   "ios": {
     "NSLocationWhenInUseUsageDescription": "Ҷойгиршавӣ барои қайди суроға дар харита ва нишон додани фармоишҳои наздик лозим аст.",
-    "NSPhotoLibraryUsageDescription": "Барои илова кардани акс ба фармоиш ё чат дастрасӣ ба галерея лозим аст."
+    "NSPhotoLibraryUsageDescription": "Барои илова кардани акс ба фармоиш ё чат дастрасӣ ба галерея лозим аст.",
+    "NSCameraUsageDescription": "Барои сканкунии QR-коди Paynet Xolis дастрасӣ ба камера лозим аст."
   }
 }

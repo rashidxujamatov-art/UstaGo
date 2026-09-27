@@ -26,6 +26,7 @@ export class PublicConfigController {
       topup_min: s.topup_min.toString(),
       fee_bps: s.fee_bps,
       tax_methods_enabled: s.tax_methods_enabled,
+      self_employed_reminder_days: s.self_employed_reminder_days,
       withdraw_fee_bps: s.withdraw_fee_bps,
     };
   }

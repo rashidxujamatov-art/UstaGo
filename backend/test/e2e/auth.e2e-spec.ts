@@ -164,6 +164,7 @@ describe.skipIf(!enabled)('auth flow (e2e)', () => {
       topup_min: '100000',
       withdraw_fee_bps: 100,
       fee_bps: 250,
+      self_employed_reminder_days: 7,
     });
   });
 

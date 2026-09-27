@@ -19,6 +19,10 @@ import type {
   SavedCard,
   Role,
   SignedIn,
+  TaxMethod,
+  TaxMethodsOverview,
+  TaxStatus,
+  TaxVerification,
   ThemeModeApi,
   Wallet,
   WalletTransactionsPage,
@@ -98,7 +102,10 @@ export const endpoints = {
   categories: () => api.get<Category[]>('/categories'),
   wallet: () => api.get<Wallet>('/wallet'),
 
-  presignUpload: (purpose: 'ORDER_PHOTO' | 'FINISH_PHOTO' | 'CHAT_PHOTO', contentType: string) =>
+  presignUpload: (
+    purpose: 'ORDER_PHOTO' | 'FINISH_PHOTO' | 'CHAT_PHOTO' | 'TAX_CERTIFICATE',
+    contentType: string,
+  ) =>
     api.post<{ key: string; url: string; headers: Record<string, string>; max_bytes: number }>(
       '/uploads/presign',
       { purpose, content_type: contentType },
@@ -163,8 +170,9 @@ export const endpoints = {
       `/wallet/transactions${before ? `?before=${encodeURIComponent(before)}` : ''}`,
     ),
   referrals: () => api.get<ReferralSummary>('/me/referrals'),
-  /** BY9 "To'ladim". */
-  customerPaid: (id: string) => api.post<Order>(`/orders/${id}/paid`),
+  /** BY9 "To'ladim": cash, or the pro's Xolis QR when they use Paynet Xolis (stage 5). */
+  customerPaid: (id: string, via?: 'CASH' | 'XOLIS_QR') =>
+    api.post<Order>(`/orders/${id}/paid`, via ? { via } : undefined),
   /** BJ13 "Pulni qabul qildim". */
   paymentReceived: (id: string) => api.post<Order>(`/orders/${id}/payment-received`),
   /** BJ13 "Pul kelmadi". */
@@ -196,4 +204,35 @@ export const endpoints = {
     api.post<WithdrawPreview>('/wallet/withdraw/preview', { amount }),
   withdraw: (input: { amount: string; card_id: string; idempotency_key: string }) =>
     api.post<WithdrawalInfo>('/wallet/withdraw', input),
+
+  // ---------------------------------------------------------------- stage 5
+
+  /** BJ8-BJ9: the executor's tax method status. */
+  taxStatus: () => api.get<TaxStatus>('/tax/status'),
+  /** BJ8/BJ9: first tries the state tax system by PINFL; a certificate goes to AD1. */
+  taxSelfEmployed: (certificateKey?: string) =>
+    api.post<TaxStatus>(
+      '/tax/self-employed',
+      certificateKey ? { certificate_key: certificateKey } : undefined,
+    ),
+  /** BJ10: the executor's Xolis QR and the phone registered in Xolis. */
+  taxConnectXolis: (input: { qr: string; phone: string }) =>
+    api.post<TaxStatus>('/tax/xolis', input),
+  /** BJ9 "Muddat tugashidan 7 kun oldin eslatish". */
+  taxSetReminders: (enabled: boolean) => api.put<TaxStatus>('/tax/reminders', { enabled }),
+
+  /** AD1 "Hujjat murojaatlari" (users.manage). */
+  adminVerifications: () => api.get<TaxVerification[]>('/admin/verifications'),
+  adminVerification: (id: string) => api.get<TaxVerification>(`/admin/verifications/${id}`),
+  adminVerificationDecide: (
+    id: string,
+    decision:
+      { decision: 'APPROVE'; valid_until?: string } | { decision: 'REJECT'; reason: string },
+  ) => api.post<TaxVerification>(`/admin/verifications/${id}/decide`, decision),
+
+  /** SA5 "Soliq usullari" (super admin only). */
+  taxMethodsOverview: () => api.get<TaxMethodsOverview>('/sa/tax-methods'),
+  setTaxMethodsEnabled: (enabled: TaxMethod[]) =>
+    api.put<TaxMethodsOverview>('/sa/tax-methods', { enabled }),
+  remindTaxMethods: () => api.post<{ sent: number }>('/sa/tax-methods/remind'),
 };
