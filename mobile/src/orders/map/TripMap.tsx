@@ -6,6 +6,8 @@ import type { Coords } from '../../api/queries';
 import { useTheme } from '../../theme/ThemeProvider';
 import { mapStyle } from './map-style';
 import { regionFor } from './region';
+import { nativeMapsAvailable } from '../../lib/app-config';
+import { TripMap as TripMapPlaceholder } from './TripMap.web';
 
 export interface TripMapProps {
   destination: Coords;
@@ -19,7 +21,7 @@ export interface TripMapProps {
  * line is a stand-in for the real route — same spirit as the design's stylised map art.
  * The web preview has a stand-in (.web.tsx), same as the BY6 address map.
  */
-export function TripMap({ destination, position }: TripMapProps) {
+function NativeTripMap({ destination, position }: TripMapProps) {
   const theme = useTheme();
   const map = useRef<MapView>(null);
   const region = regionFor(position ? [destination, position] : [destination]);
@@ -81,4 +83,9 @@ export function TripMap({ destination, position }: TripMapProps) {
       ) : null}
     </MapView>
   );
+}
+
+/** Google map, or the search-only placeholder when the build has no Maps SDK key. */
+export function TripMap(props: TripMapProps) {
+  return nativeMapsAvailable() ? <NativeTripMap {...props} /> : <TripMapPlaceholder {...props} />;
 }

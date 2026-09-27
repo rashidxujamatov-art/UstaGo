@@ -4,6 +4,8 @@ import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import type { Coords } from '../../api/queries';
 import { useTheme } from '../../theme/ThemeProvider';
 import { mapStyle } from './map-style';
+import { nativeMapsAvailable } from '../../lib/app-config';
+import { MapPicker as MapPickerPlaceholder } from './MapPicker.web';
 
 export interface MapPickerProps {
   /** Where the map moves to (start, search result, "my location"). */
@@ -16,7 +18,7 @@ export interface MapPickerProps {
 const DELTA = 0.004;
 
 /** Google map under a fixed center pin (BY6). The web preview has a stand-in (.web.tsx). */
-export function MapPicker({ target, onCenterChange }: MapPickerProps) {
+function NativeMapPicker({ target, onCenterChange }: MapPickerProps) {
   const theme = useTheme();
   const map = useRef<MapView>(null);
   const [initial] = useState(target);
@@ -49,5 +51,14 @@ export function MapPicker({ target, onCenterChange }: MapPickerProps) {
         onCenterChange({ lat: region.latitude, lng: region.longitude })
       }
     />
+  );
+}
+
+/** Google map, or the search-only placeholder when the build has no Maps SDK key. */
+export function MapPicker(props: MapPickerProps) {
+  return nativeMapsAvailable() ? (
+    <NativeMapPicker {...props} />
+  ) : (
+    <MapPickerPlaceholder {...props} />
   );
 }

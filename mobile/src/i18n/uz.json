@@ -476,6 +476,7 @@
     "confirm": "Manzilni tasdiqlash",
     "myLocation": "Mening joylashuvim",
     "webNote": "Xarita telefonda ko‘rinadi. Bu yerda manzilni qidiruv orqali tanlang.",
+    "mapOffNote": "Xarita hozircha o‘chirilgan. Manzilni qidiruv orqali tanlang.",
     "detecting": "Manzil aniqlanmoqda…"
   },
   "executorHome": {

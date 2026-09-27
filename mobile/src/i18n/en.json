@@ -476,6 +476,7 @@
     "confirm": "Confirm address",
     "myLocation": "My location",
     "webNote": "The map is available on the phone. Here, pick the address using search.",
+    "mapOffNote": "The map is turned off for now. Pick the address using search.",
     "detecting": "Finding the address…"
   },
   "executorHome": {
