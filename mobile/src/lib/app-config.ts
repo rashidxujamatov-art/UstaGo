@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 /** Values injected by app.config.ts from mobile/.env. */
 interface AppExtra {
@@ -6,6 +7,7 @@ interface AppExtra {
   appDomain?: string;
   operatorName?: string;
   operatorTin?: string;
+  mapsSdk?: { ios?: boolean; android?: boolean };
 }
 
 function extra(): AppExtra {
@@ -27,4 +29,12 @@ export function appDomain(): string {
 /** Personal-data operator shown in the consent texts (docs/01 §14: not registered yet). */
 export function appOperator(): { name: string; tin: string } {
   return { name: extra().operatorName ?? '', tin: extra().operatorTin ?? '' };
+}
+
+/** True when this build has a Google Maps SDK key for the current platform. */
+export function nativeMapsAvailable(): boolean {
+  const sdk = extra().mapsSdk;
+  if (Platform.OS === 'ios') return Boolean(sdk?.ios);
+  if (Platform.OS === 'android') return Boolean(sdk?.android);
+  return false;
 }

@@ -1,6 +1,6 @@
 import { MapPinned } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { AppText } from '../../components/AppText';
 import { useTheme } from '../../theme/ThemeProvider';
 import type { TripMapProps } from './TripMap';
@@ -27,7 +27,7 @@ export function TripMap(_props: TripMapProps) {
     >
       <MapPinned size={32} color={theme.colors.text2} />
       <AppText color="text2" style={{ textAlign: 'center' }}>
-        {t('address.webNote')}
+        {t(Platform.OS === 'web' ? 'address.webNote' : 'address.mapOffNote')}
       </AppText>
     </View>
   );

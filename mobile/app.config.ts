@@ -83,6 +83,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       // Legal entity and tax number for consent texts; placeholders until registered (§14).
       operatorName: process.env.APP_OPERATOR_NAME?.trim() || '[MChJ nomi]',
       operatorTin: process.env.APP_OPERATOR_TIN?.trim() || '[raqam]',
+      // Without a Maps SDK key the native map cannot render; the app shows the search-only
+      // placeholder instead (keys are added before launch, docs/01 §10).
+      mapsSdk: {
+        ios: Boolean(mapsKeys.iosGoogleMapsApiKey),
+        android: Boolean(mapsKeys.androidGoogleMapsApiKey),
+      },
       ...(easProjectId ? { eas: { projectId: easProjectId } } : {}),
     },
   };

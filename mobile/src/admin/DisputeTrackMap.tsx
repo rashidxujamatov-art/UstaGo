@@ -5,6 +5,8 @@ import type { DisputeTrackPoint } from '../api/types';
 import { regionFor } from '../orders/map/region';
 import { mapStyle } from '../orders/map/map-style';
 import { useTheme } from '../theme/ThemeProvider';
+import { nativeMapsAvailable } from '../lib/app-config';
+import { DisputeTrackMap as DisputeTrackMapPlaceholder } from './DisputeTrackMap.web';
 
 export interface DisputeTrackMapProps {
   points: DisputeTrackPoint[];
@@ -15,7 +17,7 @@ export interface DisputeTrackMapProps {
  * `GET /admin/disputes/:orderId/track`, audited on every read). Unlike the live `TripMap`
  * (destination + one moving marker), this draws every stored point as a static polyline.
  */
-export function DisputeTrackMap({ points }: DisputeTrackMapProps) {
+function NativeDisputeTrackMap({ points }: DisputeTrackMapProps) {
   const theme = useTheme();
   const coords = points.map((point) => ({ lat: point.lat, lng: point.lng }));
   const region = regionFor(coords);
@@ -78,5 +80,14 @@ export function DisputeTrackMap({ points }: DisputeTrackMapProps) {
         </Marker>
       ) : null}
     </MapView>
+  );
+}
+
+/** Google map, or the search-only placeholder when the build has no Maps SDK key. */
+export function DisputeTrackMap(props: DisputeTrackMapProps) {
+  return nativeMapsAvailable() ? (
+    <NativeDisputeTrackMap {...props} />
+  ) : (
+    <DisputeTrackMapPlaceholder {...props} />
   );
 }
