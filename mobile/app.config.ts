@@ -37,6 +37,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     platforms:
       process.env.EXPO_WEB_PREVIEW === '1' ? ['ios', 'android', 'web'] : ['ios', 'android'],
     orientation: 'portrait',
+    // Brand "G" (docs/03 §2.4). Regenerate the PNGs when the name or logo changes.
+    icon: './assets/icon.png',
     scheme: bundleId,
     userInterfaceStyle: 'automatic',
     ios: {
@@ -47,12 +49,16 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       package: bundleId,
+      adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#2461C2' },
     },
     plugins: [
       'expo-router',
       'expo-localization',
       // Same value as palette.light.brand (src/theme/tokens.ts); app config cannot import TS modules.
-      ['expo-splash-screen', { backgroundColor: '#2461C2' }],
+      [
+        'expo-splash-screen',
+        { backgroundColor: '#2461C2', image: './assets/splash-icon.png', imageWidth: 160 },
+      ],
       ['react-native-maps', mapsKeys],
       // Stage 6 (BJ11/BJ12): the pro's location keeps posting while the app is backgrounded,
       // with an Android foreground service notification and the iOS background location mode.
