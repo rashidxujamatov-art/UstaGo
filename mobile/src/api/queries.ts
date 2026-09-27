@@ -29,6 +29,10 @@ export const queryKeys = {
   cards: ['cards'] as const,
   payment: (id: string) => ['payment', id] as const,
   withdrawPreview: (amount: string | null) => ['withdraw-preview', amount] as const,
+  taxStatus: ['tax-status'] as const,
+  adminVerifications: ['admin-verifications'] as const,
+  adminVerification: (id: string) => ['admin-verification', id] as const,
+  taxMethodsOverview: ['tax-methods-overview'] as const,
 };
 
 export const useConfig = () => useQuery({ queryKey: queryKeys.config, queryFn: endpoints.config });
@@ -108,6 +112,24 @@ export const useWithdrawPreview = (amount: string | null) =>
     queryFn: () => endpoints.withdrawPreview(amount ?? undefined),
     placeholderData: (previous) => previous,
   });
+
+/** BJ8/BJ9 "Soliq holati". */
+export const useTaxStatus = () =>
+  useQuery({ queryKey: queryKeys.taxStatus, queryFn: endpoints.taxStatus });
+
+/** AD1 "Hujjat murojaatlari". */
+export const useAdminVerifications = () =>
+  useQuery({ queryKey: queryKeys.adminVerifications, queryFn: endpoints.adminVerifications });
+
+export const useAdminVerification = (id: string) =>
+  useQuery({
+    queryKey: queryKeys.adminVerification(id),
+    queryFn: () => endpoints.adminVerification(id),
+  });
+
+/** SA5 "Soliq usullari". */
+export const useTaxMethodsOverview = () =>
+  useQuery({ queryKey: queryKeys.taxMethodsOverview, queryFn: endpoints.taxMethodsOverview });
 
 /** Everything that shows an order, its lists or the balance it holds. */
 export function invalidateOrder(client: QueryClient, orderId: string): void {

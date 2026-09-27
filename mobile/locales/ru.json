@@ -1,6 +1,7 @@
 {
   "ios": {
     "NSLocationWhenInUseUsageDescription": "Геолокация нужна, чтобы отметить адрес на карте и показать заказы поблизости.",
-    "NSPhotoLibraryUsageDescription": "Доступ к галерее нужен, чтобы добавить фото к заказу или в чат."
+    "NSPhotoLibraryUsageDescription": "Доступ к галерее нужен, чтобы добавить фото к заказу или в чат.",
+    "NSCameraUsageDescription": "Камера нужна, чтобы отсканировать QR-код Paynet Xolis."
   }
 }

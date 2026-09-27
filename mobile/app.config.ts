@@ -57,6 +57,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       // Foreground only; background tracking (BJ12) comes with stage 6.
       ['expo-location', { isAndroidBackgroundLocationEnabled: false }],
       ['expo-image-picker', { cameraPermission: false, microphonePermission: false }],
+      // BJ10: scanning the executor's Paynet Xolis QR. No audio is needed.
+      ['expo-camera', { microphonePermission: false, recordAudioAndroid: false }],
     ],
     locales: {
       uz: './locales/uz.json',

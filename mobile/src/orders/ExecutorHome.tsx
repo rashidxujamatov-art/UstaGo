@@ -209,7 +209,7 @@ function FreePeriodBanner() {
   return (
     <Pressable
       accessibilityRole="button"
-      onPress={() => router.push('/soon')}
+      onPress={() => router.push('/tax')}
       style={{
         marginHorizontal: theme.spacing.md,
         flexDirection: 'row',

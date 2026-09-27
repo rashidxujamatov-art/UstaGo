@@ -74,7 +74,10 @@
     "nightMode": "Tungi rejim",
     "help": "Yordam",
     "logout": "Chiqish",
-    "logoutConfirm": "Hisobdan chiqasizmi?"
+    "logoutConfirm": "Hisobdan chiqasizmi?",
+    "taxStatus": "Soliq holati",
+    "verifications": "Hujjat murojaatlari",
+    "taxMethods": "Soliq usullari"
   },
   "auth": {
     "haveAccount": "Hisobingiz bormi?",
@@ -221,7 +224,75 @@
     }
   },
   "tax": {
-    "required": "Bepul oy tugadi. Ishni davom ettirish uchun soliq usulini tanlang."
+    "required": "Bepul oy tugadi. Ishni davom ettirish uchun soliq usulini tanlang.",
+    "methodDisabled": "Bu soliq usuli hozir yopiq.",
+    "certificateRequired": "Avtomatik tekshirib bo‘lmadi. Guvohnoma rasmini yuklang.",
+    "verificationPending": "So‘rovingiz allaqachon ko‘rib chiqilmoqda.",
+    "alreadyDecided": "Bu murojaat allaqachon hal qilingan.",
+    "xolisNotAvailable": "Xolis QR hozir mavjud emas. Naqd tanlang.",
+    "title": "Soliq holati",
+    "pickerTitle": "Bepul oy tugadi",
+    "pickerSubtitle": "Yangi ish olish uchun ikki usuldan birini tanlang",
+    "method": {
+      "SELF_EMPLOYED": "O‘zini o‘zi band qilganman",
+      "XOLIS": "Paynet Xolis"
+    },
+    "methodDesc": {
+      "SELF_EMPLOYED": "Hujjat davlat soliq tizimida tekshiriladi. Soliqni o‘zingiz to‘laysiz.",
+      "XOLIS": "Mijoz Xolis QR-kodingizga to‘laydi. Aylanmadan 1% soliqni Xolis o‘zi to‘laydi."
+    },
+    "autoBadge": "Soliq avtomatik",
+    "exampleLine": "{amount} so‘mlik ishdan:",
+    "exampleFee": "{appName} oladi",
+    "exampleTaxSelf": "Soliqni o‘zingiz to‘laysiz",
+    "exampleTaxXolis": "Soliqni Xolis to‘laydi",
+    "pickerNote": "Ikkala usulda ham {appName} faqat {percent}% xizmat haqi oladi. Usulni keyin Sozlamalar → Soliq holati bo‘limidan almashtirish mumkin.",
+    "chooseSelfEmployed": "O‘zini o‘zi band deb belgilash",
+    "connectXolis": "Paynet Xolis’ni ulash",
+    "rejectedTitle": "So‘rov rad etildi",
+    "rejectedGeneric": "Admin so‘rovni rad etdi.",
+    "expiredTitle": "Muddat tugadi",
+    "expiredSubtitle": "Amal qilish muddati tugagan. Yangi hujjat yuklang yoki usulni almashtiring.",
+    "verifiedTitle": "Soliq usuli tasdiqlandi",
+    "verifiedSubtitle": "Endi yangi ish olishingiz mumkin.",
+    "pendingTitle": "Tekshirilmoqda",
+    "pendingSubtitle": "So‘rovingiz admin tomonidan ko‘rib chiqilmoqda.",
+    "statusMethod": "Usul",
+    "statusValidUntil": "Amal qiladi",
+    "validUntilValue": "{date} gacha",
+    "statusChecked": "Tekshirildi",
+    "statusRequested": "So‘rov yuborilgan",
+    "noWithholding": "{appName} soliq ushlamaydi",
+    "noWithholdingSelf": "Soliqni o‘zingiz to‘laysiz. {appName} faqat {percent}% xizmat haqi oladi.",
+    "noWithholdingXolis": "Soliqni (aylanmadan 1%) Xolis avtomatik to‘laydi. {appName} faqat {percent}% xizmat haqi oladi.",
+    "remindersLabel": "Muddat tugashidan {days} kun oldin eslatish",
+    "changeMethod": "Usulni almashtirish",
+    "retry": "Qayta urinish",
+    "renew": "Yangilash",
+    "xolisTitle": "Paynet Xolis’ni ulash",
+    "xolisIntro": "Xolis — yakka tadbirkorlar va o‘zini o‘zi band qilganlar uchun Paynet ilovasi. Unga tushgan to‘lovdan 1% soliq avtomatik to‘lanadi.",
+    "xolisStep1Title": "Xolis’da ro‘yxatdan o‘ting",
+    "xolisStep1Subtitle": "Paynet Xolis ilovasida, Face ID bilan",
+    "xolisOpenApp": "Xolis ilovasini ochish",
+    "xolisStep2Title": "QR-kodingizni ulang",
+    "xolisStep2Subtitle": "Mijozlar sizga shu kod orqali to‘laydi",
+    "scan": "Skanerlash",
+    "fromPhoto": "Rasmdan",
+    "xolisPhoneLabel": "Xolis’dagi telefon raqam",
+    "xolisQrHint": "QR-kodni skanerlab yoki rasmdan yuklab ulang",
+    "xolisQrConnected": "QR-kod ulandi",
+    "xolisQrRequired": "QR-kodni ulang",
+    "xolisQrNotFound": "Rasmda QR-kod topilmadi. Boshqa rasm tanlang.",
+    "cameraDenied": "Kameraga ruxsat kerak. Sozlamalardan yoqing.",
+    "xolisStep3Title": "Soliq tizimida tekshiruv",
+    "xolisStep3Subtitle": "YaTT yoki o‘zini o‘zi band maqomi JShShIR bo‘yicha tekshiriladi",
+    "xolisSecureNote": "Pul to‘g‘ridan-to‘g‘ri Xolis hamyoningizga tushadi. {appName} xizmat haqini balansingizdan oladi.",
+    "xolisSubmit": "Ulash va tekshirish",
+    "certificateTitle": "Hujjatni yuklash",
+    "certificateIntro": "Avtomatik tekshirib bo‘lmadi. Guvohnoma rasmini yuklang, admin tekshiradi.",
+    "certificatePick": "Rasm tanlash",
+    "certificateSubmit": "Yuborish",
+    "certificateUploadFailed": "Rasm yuklanmadi. Qaytadan urinib ko‘ring."
   },
   "trip": {
     "sharing": "Joylashuvingiz mijozga ko‘rinmoqda",
@@ -514,7 +585,8 @@
     "waitingExecutor": "Usta pulni qabul qilganini tasdiqlashini kutyapmiz",
     "disputed": "Nizo ochilgan. Admin ko‘rib chiqadi",
     "closed": "Buyurtma yopildi",
-    "onlineNext": "Online to‘lov keyingi bosqichda qo‘shiladi"
+    "onlineNext": "Online to‘lov keyingi bosqichda qo‘shiladi",
+    "chooseMethod": "To‘lov usulini tanlang"
   },
   "pay": {
     "title": "To‘lov",
@@ -617,5 +689,37 @@
     "cardDeclined": "Karta to‘lovni rad etdi.",
     "cardNotFound": "Karta topilmadi.",
     "withdrawalsDisabled": "Pul yechish hali yoqilmagan."
+  },
+  "admin": {
+    "verificationsTitle": "Hujjat murojaatlari",
+    "verificationsEmpty": "Hozircha murojaat yo‘q",
+    "verificationTitle": "Murojaatni ko‘rib chiqish",
+    "verificationSubmitted": "Yuborilgan",
+    "verificationStatus": "Holat",
+    "verificationStatusValue": {
+      "PENDING": "Kutilmoqda",
+      "VERIFIED": "Tasdiqlangan",
+      "REJECTED": "Rad etilgan"
+    },
+    "certificateTitle": "Guvohnoma",
+    "certificateMissing": "Rasm topilmadi",
+    "xolisTitle": "Xolis QR",
+    "validUntilLabel": "Amal qilish muddati",
+    "validUntilInvalid": "Sana kelajakda bo‘lishi kerak: kk.oo.yyyy",
+    "approve": "Tasdiqlash",
+    "reject": "Rad etish",
+    "rejectTitle": "Nega rad etyapsiz?",
+    "rejectReasonLabel": "Sabab",
+    "rejectConfirm": "Rad etish"
+  },
+  "sa": {
+    "taxMethodsTitle": "Soliq usullari",
+    "taxMethodsIntro": "Bepul oy tugagach usta shu ikki usuldan birini tanlaydi. {appName} soliq ushlamaydi, faqat xizmat haqi oladi.",
+    "acceptShare": "Ish olish uchun balans: {percent}%",
+    "chosenBy": "Tanlagan ustalar",
+    "withoutMethod": "Usul tanlamagan: {count} usta",
+    "withoutMethodSub": "Bepul oyi tugagan, yangi ish ololmaydi",
+    "remindButton": "Eslatma yuborish",
+    "remindSent": "{count} ustaga eslatma yuborildi"
   }
 }

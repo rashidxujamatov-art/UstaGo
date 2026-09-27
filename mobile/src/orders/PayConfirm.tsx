@@ -2,12 +2,14 @@ import { Check, Flag } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Order } from '../api/types';
 import { AppText } from '../components/AppText';
 import { BarHeader } from '../components/ui/BarHeader';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { Segmented } from '../components/ui/Segmented';
 import { leave } from '../lib/navigation';
 import { useTheme } from '../theme/ThemeProvider';
 import { DangerLink, LockNote, StatusBanner } from './ConfirmParts';
@@ -17,7 +19,11 @@ import { usePaymentActions } from './payment-actions';
 import { PaymentTag } from './PaymentTag';
 import { useOrderTexts } from './texts';
 
-/** BY9: the customer paid cash or to the pro's Xolis QR and says "To'ladim" (§5.1). */
+/**
+ * BY9: the customer pays cash or, when the pro uses Paynet Xolis, to their Xolis QR
+ * instead — chosen here, not when the order was posted (decision of 2026-09-26, stage 5).
+ * Either way, the customer then says "To'ladim" (§5.1).
+ */
 export function PayConfirm({ order }: { order: Order }) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -25,7 +31,11 @@ export function PayConfirm({ order }: { order: Order }) {
   const texts = useOrderTexts();
   const actions = usePaymentActions(order);
   const [disputeOpen, setDisputeOpen] = useState(false);
-  const xolis = order.payment_method === 'XOLIS_QR';
+  const canChooseXolis = order.payment_method === 'CASH' && Boolean(order.xolis_qr);
+  const [via, setVia] = useState<'CASH' | 'XOLIS_QR'>(
+    order.payment_method === 'XOLIS_QR' ? 'XOLIS_QR' : 'CASH',
+  );
+  const xolis = canChooseXolis ? via === 'XOLIS_QR' : order.payment_method === 'XOLIS_QR';
 
   const steps = [
     t(xolis ? 'confirm.stepXolis' : 'confirm.stepCash'),
@@ -60,10 +70,36 @@ export function PayConfirm({ order }: { order: Order }) {
               </AppText>
               <AppText size="title" weight="semibold">{` ${t('common.currency')}`}</AppText>
             </AppText>
-            <PaymentTag method={order.payment_method} />
+            <PaymentTag method={canChooseXolis ? via : order.payment_method} />
           </View>
           <AppText color="text2">{t('confirm.amountNote')}</AppText>
         </Card>
+
+        {canChooseXolis ? (
+          <Card title={t('confirm.chooseMethod')}>
+            <Segmented
+              options={[
+                { value: 'CASH' as const, label: t('payment.method.CASH') },
+                { value: 'XOLIS_QR' as const, label: t('payment.method.XOLIS_QR') },
+              ]}
+              value={via}
+              onChange={setVia}
+            />
+            {via === 'XOLIS_QR' && order.xolis_qr ? (
+              <View
+                style={{
+                  alignSelf: 'center',
+                  marginTop: theme.spacing.sm,
+                  padding: theme.spacing.lg,
+                  borderRadius: theme.radius.card,
+                  backgroundColor: theme.colors.qrBg,
+                }}
+              >
+                <QRCode value={order.xolis_qr} size={180} />
+              </View>
+            ) : null}
+          </Card>
+        ) : null}
 
         <Card title={t('confirm.howTitle')}>
           {steps.map((step, index) => (
@@ -103,7 +139,7 @@ export function PayConfirm({ order }: { order: Order }) {
             loading={actions.busy === 'paid'}
             disabled={actions.busy !== null}
             onPress={() =>
-              void actions.paid().then((done) => {
+              void actions.paid(canChooseXolis ? via : undefined).then((done) => {
                 if (done) leave({ pathname: '/order/[id]', params: { id: order.id } });
               })
             }

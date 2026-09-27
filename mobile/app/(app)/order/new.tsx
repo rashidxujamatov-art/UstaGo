@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ApiError } from '../../../src/api/client';
 import { endpoints } from '../../../src/api/endpoints';
 import { queryKeys, useCategories, useConfig } from '../../../src/api/queries';
+import type { PaymentMethod } from '../../../src/api/types';
 import { useErrorText } from '../../../src/api/use-error-text';
 import { AppText } from '../../../src/components/AppText';
 import { BarHeader } from '../../../src/components/ui/BarHeader';
@@ -56,7 +57,15 @@ export default function NewOrderScreen() {
   /** Errors show after the first submit and then follow the input. */
   const [submitted, setSubmitted] = useState(false);
 
-  const methods = useMemo(() => config.data?.payment_methods_enabled ?? [], [config.data]);
+  // XOLIS_QR is not chosen at posting time: a cash job may be paid to a Xolis pro's QR
+  // instead of cash, offered at payment time (BY9, decision of 2026-09-26, stage 5).
+  const methods = useMemo(
+    () =>
+      (config.data?.payment_methods_enabled ?? []).filter(
+        (method) => method !== 'XOLIS_QR',
+      ) as PaymentMethod[],
+    [config.data],
+  );
   const photosMax = config.data?.order_photos_max ?? 0;
   const { set } = draft;
 

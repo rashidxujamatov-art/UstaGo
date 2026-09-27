@@ -1,6 +1,7 @@
 {
   "ios": {
     "NSLocationWhenInUseUsageDescription": "Your location is used to mark the address on the map and show jobs nearby.",
-    "NSPhotoLibraryUsageDescription": "Photo access is used to add pictures to an order or a chat."
+    "NSPhotoLibraryUsageDescription": "Photo access is used to add pictures to an order or a chat.",
+    "NSCameraUsageDescription": "The camera is used to scan a Paynet Xolis QR code."
   }
 }

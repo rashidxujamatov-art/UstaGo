@@ -35,7 +35,8 @@ export function usePaymentActions(order: Pick<Order, 'id' | 'viewer_role'> | und
 
   return {
     busy,
-    paid: () => run('paid', () => endpoints.customerPaid(order?.id ?? '')),
+    paid: (via?: 'CASH' | 'XOLIS_QR') =>
+      run('paid', () => endpoints.customerPaid(order?.id ?? '', via)),
     received: () => run('received', () => endpoints.paymentReceived(order?.id ?? '')),
     dispute: (note?: string) =>
       run('dispute', () =>

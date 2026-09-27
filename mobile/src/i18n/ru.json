@@ -74,7 +74,10 @@
     "nightMode": "Ночной режим",
     "help": "Помощь",
     "logout": "Выйти",
-    "logoutConfirm": "Выйти из аккаунта?"
+    "logoutConfirm": "Выйти из аккаунта?",
+    "taxStatus": "Статус налога",
+    "verifications": "Обращения по документам",
+    "taxMethods": "Способы уплаты налога"
   },
   "auth": {
     "haveAccount": "Уже есть аккаунт?",
@@ -221,7 +224,75 @@
     }
   },
   "tax": {
-    "required": "Бесплатный месяц закончился. Чтобы продолжить, выберите способ уплаты налога."
+    "required": "Бесплатный месяц закончился. Чтобы продолжить, выберите способ уплаты налога.",
+    "methodDisabled": "Этот способ уплаты налога сейчас отключён.",
+    "certificateRequired": "Не удалось проверить автоматически. Загрузите фото справки.",
+    "verificationPending": "Ваша заявка уже рассматривается.",
+    "alreadyDecided": "Эта заявка уже рассмотрена.",
+    "xolisNotAvailable": "QR-код Xolis сейчас недоступен. Выберите наличные.",
+    "title": "Статус налога",
+    "pickerTitle": "Бесплатный месяц закончился",
+    "pickerSubtitle": "Чтобы взять новый заказ, выберите один из двух способов",
+    "method": {
+      "SELF_EMPLOYED": "Самозанятый",
+      "XOLIS": "Paynet Xolis"
+    },
+    "methodDesc": {
+      "SELF_EMPLOYED": "Документ проверяется в государственной налоговой системе. Налог платите сами.",
+      "XOLIS": "Клиент платит на ваш QR-код Xolis. Налог 1% с оборота платит сам Xolis."
+    },
+    "autoBadge": "Налог автоматически",
+    "exampleLine": "С заказа на {amount} сум:",
+    "exampleFee": "{appName} получает",
+    "exampleTaxSelf": "Налог платите сами",
+    "exampleTaxXolis": "Налог платит Xolis",
+    "pickerNote": "В обоих способах {appName} берёт только {percent}% комиссии сервиса. Способ потом можно сменить в Настройках → Статус налога.",
+    "chooseSelfEmployed": "Отметить как самозанятый",
+    "connectXolis": "Подключить Paynet Xolis",
+    "rejectedTitle": "Заявка отклонена",
+    "rejectedGeneric": "Администратор отклонил заявку.",
+    "expiredTitle": "Срок истёк",
+    "expiredSubtitle": "Срок действия истёк. Загрузите новый документ или смените способ.",
+    "verifiedTitle": "Способ уплаты налога подтверждён",
+    "verifiedSubtitle": "Теперь вы можете брать новые заказы.",
+    "pendingTitle": "На рассмотрении",
+    "pendingSubtitle": "Вашу заявку рассматривает администратор.",
+    "statusMethod": "Способ",
+    "statusValidUntil": "Действует",
+    "validUntilValue": "до {date}",
+    "statusChecked": "Проверено",
+    "statusRequested": "Заявка отправлена",
+    "noWithholding": "{appName} не удерживает налог",
+    "noWithholdingSelf": "Налог платите сами. {appName} берёт только {percent}% комиссии сервиса.",
+    "noWithholdingXolis": "Налог (1% с оборота) автоматически платит Xolis. {appName} берёт только {percent}% комиссии сервиса.",
+    "remindersLabel": "Напоминать за {days} дн. до окончания срока",
+    "changeMethod": "Сменить способ",
+    "retry": "Повторить попытку",
+    "renew": "Обновить",
+    "xolisTitle": "Подключение Paynet Xolis",
+    "xolisIntro": "Xolis — приложение Paynet для ИП и самозанятых. С поступивших платежей автоматически удерживается 1% налога.",
+    "xolisStep1Title": "Зарегистрируйтесь в Xolis",
+    "xolisStep1Subtitle": "В приложении Paynet Xolis, через Face ID",
+    "xolisOpenApp": "Открыть приложение Xolis",
+    "xolisStep2Title": "Подключите свой QR-код",
+    "xolisStep2Subtitle": "Клиенты будут платить вам по этому коду",
+    "scan": "Сканировать",
+    "fromPhoto": "Из галереи",
+    "xolisPhoneLabel": "Номер телефона в Xolis",
+    "xolisQrHint": "Отсканируйте код или выберите его из галереи",
+    "xolisQrConnected": "QR-код подключён",
+    "xolisQrRequired": "Подключите QR-код",
+    "xolisQrNotFound": "QR-код на фото не найден. Выберите другое фото.",
+    "cameraDenied": "Нужен доступ к камере. Включите его в настройках.",
+    "xolisStep3Title": "Проверка в налоговой системе",
+    "xolisStep3Subtitle": "Статус ИП или самозанятого проверяется по ПИНФЛ",
+    "xolisSecureNote": "Деньги поступают прямо на ваш кошелёк Xolis. {appName} списывает комиссию сервиса с вашего баланса.",
+    "xolisSubmit": "Подключить и проверить",
+    "certificateTitle": "Загрузка документа",
+    "certificateIntro": "Не удалось проверить автоматически. Загрузите фото справки — администратор проверит его.",
+    "certificatePick": "Выбрать фото",
+    "certificateSubmit": "Отправить",
+    "certificateUploadFailed": "Фото не загрузилось. Попробуйте ещё раз."
   },
   "trip": {
     "sharing": "Ваше местоположение видно клиенту",
@@ -514,7 +585,8 @@
     "waitingExecutor": "Ждём, когда мастер подтвердит получение денег",
     "disputed": "Открыт спор. Его рассмотрит администратор",
     "closed": "Заказ закрыт",
-    "onlineNext": "Онлайн-оплата появится на следующем этапе"
+    "onlineNext": "Онлайн-оплата появится на следующем этапе",
+    "chooseMethod": "Выберите способ оплаты"
   },
   "pay": {
     "title": "Оплата",
@@ -617,5 +689,37 @@
     "cardDeclined": "Карта отклонила оплату.",
     "cardNotFound": "Карта не найдена.",
     "withdrawalsDisabled": "Вывод средств пока не включён."
+  },
+  "admin": {
+    "verificationsTitle": "Обращения по документам",
+    "verificationsEmpty": "Пока нет обращений",
+    "verificationTitle": "Рассмотрение обращения",
+    "verificationSubmitted": "Отправлено",
+    "verificationStatus": "Статус",
+    "verificationStatusValue": {
+      "PENDING": "На рассмотрении",
+      "VERIFIED": "Подтверждено",
+      "REJECTED": "Отклонено"
+    },
+    "certificateTitle": "Справка",
+    "certificateMissing": "Фото не найдено",
+    "xolisTitle": "QR-код Xolis",
+    "validUntilLabel": "Срок действия",
+    "validUntilInvalid": "Дата должна быть в будущем: дд.мм.гггг",
+    "approve": "Подтвердить",
+    "reject": "Отклонить",
+    "rejectTitle": "Почему вы отклоняете?",
+    "rejectReasonLabel": "Причина",
+    "rejectConfirm": "Отклонить"
+  },
+  "sa": {
+    "taxMethodsTitle": "Способы уплаты налога",
+    "taxMethodsIntro": "После бесплатного месяца мастер выбирает один из этих двух способов. {appName} не удерживает налог, только комиссию сервиса.",
+    "acceptShare": "Для приёма заказов нужен баланс: {percent}%",
+    "chosenBy": "Выбрали мастеров",
+    "withoutMethod": "Не выбрали способ: {count} мастеров",
+    "withoutMethodSub": "Бесплатный месяц закончился, новые заказы брать нельзя",
+    "remindButton": "Отправить напоминание",
+    "remindSent": "Напоминание отправлено {count} мастерам"
   }
 }

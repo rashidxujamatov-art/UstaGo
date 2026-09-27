@@ -5,10 +5,13 @@ import {
   Briefcase,
   CircleQuestionMark,
   ClipboardList,
+  FileCheck,
   Globe,
+  Landmark,
   LogOut,
   type LucideIcon,
   Moon,
+  Percent,
   Settings,
   Users,
   Wallet,
@@ -49,6 +52,10 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
 
   if (!user) return null;
   const isExecutor = user.active_role === 'EXECUTOR';
+  const canManageVerifications =
+    user.staff !== null &&
+    (user.staff.role === 'SUPER_ADMIN' || user.staff.permissions.includes('users.manage'));
+  const isSuperAdmin = user.staff?.role === 'SUPER_ADMIN';
   const name = user.identity
     ? `${user.identity.first_name} ${user.identity.last_name}`
     : user.phone;
@@ -80,7 +87,9 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
     router.push('/soon');
   };
 
-  const open = (path: '/wallet' | '/referral') => {
+  const open = (
+    path: '/wallet' | '/referral' | '/tax' | '/admin/verifications' | '/admin/tax-methods',
+  ) => {
     onClose();
     router.push(path);
   };
@@ -167,7 +176,24 @@ export function MainMenu({ visible, onClose }: MainMenuProps) {
             <MenuRow icon={Briefcase} label={t('menu.myJobs')} onPress={myJobs} />
             <MenuRow icon={Wallet} label={t('menu.wallet')} onPress={() => open('/wallet')} />
             <MenuRow icon={Users} label={t('menu.referral')} onPress={() => open('/referral')} />
+            {isExecutor ? (
+              <MenuRow icon={Percent} label={t('menu.taxStatus')} onPress={() => open('/tax')} />
+            ) : null}
             <MenuRow icon={Settings} label={t('menu.settings')} onPress={soon} />
+            {canManageVerifications ? (
+              <MenuRow
+                icon={FileCheck}
+                label={t('menu.verifications')}
+                onPress={() => open('/admin/verifications')}
+              />
+            ) : null}
+            {isSuperAdmin ? (
+              <MenuRow
+                icon={Landmark}
+                label={t('menu.taxMethods')}
+                onPress={() => open('/admin/tax-methods')}
+              />
+            ) : null}
             <MenuRow
               icon={Globe}
               label={t('menu.language')}
