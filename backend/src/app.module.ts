@@ -23,6 +23,7 @@ import { SettingsModule } from './modules/settings/settings.module.js';
 import { SmsModule } from './modules/sms/sms.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
 import { TaxModule } from './modules/tax/tax.module.js';
+import { TripsModule } from './modules/trips/trips.module.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { WalletModule } from './modules/wallet/wallet.module.js';
 
@@ -55,6 +56,7 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
     OrdersModule,
     PaymentsModule,
     TaxModule,
+    TripsModule,
     RealtimeModule,
     HealthModule,
   ],

@@ -5,7 +5,7 @@ import { Linking } from 'react-native';
  * Turn-by-turn navigation inside our app is not allowed by Google's terms (CLAUDE.md rule 8).
  */
 export function googleMapsDirectionsUrl(lat: number, lng: number): string {
-  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
 }
 
 export function openDirections(lat: number, lng: number): void {

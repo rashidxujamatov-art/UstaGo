@@ -28,6 +28,9 @@ export class PublicConfigController {
       tax_methods_enabled: s.tax_methods_enabled,
       self_employed_reminder_days: s.self_employed_reminder_days,
       withdraw_fee_bps: s.withdraw_fee_bps,
+      location_interval_sec: s.location_interval_sec,
+      auto_stop_radius_m: s.auto_stop_radius_m,
+      max_trip_minutes: s.max_trip_minutes,
     };
   }
 }

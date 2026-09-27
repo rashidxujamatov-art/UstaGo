@@ -1,4 +1,7 @@
 import '../src/i18n';
+// Registers the stage 6 background location task; must run before the OS can deliver a batch
+// to a fresh JS context (the app restarting mid-trip).
+import '../src/location/trip-task';
 
 // Per-weight imports so unused weights (800, 900) are not bundled.
 import { GolosText_400Regular } from '@expo-google-fonts/golos-text/400Regular';

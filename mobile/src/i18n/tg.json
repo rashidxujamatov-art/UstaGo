@@ -77,7 +77,8 @@
     "logoutConfirm": "Аз ҳисоб мебароед?",
     "taxStatus": "Ҳолати андоз",
     "verifications": "Мурожиатҳои ҳуҷҷат",
-    "taxMethods": "Усулҳои андоз"
+    "taxMethods": "Усулҳои андоз",
+    "mapsSettings": "Харита ва ҷойгиршавӣ"
   },
   "auth": {
     "haveAccount": "Ҳисоб доред?",
@@ -296,7 +297,42 @@
   },
   "trip": {
     "sharing": "Ҷойгиршавии шумо ба мизоҷ намоён аст",
-    "eta": "Пас аз {min} дақиқа мерасад"
+    "notSharing": "Фиристода намешавад",
+    "stopSharing": "Қатъ кардан",
+    "stopConfirmTitle": "Фиристодани ҷойгиршавиро қатъ мекунед?",
+    "notShared": "Усто ҷойгиршавии худро мубодила накардааст",
+    "eta": "Пас аз {min} дақиқа мерасад",
+    "etaSub": "{km} монд · тахминан соати {time}",
+    "freshness": "Зинда · {sec} сония пеш нав шуд",
+    "proEta": "{min} дақиқа · {km}",
+    "proEtaSub": "Шумо тахминан соати {time} мерасед",
+    "enRouteHeader": "Усто дар роҳ",
+    "arrivedHeader": "Усто расид",
+    "arrivedSub": "{name} · {when}",
+    "trackingStoppedNote": "Пайгирӣ қатъ шуд — ҷойгиршавии усто дигар намоён нест.",
+    "autoStopNote": "Пас аз расидани усто пайгирӣ худ аз худ қатъ мешавад.",
+    "backToOrder": "Бозгашт ба фармоиш",
+    "bannerEnRoute": "Усто дар роҳ — дар харита дидан",
+    "bannerArrived": "Усто расид — дар харита дидан",
+    "step": {
+      "accepted": "Қабул кард",
+      "enroute": "Дар роҳ",
+      "arrived": "Расид"
+    },
+    "intro": {
+      "title": "Ба роҳ мебароед?",
+      "body": "{name} омадани шуморо дар харита зинда мебинад ва шуморо интизор мешавад.",
+      "bullet1": "Танҳо дар давоми ҳамин фармоиш",
+      "bullet2": "Пас аз расиданатон худ аз худ қатъ мешавад",
+      "bullet3": "Дар вақти дигар ҳеҷ кас намебинад",
+      "permissionHint": "Агар телефон рухсат пурсад, «Иҷозат додан»-ро пахш кунед.",
+      "confirm": "Ҳа, ба роҳ баромадам",
+      "later": "Ҳоло не"
+    },
+    "notification": {
+      "title": "{appName}",
+      "body": "{appName} ҷойгиршавии шуморо ба мизоҷ нишон медиҳад"
+    }
   },
   "payment": {
     "iPaid": "Пардохт кардам",
@@ -720,6 +756,45 @@
     "withoutMethod": "Усул интихоб накардаанд: {count} усто",
     "withoutMethodSub": "Моҳи ройгонашон тамом шуд, кори нав гирифта наметавонанд",
     "remindButton": "Фиристодани ёдрасон",
-    "remindSent": "Ба {count} усто ёдрасон фиристода шуд"
+    "remindSent": "Ба {count} усто ёдрасон фиристода шуд",
+    "mapsTitle": "Харита ва ҷойгиршавӣ",
+    "mapsServiceSection": "Хидмати харита",
+    "mapsProviderName": "Google Maps Platform",
+    "mapsProviderDesc": "харита, маршрут, ҷустуҷӯи суроға",
+    "mapsConnected": "Пайваст шуд",
+    "mapsMock": "Mock (реҷаи санҷиш)",
+    "mapsApiKeyLabel": "Калиди API",
+    "mapsApiKeyHint": "аз кабинети Google Cloud гирифта мешавад",
+    "mapsApiKeyConfigured": "Танзим шудааст",
+    "mapsApiKeyMissing": "Танзим нашудааст",
+    "mapsUsageSection": "Ҳадди ройгон (моҳона)",
+    "mapsUsageRoutes": "Маршрут ва вақт",
+    "mapsUsageGeocode": "Муайян кардани суроға",
+    "mapsUsagePlaces": "Ҷустуҷӯи суроға",
+    "mapsLiveSection": "Ҷойгиршавии зинда",
+    "mapsIntervalLabel": "Фосилаи навсозӣ",
+    "mapsIntervalHint": "ҷойгиршавии усто фиристода мешавад",
+    "mapsEtaRefreshLabel": "Фосилаи навсозии ETA",
+    "mapsEtaRefreshHint": "маршрут аз нав ҳисоб карда мешавад",
+    "mapsDeviationLabel": "Дурӣ аз маршрут",
+    "mapsDeviationHint": "ба ин андоза дур шавад, ETA аз нав ҳисоб мешавад",
+    "mapsAutoStopLabel": "Қатъи худкор",
+    "mapsAutoStopHint": "то суроға ин қадар монад",
+    "mapsMaxTripLabel": "Дарозтарин сафар",
+    "mapsMaxTripHint": "пас аз ин муддат қатъ мешавад",
+    "mapsSharingStartsLabel": "Мубодила оғоз мешавад",
+    "mapsSharingStartsValue": "Вақте усто «Ба роҳ баромадам»-ро пахш мекунад",
+    "mapsAddressVisibleLabel": "Суроға пеш аз қабули фармоиш намоён аст",
+    "mapsPrivacySection": "Махфият",
+    "mapsRetentionLabel": "Нигоҳдории таърихи роҳ",
+    "mapsRetentionHint": "танҳо барои баррасии шикоят",
+    "mapsAdminsHideLabel": "Админҳо ҷойгиршавии зиндаро намебинанд",
+    "mapsSeconds": "сония",
+    "mapsMeters": "метр",
+    "mapsMinutes": "дақиқа",
+    "mapsDays": "рӯз",
+    "mapsSave": "Захира кардан",
+    "mapsSaved": "Танзимот захира шуд",
+    "mapsInvalid": "Рақами бутуни мусбат ворид кунед"
   }
 }

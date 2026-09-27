@@ -77,7 +77,8 @@
     "logoutConfirm": "Выйти из аккаунта?",
     "taxStatus": "Статус налога",
     "verifications": "Обращения по документам",
-    "taxMethods": "Способы уплаты налога"
+    "taxMethods": "Способы уплаты налога",
+    "mapsSettings": "Карта и геолокация"
   },
   "auth": {
     "haveAccount": "Уже есть аккаунт?",
@@ -296,7 +297,42 @@
   },
   "trip": {
     "sharing": "Ваше местоположение видно клиенту",
-    "eta": "Прибудет через {min} мин"
+    "notSharing": "Не передаётся",
+    "stopSharing": "Остановить",
+    "stopConfirmTitle": "Остановить передачу местоположения?",
+    "notShared": "Мастер не поделился местоположением",
+    "eta": "Прибудет через {min} мин",
+    "etaSub": "Осталось {km} · примерно к {time}",
+    "freshness": "Онлайн · обновлено {sec} сек назад",
+    "proEta": "{min} мин · {km}",
+    "proEtaSub": "Вы прибудете примерно к {time}",
+    "enRouteHeader": "Мастер в пути",
+    "arrivedHeader": "Мастер приехал",
+    "arrivedSub": "{name} · {when}",
+    "trackingStoppedNote": "Отслеживание остановлено — местоположение мастера больше не видно.",
+    "autoStopNote": "Когда мастер приедет, отслеживание остановится само.",
+    "backToOrder": "Вернуться к заказу",
+    "bannerEnRoute": "Мастер в пути — посмотреть на карте",
+    "bannerArrived": "Мастер приехал — посмотреть на карте",
+    "step": {
+      "accepted": "Принял",
+      "enroute": "В пути",
+      "arrived": "Приехал"
+    },
+    "intro": {
+      "title": "Вы выезжаете?",
+      "body": "{name} увидит, что вы едете, на карте в реальном времени и будет ждать вас.",
+      "bullet1": "Только на время этого заказа",
+      "bullet2": "Остановится само, когда вы приедете",
+      "bullet3": "В другое время никто не видит",
+      "permissionHint": "Если телефон спросит разрешение, нажмите «Разрешить».",
+      "confirm": "Да, я выехал",
+      "later": "Ещё нет"
+    },
+    "notification": {
+      "title": "{appName}",
+      "body": "{appName} показывает ваше местоположение клиенту"
+    }
   },
   "payment": {
     "iPaid": "Я оплатил",
@@ -720,6 +756,45 @@
     "withoutMethod": "Не выбрали способ: {count} мастеров",
     "withoutMethodSub": "Бесплатный месяц закончился, новые заказы брать нельзя",
     "remindButton": "Отправить напоминание",
-    "remindSent": "Напоминание отправлено {count} мастерам"
+    "remindSent": "Напоминание отправлено {count} мастерам",
+    "mapsTitle": "Карта и геолокация",
+    "mapsServiceSection": "Картографический сервис",
+    "mapsProviderName": "Google Maps Platform",
+    "mapsProviderDesc": "карта, маршрут, поиск адреса",
+    "mapsConnected": "Подключено",
+    "mapsMock": "Mock (тестовый режим)",
+    "mapsApiKeyLabel": "API-ключ",
+    "mapsApiKeyHint": "берётся в кабинете Google Cloud",
+    "mapsApiKeyConfigured": "Настроен",
+    "mapsApiKeyMissing": "Не настроен",
+    "mapsUsageSection": "Бесплатный лимит (в месяц)",
+    "mapsUsageRoutes": "Маршрут и время",
+    "mapsUsageGeocode": "Определение адреса",
+    "mapsUsagePlaces": "Поиск адреса",
+    "mapsLiveSection": "Живая геолокация",
+    "mapsIntervalLabel": "Интервал обновления",
+    "mapsIntervalHint": "отправляется местоположение мастера",
+    "mapsEtaRefreshLabel": "Интервал пересчёта ETA",
+    "mapsEtaRefreshHint": "маршрут пересчитывается заново",
+    "mapsDeviationLabel": "Отклонение от маршрута",
+    "mapsDeviationHint": "при таком отклонении ETA пересчитывается",
+    "mapsAutoStopLabel": "Автоматическая остановка",
+    "mapsAutoStopHint": "когда до адреса остаётся столько",
+    "mapsMaxTripLabel": "Максимальная длительность поездки",
+    "mapsMaxTripHint": "после этого поездка останавливается",
+    "mapsSharingStartsLabel": "Передача начинается",
+    "mapsSharingStartsValue": "Когда мастер нажимает «Я выехал»",
+    "mapsAddressVisibleLabel": "Адрес виден до принятия заказа",
+    "mapsPrivacySection": "Конфиденциальность",
+    "mapsRetentionLabel": "Хранение истории маршрута",
+    "mapsRetentionHint": "только для рассмотрения жалоб",
+    "mapsAdminsHideLabel": "Админы не видят живую геолокацию",
+    "mapsSeconds": "сек",
+    "mapsMeters": "м",
+    "mapsMinutes": "мин",
+    "mapsDays": "дн",
+    "mapsSave": "Сохранить",
+    "mapsSaved": "Настройки сохранены",
+    "mapsInvalid": "Введите положительное целое число"
   }
 }

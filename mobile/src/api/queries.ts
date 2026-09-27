@@ -33,6 +33,8 @@ export const queryKeys = {
   adminVerifications: ['admin-verifications'] as const,
   adminVerification: (id: string) => ['admin-verification', id] as const,
   taxMethodsOverview: ['tax-methods-overview'] as const,
+  trip: (id: string) => ['trip', id] as const,
+  mapsOverview: ['maps-overview'] as const,
 };
 
 export const useConfig = () => useQuery({ queryKey: queryKeys.config, queryFn: endpoints.config });
@@ -130,6 +132,23 @@ export const useAdminVerification = (id: string) =>
 /** SA5 "Soliq usullari". */
 export const useTaxMethodsOverview = () =>
   useQuery({ queryKey: queryKeys.taxMethodsOverview, queryFn: endpoints.taxMethodsOverview });
+
+/**
+ * BJ12/BY7/BY8 "Usta yo'lda": the initial read; live updates then come from `trip.position`,
+ * `trip.eta` and `trip.ended` (customer) or a plain poll while ACTIVE (the pro's own screen,
+ * which only receives `trip.ended` over the socket).
+ */
+export const useOrderTrip = (id: string, enabled: boolean) =>
+  useQuery({
+    queryKey: queryKeys.trip(id),
+    queryFn: () => endpoints.trip(id),
+    enabled,
+    refetchInterval: (query) => (query.state.data?.status === 'ACTIVE' ? 15_000 : false),
+  });
+
+/** SA6 "Xarita va joylashuv". */
+export const useMapsOverview = () =>
+  useQuery({ queryKey: queryKeys.mapsOverview, queryFn: endpoints.mapsOverview });
 
 /** Everything that shows an order, its lists or the balance it holds. */
 export function invalidateOrder(client: QueryClient, orderId: string): void {

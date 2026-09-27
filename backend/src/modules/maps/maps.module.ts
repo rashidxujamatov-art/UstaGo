@@ -99,5 +99,6 @@ class MapsController {
           : new MockMapsProvider(),
     },
   ],
+  exports: [MAPS_PROVIDER],
 })
 export class MapsModule {}

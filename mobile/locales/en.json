@@ -1,6 +1,7 @@
 {
   "ios": {
     "NSLocationWhenInUseUsageDescription": "Your location is used to mark the address on the map and show jobs nearby.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "While you're on the way, your location is shown live to the customer on the map, even in the background. Only for this job, and you can stop it at any time.",
     "NSPhotoLibraryUsageDescription": "Photo access is used to add pictures to an order or a chat.",
     "NSCameraUsageDescription": "The camera is used to scan a Paynet Xolis QR code."
   }

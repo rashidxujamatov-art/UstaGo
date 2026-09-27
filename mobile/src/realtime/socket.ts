@@ -5,7 +5,15 @@ import { useSession } from '../store/session';
 
 /** Events the backend sends (docs/02-arxitektura.md §7). */
 export type RealtimeEvent =
-  'order.status' | 'payment.status' | 'chat.message' | 'chat.read' | 'notification';
+  | 'order.status'
+  | 'payment.status'
+  | 'chat.message'
+  | 'chat.read'
+  | 'notification'
+  // Stage 6: to the order's customer only, except trip.ended which the pro also gets.
+  | 'trip.position'
+  | 'trip.eta'
+  | 'trip.ended';
 
 let socket: Socket | null = null;
 let socketToken: string | null = null;

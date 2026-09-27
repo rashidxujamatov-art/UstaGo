@@ -68,7 +68,7 @@ export async function createHarness(): Promise<Harness> {
   await prisma.$executeRawUnsafe(
     `TRUNCATE users, invite_codes, audit_logs, settings, categories, orders, order_events,
        messages, wallet_accounts, ledger_transactions, ledger_entries, wallet_holds, withdrawals,
-       payments, cards, tax_verifications, maps_usage
+       payments, cards, tax_verifications, maps_usage, trips, trip_points
      RESTART IDENTITY CASCADE`,
   );
   await redis.flushdb();

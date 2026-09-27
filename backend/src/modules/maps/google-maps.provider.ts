@@ -1,7 +1,9 @@
+import type { LatLng } from '../../common/geo/distance.js';
 import type { Language } from '../../generated/prisma/client.js';
-import type { MapsProvider, PlaceLocation, PlaceSuggestion } from './maps.provider.js';
+import type { MapsProvider, PlaceLocation, PlaceSuggestion, RouteResult } from './maps.provider.js';
+import { decodePolyline } from './polyline.js';
 
-type UsageRecorder = (kind: 'geocode' | 'autocomplete' | 'place') => Promise<void>;
+type UsageRecorder = (kind: 'geocode' | 'autocomplete' | 'place' | 'routes') => Promise<void>;
 
 /** Google Geocoding API and Places API (New). Every request is recorded for SA6. */
 export class GoogleMapsProvider implements MapsProvider {
@@ -102,6 +104,46 @@ export class GoogleMapsProvider implements MapsProvider {
     };
   }
 
+  /** Routes API `computeRoutes` (docs/01 §10): ETA and distance for the live-location trip. */
+  async route(origin: LatLng, destination: LatLng): Promise<RouteResult | null> {
+    await this.recordUsage('routes');
+    const response = await this.fetchFn(
+      'https://routes.googleapis.com/directions/v2:computeRoutes',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': this.apiKey,
+          'X-Goog-FieldMask':
+            'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline',
+        },
+        body: JSON.stringify({
+          origin: { location: { latLng: { latitude: origin.lat, longitude: origin.lng } } },
+          destination: {
+            location: { latLng: { latitude: destination.lat, longitude: destination.lng } },
+          },
+          travelMode: 'DRIVE',
+        }),
+        signal: AbortSignal.timeout(8_000),
+      },
+    );
+    const body = (await this.json(response)) as {
+      routes?: {
+        duration?: string;
+        distanceMeters?: number;
+        polyline?: { encodedPolyline?: string };
+      }[];
+    };
+    const route = body.routes?.[0];
+    if (!route) return null;
+    const encoded = route.polyline?.encodedPolyline;
+    return {
+      durationSec: parseDurationSeconds(route.duration),
+      distanceM: route.distanceMeters ?? 0,
+      polyline: encoded ? decodePolyline(encoded) : undefined,
+    };
+  }
+
   private async json(response: Response): Promise<unknown> {
     if (!response.ok) {
       const text = await response.text().catch(() => '');
@@ -109,4 +151,11 @@ export class GoogleMapsProvider implements MapsProvider {
     }
     return response.json();
   }
+}
+
+/** Google's Duration proto is JSON-encoded as a string like "1234s" or "1234.5s". */
+function parseDurationSeconds(value: string | undefined): number {
+  if (!value) return 0;
+  const seconds = Number.parseFloat(value.endsWith('s') ? value.slice(0, -1) : value);
+  return Number.isFinite(seconds) ? Math.round(seconds) : 0;
 }

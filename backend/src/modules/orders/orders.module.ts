@@ -2,6 +2,7 @@ import { Controller, Get, Module } from '@nestjs/common';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { ChatService } from '../chat/chat.service.js';
 import { SettingsModule } from '../settings/settings.module.js';
+import { TripsModule } from '../trips/trips.module.js';
 import { WalletModule } from '../wallet/wallet.module.js';
 import { FeedController, OrdersController } from './orders.controller.js';
 import { OrdersService } from './orders.service.js';
@@ -22,7 +23,7 @@ class CategoriesController {
 }
 
 @Module({
-  imports: [SettingsModule, WalletModule],
+  imports: [SettingsModule, WalletModule, TripsModule],
   controllers: [OrdersController, FeedController, CategoriesController],
   providers: [OrdersService, ChatService],
   exports: [OrdersService],

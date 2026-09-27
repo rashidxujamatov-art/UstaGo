@@ -1,6 +1,7 @@
 {
   "ios": {
     "NSLocationWhenInUseUsageDescription": "Manzilni xaritada belgilash va yaqin atrofdagi buyurtmalarni ko‘rsatish uchun joylashuvingiz kerak.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Yo‘lga chiqqaningizda joylashuvingiz mijozga xaritada jonli ko‘rsatiladi, ilova fonda bo‘lsa ham. Faqat shu buyurtma davomida, xohlasangiz istalgan payt to‘xtatishingiz mumkin.",
     "NSPhotoLibraryUsageDescription": "Buyurtma yoki chatga rasm qo‘shish uchun galereyaga ruxsat kerak.",
     "NSCameraUsageDescription": "Paynet Xolis QR-kodini skanerlash uchun kameraga ruxsat kerak."
   }

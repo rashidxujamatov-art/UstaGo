@@ -273,7 +273,7 @@ Qo‘shimcha:
 - **Ulashish ixtiyoriy** (tasdiqlangan): usta joylashuvini ulashmasa ham ishni bajaradi. Buyurtmachiga "Usta joylashuvini ulashmagan" deb ko‘rsatiladi, manzil telefon orqali yoki boshqa yo‘l bilan aniqlashtiriladi.
 - **Ulashish boshlanishi**: usta "Yo‘lga chiqdim"ni bosadi. Birinchi marta BJ11 ekrani ko‘rsatiladi va rozilik yozib qo‘yiladi. Buyurtma `EN_ROUTE` holatiga o‘tadi.
 - **Uzatish**:
-  - Usta ilovasi har `location_interval_sec` (5) soniyada joylashuvni WebSocket orqali yuboradi.
+  - Usta ilovasi har `location_interval_sec` (5) soniyada joylashuvni HTTP orqali yuboradi (fon rejimida ham ishlaydi); buyurtmachiga WebSocket orqali yetkaziladi.
   - Server oxirgi nuqtani Redis’da saqlaydi va `trip_points` jadvaliga yozadi.
   - Nuqta faqat shu buyurtmaning buyurtmachisiga yuboriladi.
 - **Yetib kelish vaqti (ETA)**: server Routes API orqali har `eta_refresh_sec` (120) soniyada yoki usta yo‘ldan 300 m dan ko‘p chetga chiqsa qayta hisoblaydi. Har bir nuqtada hisoblanmaydi (Google so‘rovlarini tejash uchun).

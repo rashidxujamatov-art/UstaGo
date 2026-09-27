@@ -77,7 +77,8 @@
     "logoutConfirm": "Log out of your account?",
     "taxStatus": "Tax status",
     "verifications": "Document requests",
-    "taxMethods": "Tax methods"
+    "taxMethods": "Tax methods",
+    "mapsSettings": "Map and location"
   },
   "auth": {
     "haveAccount": "Have an account?",
@@ -296,7 +297,42 @@
   },
   "trip": {
     "sharing": "Your location is visible to the customer",
-    "eta": "Arrives in {min} min"
+    "notSharing": "Not shared",
+    "stopSharing": "Stop",
+    "stopConfirmTitle": "Stop sharing your location?",
+    "notShared": "The pro has not shared their location",
+    "eta": "Arrives in {min} min",
+    "etaSub": "{km} left · about {time}",
+    "freshness": "Live · updated {sec} sec ago",
+    "proEta": "{min} min · {km}",
+    "proEtaSub": "You'll arrive about {time}",
+    "enRouteHeader": "Pro on the way",
+    "arrivedHeader": "Pro has arrived",
+    "arrivedSub": "{name} · {when}",
+    "trackingStoppedNote": "Tracking stopped — the pro's location is no longer visible.",
+    "autoStopNote": "Tracking stops on its own once the pro arrives.",
+    "backToOrder": "Back to the order",
+    "bannerEnRoute": "Pro on the way — view on the map",
+    "bannerArrived": "Pro has arrived — view on the map",
+    "step": {
+      "accepted": "Accepted",
+      "enroute": "On the way",
+      "arrived": "Arrived"
+    },
+    "intro": {
+      "title": "Heading out?",
+      "body": "{name} will see you coming live on the map and be ready for you.",
+      "bullet1": "Only for this job",
+      "bullet2": "Stops on its own once you arrive",
+      "bullet3": "No one sees it at any other time",
+      "permissionHint": "If your phone asks for permission, tap “Allow”.",
+      "confirm": "Yes, I’m on my way",
+      "later": "Not yet"
+    },
+    "notification": {
+      "title": "{appName}",
+      "body": "{appName} is showing your location to the customer"
+    }
   },
   "payment": {
     "iPaid": "I paid",
@@ -720,6 +756,45 @@
     "withoutMethod": "No method chosen: {count} pros",
     "withoutMethodSub": "Their free month has ended, they cannot take new jobs",
     "remindButton": "Send a reminder",
-    "remindSent": "Reminder sent to {count} pros"
+    "remindSent": "Reminder sent to {count} pros",
+    "mapsTitle": "Map and location",
+    "mapsServiceSection": "Map service",
+    "mapsProviderName": "Google Maps Platform",
+    "mapsProviderDesc": "map, route, address search",
+    "mapsConnected": "Connected",
+    "mapsMock": "Mock (test mode)",
+    "mapsApiKeyLabel": "API key",
+    "mapsApiKeyHint": "from the Google Cloud console",
+    "mapsApiKeyConfigured": "Configured",
+    "mapsApiKeyMissing": "Not configured",
+    "mapsUsageSection": "Free limit (monthly)",
+    "mapsUsageRoutes": "Route and time",
+    "mapsUsageGeocode": "Address lookup",
+    "mapsUsagePlaces": "Address search",
+    "mapsLiveSection": "Live location",
+    "mapsIntervalLabel": "Update interval",
+    "mapsIntervalHint": "how often the pro's location is sent",
+    "mapsEtaRefreshLabel": "ETA refresh interval",
+    "mapsEtaRefreshHint": "how often the route is recomputed",
+    "mapsDeviationLabel": "Route deviation",
+    "mapsDeviationHint": "this far off recomputes the ETA",
+    "mapsAutoStopLabel": "Auto stop",
+    "mapsAutoStopHint": "this close to the address",
+    "mapsMaxTripLabel": "Longest trip",
+    "mapsMaxTripHint": "stops after running this long",
+    "mapsSharingStartsLabel": "Sharing starts",
+    "mapsSharingStartsValue": "When the pro taps “I’m on my way”",
+    "mapsAddressVisibleLabel": "Address is visible before a job is accepted",
+    "mapsPrivacySection": "Privacy",
+    "mapsRetentionLabel": "Route history retention",
+    "mapsRetentionHint": "kept only to review complaints",
+    "mapsAdminsHideLabel": "Admins never see live location",
+    "mapsSeconds": "sec",
+    "mapsMeters": "m",
+    "mapsMinutes": "min",
+    "mapsDays": "days",
+    "mapsSave": "Save",
+    "mapsSaved": "Settings saved",
+    "mapsInvalid": "Enter a positive whole number"
   }
 }
