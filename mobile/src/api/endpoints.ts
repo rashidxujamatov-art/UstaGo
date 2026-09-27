@@ -1,26 +1,55 @@
 import { api } from './index';
 import type {
   AcceptPreview,
+  AdminCategory,
+  AdminDashboard,
+  AdminOrderDetail,
+  AdminOrderListFilter,
+  AdminOrderListPage,
+  AdminPermission,
+  AdminPermissionRequestItem,
+  AdminUserDetail,
+  AdminUserListFilter,
+  AdminUserListPage,
+  BroadcastCreateResult,
+  BroadcastDetail,
+  BroadcastListPage,
   CancelReason,
   Category,
+  CategoryUpdateInput,
   ChatMessage,
   DeviceInfo,
+  DisputeDecisionValue,
+  DisputeDetail,
+  DisputeListFilter,
+  DisputeListPage,
+  DisputeTrack,
+  FinanceOrdersPage,
+  FinancePeriod,
+  FinanceSummary,
   Invite,
   Language,
   LoginResult,
   MapsOverview,
   MapsSettings,
   Me,
+  NewBroadcastInput,
+  NewCategoryInput,
   OtpTicket,
   NewOrderInput,
   Order,
   PaymentInfo,
+  PermissionRequest,
+  PermissionRequestStatus,
   PlaceSuggestion,
   PublicConfig,
   ReferralSummary,
+  SaSettings,
+  SaSettingsUpdate,
   SavedCard,
   Role,
   SignedIn,
+  StaffMember,
   TaxMethod,
   TaxMethodsOverview,
   TaxStatus,
@@ -258,4 +287,133 @@ export const endpoints = {
   /** SA6 "Xarita va joylashuv" (super admin only). */
   mapsOverview: () => api.get<MapsOverview>('/sa/maps'),
   setMapsSettings: (input: Partial<MapsSettings>) => api.put<MapsOverview>('/sa/maps', input),
+
+  // ---------------------------------------------------------------- stage 7 · AD1
+
+  /** AD1 "Admin paneli" (any staff row; sections degrade instead of 403ing). */
+  adminDashboard: () => api.get<AdminDashboard>('/admin/dashboard'),
+  /** AD1 "Ruxsat so'rash". */
+  requestPermission: (input: { permission: AdminPermission; note?: string }) =>
+    api.post<PermissionRequest>('/admin/permission-requests', input),
+
+  // ---------------------------------------------------------------- stage 7 · AD2 users
+
+  adminUsers: (filter: AdminUserListFilter, before?: string) => {
+    const params = new URLSearchParams();
+    if (filter.search) params.set('search', filter.search);
+    if (filter.role) params.set('role', filter.role);
+    if (filter.status) params.set('status', filter.status);
+    if (filter.verification) params.set('verification', filter.verification);
+    if (before) params.set('before', before);
+    return api.get<AdminUserListPage>(`/admin/users?${params}`);
+  },
+  adminUser: (id: string) => api.get<AdminUserDetail>(`/admin/users/${id}`),
+  blockUser: (id: string, reason: string) =>
+    api.post<AdminUserDetail>(`/admin/users/${id}/block`, { reason }),
+  unblockUser: (id: string) => api.post<AdminUserDetail>(`/admin/users/${id}/unblock`),
+
+  // ---------------------------------------------------------------- stage 7 · AD3 disputes
+
+  adminDisputes: (status: DisputeListFilter | undefined, before?: string) => {
+    const params = new URLSearchParams();
+    if (status) params.set('status', status);
+    if (before) params.set('before', before);
+    return api.get<DisputeListPage>(`/admin/disputes?${params}`);
+  },
+  adminDispute: (orderId: string) => api.get<DisputeDetail>(`/admin/disputes/${orderId}`),
+  adminDisputeTrack: (orderId: string) => api.get<DisputeTrack>(`/admin/disputes/${orderId}/track`),
+  decideDispute: (orderId: string, decision: DisputeDecisionValue, note?: string) =>
+    api.post<DisputeDetail>(`/admin/disputes/${orderId}/decide`, { decision, note }),
+  approveDispute: (orderId: string, note?: string) =>
+    api.post<DisputeDetail>(`/sa/disputes/${orderId}/approve`, note ? { note } : undefined),
+  rejectDispute: (orderId: string, reason: string) =>
+    api.post<DisputeDetail>(`/sa/disputes/${orderId}/reject`, { reason }),
+  /** SA "Tasdiqlash kutilmoqda" inbox mirroring AD3's "Super admin tasdiqlaydi" note. */
+  pendingApprovalDisputes: (before?: string) =>
+    api.get<DisputeListPage>(
+      `/sa/disputes/pending-approval${before ? `?before=${encodeURIComponent(before)}` : ''}`,
+    ),
+
+  // ---------------------------------------------------------------- stage 7 · orders moderation
+
+  adminOrders: (filter: AdminOrderListFilter, before?: string) => {
+    const params = new URLSearchParams();
+    if (filter.search) params.set('search', filter.search);
+    if (filter.status) params.set('status', filter.status);
+    if (filter.payment_method) params.set('payment_method', filter.payment_method);
+    if (filter.stuck) params.set('stuck', 'true');
+    if (filter.from) params.set('from', filter.from);
+    if (filter.to) params.set('to', filter.to);
+    if (before) params.set('before', before);
+    return api.get<AdminOrderListPage>(`/admin/orders?${params}`);
+  },
+  adminOrder: (id: string) => api.get<AdminOrderDetail>(`/admin/orders/${id}`),
+  moderateCancelOrder: (id: string, reason: string) =>
+    api.post<Order>(`/admin/orders/${id}/cancel`, { reason }),
+
+  // ---------------------------------------------------------------- stage 7 · categories
+
+  adminCategories: () => api.get<AdminCategory[]>('/admin/categories'),
+  createCategory: (input: NewCategoryInput) => api.post<AdminCategory>('/admin/categories', input),
+  updateCategory: (id: string, input: CategoryUpdateInput) =>
+    api.put<AdminCategory>(`/admin/categories/${id}`, input),
+  activateCategory: (id: string) => api.post<AdminCategory>(`/admin/categories/${id}/activate`),
+  deactivateCategory: (id: string) => api.post<AdminCategory>(`/admin/categories/${id}/deactivate`),
+
+  // ---------------------------------------------------------------- stage 7 · broadcast
+
+  createBroadcast: (input: NewBroadcastInput) =>
+    api.post<BroadcastCreateResult>('/admin/broadcasts', input),
+  broadcasts: (before?: string) =>
+    api.get<BroadcastListPage>(
+      `/admin/broadcasts${before ? `?before=${encodeURIComponent(before)}` : ''}`,
+    ),
+  broadcast: (id: string) => api.get<BroadcastDetail>(`/admin/broadcasts/${id}`),
+
+  // ---------------------------------------------------------------- stage 7 · SA1 dashboard
+
+  saDashboard: (period: FinancePeriod, range?: { from: string; to: string }) => {
+    const params = new URLSearchParams({ period });
+    if (range) {
+      params.set('from', range.from);
+      params.set('to', range.to);
+    }
+    return api.get<FinanceSummary>(`/sa/dashboard?${params}`);
+  },
+
+  // ---------------------------------------------------------------- stage 7 · SA2 settings
+
+  saSettings: () => api.get<SaSettings>('/sa/settings'),
+  updateSaSettings: (input: SaSettingsUpdate) => api.put<SaSettings>('/sa/settings', input),
+
+  // ---------------------------------------------------------------- stage 7 · SA3 staff
+
+  saStaff: () => api.get<StaffMember[]>('/sa/staff'),
+  grantStaff: (input: { phone: string; permissions?: AdminPermission[] }) =>
+    api.post<StaffMember>('/sa/staff', input),
+  updateStaffPermissions: (id: string, permissions: AdminPermission[]) =>
+    api.put<StaffMember>(`/sa/staff/${id}/permissions`, { permissions }),
+  revokeStaff: (id: string) => api.post<void>(`/sa/staff/${id}/revoke`),
+  saPermissionRequests: (status: PermissionRequestStatus = 'PENDING') =>
+    api.get<AdminPermissionRequestItem[]>(`/sa/permission-requests?status=${status}`),
+  decidePermissionRequest: (
+    id: string,
+    input: { approve: true } | { approve: false; reason: string },
+  ) => api.post<AdminPermissionRequestItem>(`/sa/permission-requests/${id}/decide`, input),
+
+  // ---------------------------------------------------------------- stage 7 · SA4 finance
+
+  saFinanceSummary: (period: FinancePeriod, range?: { from: string; to: string }) => {
+    const params = new URLSearchParams({ period });
+    if (range) {
+      params.set('from', range.from);
+      params.set('to', range.to);
+    }
+    return api.get<FinanceSummary>(`/sa/finance/summary?${params}`);
+  },
+  saFinanceOrders: (range: { from: string; to: string }, before?: string) => {
+    const params = new URLSearchParams(range);
+    if (before) params.set('before', before);
+    return api.get<FinanceOrdersPage>(`/sa/finance/orders?${params}`);
+  },
 };

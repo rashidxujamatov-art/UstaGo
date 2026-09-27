@@ -9,6 +9,7 @@ import { loggerParams } from './config/logger.js';
 import { PrismaModule } from './infra/prisma/prisma.module.js';
 import { QueuesModule } from './infra/queues/queues.module.js';
 import { RedisModule } from './infra/redis/redis.module.js';
+import { AdminModule } from './modules/admin/admin.module.js';
 import { AuditModule } from './modules/audit/audit.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { HealthModule } from './modules/health/health.module.js';
@@ -59,6 +60,7 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
     TripsModule,
     RealtimeModule,
     HealthModule,
+    AdminModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: AppExceptionFilter }],
 })

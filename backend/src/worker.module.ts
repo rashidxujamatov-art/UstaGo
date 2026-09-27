@@ -8,6 +8,8 @@ import { loggerParams } from './config/logger.js';
 import { PrismaModule } from './infra/prisma/prisma.module.js';
 import { QueuesModule } from './infra/queues/queues.module.js';
 import { RedisModule } from './infra/redis/redis.module.js';
+import { AdminModule } from './modules/admin/admin.module.js';
+import { BROADCAST_QUEUE, BroadcastProcessor } from './modules/admin/broadcast.controller.js';
 import { AuditModule } from './modules/audit/audit.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import {
@@ -65,6 +67,7 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
       { name: PAYOUTS_QUEUE },
       { name: TAX_QUEUE },
       { name: TRIPS_QUEUE },
+      { name: BROADCAST_QUEUE },
     ),
     CommonModule,
     AuditModule,
@@ -76,6 +79,7 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
     PaymentsModule,
     TaxModule,
     TripsModule,
+    AdminModule,
   ],
   providers: [
     OrderExpiryScheduler,
@@ -89,6 +93,7 @@ import { WalletModule } from './modules/wallet/wallet.module.js';
     TaxProcessor,
     TripsScheduler,
     TripsProcessor,
+    BroadcastProcessor,
   ],
 })
 export class WorkerModule {}

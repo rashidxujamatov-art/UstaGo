@@ -46,4 +46,6 @@ export const settingsDefaults: StoredSettings = {
   address_visible_before_accept: true,
   confirm_reminder_hours: [2, 24],
   confirm_admin_task_hours: 48,
+  dispute_partial_bps: 5_000,
+  broadcast_min_interval_sec: 300,
 };

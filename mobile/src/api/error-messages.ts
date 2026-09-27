@@ -63,6 +63,22 @@ export const ERROR_MESSAGE_KEYS = {
   CARD_DECLINED: 'payErrors.cardDeclined',
   CARD_NOT_FOUND: 'payErrors.cardNotFound',
   WITHDRAWALS_DISABLED: 'payErrors.withdrawalsDisabled',
+  DISPUTE_NOT_DISPUTED: 'adminErrors.disputeNotDisputed',
+  DISPUTE_ALREADY_DECIDED: 'adminErrors.disputeAlreadyDecided',
+  DISPUTE_DECISION_NOT_ALLOWED: 'adminErrors.disputeDecisionNotAllowed',
+  DISPUTE_APPROVAL_NOT_PENDING: 'adminErrors.disputeApprovalNotPending',
+  ORDER_MODERATE_NOT_CANCELLABLE: 'adminErrors.orderNotCancellable',
+  CATEGORY_SLUG_TAKEN: 'adminErrors.categorySlugTaken',
+  CATEGORY_NOT_FOUND: 'adminErrors.categoryNotFound',
+  STAFF_USER_NOT_FOUND: 'adminErrors.staffUserNotFound',
+  STAFF_IDENTITY_REQUIRED: 'adminErrors.staffIdentityRequired',
+  STAFF_ALREADY_SUPER_ADMIN: 'adminErrors.staffAlreadySuperAdmin',
+  STAFF_PERMISSION_INVALID: 'adminErrors.staffPermissionInvalid',
+  PERMISSION_REQUEST_INVALID: 'adminErrors.permissionRequestInvalid',
+  PERMISSION_REQUEST_NOT_PENDING: 'adminErrors.permissionRequestNotPending',
+  USER_ALREADY_BLOCKED: 'adminErrors.userAlreadyBlocked',
+  USER_NOT_BLOCKED: 'adminErrors.userNotBlocked',
+  BROADCAST_RATE_LIMITED: 'adminErrors.broadcastRateLimited',
 } as const;
 
 export type ErrorCode = keyof typeof ERROR_MESSAGE_KEYS;

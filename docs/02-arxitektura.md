@@ -96,7 +96,7 @@ Hamma pul ustunlari `BIGINT` (tiyin), vaqt `TIMESTAMPTZ` (UTC). Ekranda vaqt `As
 - `staff_permissions`: user_id, role (`ADMIN`, `SUPER_ADMIN`), permissions[]
 - `executor_profiles`: user_id, categories[], rating, free_period_start, free_period_end, tax_method, tax_status, tax_valid_until
 - `tax_verifications`: id, user_id, method, status, source (`AUTO`, `MANUAL`), file_key, reviewer_id, checked_at, valid_until
-- `orders`: id, number (sequence), customer_id, executor_id, category_id, title, description, photos[], address_text, location (PostGIS point), entrance, floor, apartment, landmark, time_from, time_to, price, payment_method, status, fee_bps_snapshot, ref_l1_bps_snapshot, ref_l2_bps_snapshot, fee, fee_demo, fee_real (qabul qilinganda oldindan hisoblanadi), created_at, accepted_at, finished_at ("Ishni tugatdim"), customer_paid_at ("To‘ladim"), executor_received_at ("Pulni qabul qildim"), paid_at, cancelled_by, cancel_reason
+- `orders`: id, number (sequence), customer_id, executor_id, category_id, title, description, photos[], address_text, location (PostGIS point), entrance, floor, apartment, landmark, time_from, time_to, price, payment_method, status, fee_bps_snapshot, ref_l1_bps_snapshot, ref_l2_bps_snapshot, fee, fee_demo, fee_real (qabul qilinganda oldindan hisoblanadi), created_at, accepted_at, finished_at ("Ishni tugatdim"), customer_paid_at ("To‘ladim"), executor_received_at ("Pulni qabul qildim"), paid_at, cancelled_by, cancel_reason, disputed_at, disputed_by, dispute_note, dispute_decision (`FULL`, `PARTIAL`, `CANCEL`), dispute_decision_note, dispute_decided_by, dispute_decided_at, dispute_approval (`NONE`, `PENDING`, `APPROVED`, `REJECTED`), dispute_approved_by, dispute_approved_at, dispute_reject_reason, dispute_original_price (7-bosqich: `PARTIAL` qarordan oldingi narx, faqat ko‘rsatish uchun), dispute_executed_at
 - `order_events`: order_id, from_status, to_status, actor_id, at, payload
 - `wallet_accounts`: id, owner_type (`USER`, `PLATFORM`), owner_id, kind (`REAL`, `DEMO`, `PLATFORM_REVENUE`, `PLATFORM_MARKETING` (demo ishlar referali), `PAYOUT_PROVIDER_FEES` (bank o‘tkazma xizmati, tranzit — daromad emas), `DEMO_SINK`, `PAYMENT_CLEARING`, `PAYOUT_CLEARING`), balance (kesh)
 - `ledger_transactions`: id, type, order_id, idempotency_key (unique), created_by, created_at
@@ -109,7 +109,9 @@ Hamma pul ustunlari `BIGINT` (tiyin), vaqt `TIMESTAMPTZ` (UTC). Ekranda vaqt `As
 - `trips`: id, order_id, executor_id, started_at, ended_at, end_reason, last_eta_sec, last_distance_m
 - `trip_points`: trip_id, at, location (point), accuracy_m, speed. 30 kundan keyin o‘chiriladi
 - `messages`: id, order_id, sender_id, text, attachments[], created_at, read_at
-- `disputes`: id, order_id, opened_by, reason, status, decision, decided_by, approved_by (super admin)
+- Nizo (dispute) alohida jadval emas: holati va qarori `orders`ning yuqoridagi `dispute_*` ustunlarida turadi (7-bosqich; §3.3, §5, §13).
+- `permission_requests` (7-bosqich, AD1 "Ruxsat so'rash"): id, requested_by, permission, note, status (`PENDING`, `APPROVED`, `REJECTED`), decided_by, decided_at, reason, created_at
+- `broadcasts` (7-bosqich, `notifications.broadcast`): id, target (`ALL`, `CUSTOMER`, `EXECUTOR`), title (4 tilda), body (4 tilda), created_by, created_at, recipients_count, status (`QUEUED`, `SENDING`, `DONE`)
 - `notifications`, `categories`, `settings`, `audit_logs`, `maps_usage`
 
 Indekslar: `orders(status, location)` GIST, `orders(customer_id)`, `orders(executor_id)`, `ledger_entries(account_id)`, `trip_points(trip_id, at)`.
@@ -131,8 +133,8 @@ Autentifikatsiya: `Authorization: Bearer <access>`. Xato formati: `{ "code": "OR
 | Xarita | `GET /maps/reverse-geocode`, `GET /maps/autocomplete`, `GET /maps/place/:id` |
 | Umumiy | `GET /config` (kirishdan oldin kerak bo‘lgan sozlamalar), `GET /categories`, `POST /uploads/presign` (rasm yuklash uchun presigned URL) |
 | Callback | `POST /payments/payme` (JSON-RPC, Basic auth; hisob maydoni — `payment_id`), `POST /payments/click/prepare`, `POST /payments/click/complete` (MD5 imzo; `merchant_trans_id` — to‘lov ID) |
-| Admin | `GET /admin/users`, `POST /admin/users/:id/block`, `GET /admin/verifications`, `POST /admin/verifications/:id/decide`, `GET /admin/disputes`, `POST /admin/disputes/:id/decide`, `GET /admin/orders` |
-| Super admin | `GET/PUT /sa/settings`, `GET/POST /sa/invite-codes` (platforma kodlari), `GET/POST /sa/staff`, `PUT /sa/staff/:id/permissions`, `GET /sa/finance/summary`, `GET /sa/finance/ledger`, `POST /sa/disputes/:id/approve-refund`, `GET /sa/maps/usage` |
+| Admin | `GET /admin/dashboard` (AD1), `POST /admin/permission-requests` ("Ruxsat so'rash"), `GET /admin/users`, `GET /admin/users/:id`, `POST /admin/users/:id/block`, `POST /admin/users/:id/unblock`, `GET /admin/verifications`, `POST /admin/verifications/:id/decide`, `GET /admin/disputes`, `GET /admin/disputes/:orderId`, `GET /admin/disputes/:orderId/track` (saqlangan yo'l, §10), `POST /admin/disputes/:orderId/decide` (`FULL`/`PARTIAL`/`CANCEL`), `GET /admin/orders`, `GET /admin/orders/:id`, `POST /admin/orders/:id/cancel`, `GET/POST /admin/categories`, `PUT /admin/categories/:id`, `POST /admin/categories/:id/activate`\|`deactivate`, `POST /admin/broadcasts`, `GET /admin/broadcasts`, `GET /admin/broadcasts/:id` |
+| Super admin | `GET/PUT /sa/settings` (7-bosqich sozlamalari, SA5/SA6'niki bundan tashqari), `GET/POST /sa/invite-codes` (platforma kodlari), `GET/POST /sa/staff`, `PUT /sa/staff/:id/permissions`, `POST /sa/staff/:id/revoke`, `GET /sa/permission-requests`, `POST /sa/permission-requests/:id/decide`, `GET /sa/dashboard` (SA1), `GET /sa/finance/summary`, `GET /sa/finance/orders`, `GET /sa/disputes/pending-approval`, `POST /sa/disputes/:orderId/approve`, `POST /sa/disputes/:orderId/reject`, `GET /sa/maps/usage` |
 
 `GET /wallet` javobi: `real`, `demo` (hali amal qiladigan demo), `holds`, `available`, `must_keep`, `max_withdraw`, `demo_granted` (berilgan demo bonus), `free_period` (`ends_at`, `days_left`, `active`; faqat ustada).
 

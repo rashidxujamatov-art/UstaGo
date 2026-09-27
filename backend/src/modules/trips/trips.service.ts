@@ -304,6 +304,41 @@ export class TripsService {
     return this.getTrip(userId, orderId);
   }
 
+  // ---------------------------------------------------------------- admin (AD3, stage 7)
+
+  /**
+   * §10 "Saqlash": the stored track may be viewed only while resolving a dispute
+   * (`disputes.resolve`), never by an admin browsing live locations. Every read is
+   * audited by the caller (`DisputesService`), not here.
+   */
+  async adminTrack(orderId: string): Promise<{
+    points: { lat: number; lng: number; at: string; accuracy_m: number | null }[];
+    trip_started_at: string | null;
+    trip_ended_at: string | null;
+    end_reason: TripEndReason | null;
+  }> {
+    const trip = await this.prisma.trip.findFirst({
+      where: { orderId },
+      orderBy: { startedAt: 'desc' },
+    });
+    if (!trip) throw this.notFound();
+    const points = await this.prisma.$queryRaw<
+      { lat: number; lng: number; at: Date; accuracy_m: number | null }[]
+    >`SELECT ST_Y(location::geometry) AS lat, ST_X(location::geometry) AS lng, at, accuracy_m
+      FROM trip_points WHERE trip_id = ${trip.id}::uuid ORDER BY at ASC`;
+    return {
+      points: points.map((p) => ({
+        lat: p.lat,
+        lng: p.lng,
+        at: p.at.toISOString(),
+        accuracy_m: p.accuracy_m,
+      })),
+      trip_started_at: trip.startedAt.toISOString(),
+      trip_ended_at: trip.endedAt?.toISOString() ?? null,
+      end_reason: trip.endReason,
+    };
+  }
+
   // ---------------------------------------------------------------- both parties
 
   /** BY8 / BJ11: the order's live-location state. Anyone but its two parties gets 404. */

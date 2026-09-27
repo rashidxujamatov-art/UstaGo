@@ -98,3 +98,18 @@ export const ACTIVE_STATUSES: readonly OrderStatus[] = [
   'DISPUTED',
 ];
 export const FINISHED_STATUSES: readonly OrderStatus[] = ['PAID', 'CANCELLED'];
+
+/**
+ * Orders-moderation cancel (stage 7, `orders.moderate`): any admin, from any non-terminal,
+ * non-disputed status — wider than the customer's own `CANCEL` rule above. `DISPUTED` is
+ * excluded; it has its own resolution flow (`disputes.resolve`).
+ */
+export const ADMIN_CANCELLABLE_STATUSES: readonly OrderStatus[] = [
+  'PUBLISHED',
+  'ACCEPTED',
+  'EN_ROUTE',
+  'ARRIVED',
+  'IN_PROGRESS',
+  'DONE_BY_EXECUTOR',
+  'COMPLETED',
+];

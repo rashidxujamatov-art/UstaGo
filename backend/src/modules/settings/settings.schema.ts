@@ -60,6 +60,10 @@ export const settingsShape = {
   address_visible_before_accept: z.boolean(),
   confirm_reminder_hours: uniqueList(positiveInt).min(1),
   confirm_admin_task_hours: positiveInt,
+  /** AD3 "qisman": new price = price × dispute_partial_bps / 10000 (stage 7). */
+  dispute_partial_bps: bps,
+  /** Minimum gap between two notifications.broadcast sends (stage 7). */
+  broadcast_min_interval_sec: positiveInt,
 } as const;
 
 export const settingsSchema = z.object(settingsShape).superRefine((settings, ctx) => {

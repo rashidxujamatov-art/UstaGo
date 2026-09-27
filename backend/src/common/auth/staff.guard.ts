@@ -16,8 +16,12 @@ import type { AuthenticatedRequest } from './auth.decorators.js';
 
 const STAFF_REQUIREMENT = 'staffRequirement';
 
-/** A permission from docs/01 §1, or SUPER_ADMIN for super-admin-only actions. */
-export type StaffRequirement = AdminPermission | 'SUPER_ADMIN';
+/**
+ * A permission from docs/01 §1, `SUPER_ADMIN` for super-admin-only actions, or `STAFF` for
+ * anything open to any admin/super admin regardless of their permissions (stage 7: "Ruxsat
+ * so'rash" — an admin without a permission still needs to be able to ask for it).
+ */
+export type StaffRequirement = AdminPermission | 'SUPER_ADMIN' | 'STAFF';
 
 /**
  * Admin and super-admin endpoints (CLAUDE.md rule 11: the backend decides, hiding a
@@ -50,6 +54,7 @@ export class StaffGuard implements CanActivate {
     const allowed =
       staff !== null &&
       (staff.role === 'SUPER_ADMIN' ||
+        requirement === 'STAFF' ||
         (requirement !== 'SUPER_ADMIN' && staff.permissions.includes(requirement)));
     if (!allowed) throw new AppError(ErrorCode.FORBIDDEN, {}, HttpStatus.FORBIDDEN);
     return true;

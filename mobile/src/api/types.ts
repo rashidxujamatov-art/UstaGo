@@ -443,3 +443,382 @@ export interface MapsOverview {
   usage_this_month: MapsUsage;
   settings: MapsSettings;
 }
+
+// ---------------------------------------------------------------- stage 7
+
+/** The six grantable admin permission keys (stage7-contract §0, `staff/staff.service.ts`). */
+export type AdminPermission =
+  | 'orders.moderate'
+  | 'users.manage'
+  | 'disputes.resolve'
+  | 'categories.manage'
+  | 'finance.view'
+  | 'notifications.broadcast';
+
+export type PermissionRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+/** AD1 "Ruxsat so'rash" / SA3 inbox row. */
+export interface PermissionRequest {
+  id: string;
+  permission: AdminPermission;
+  status: PermissionRequestStatus;
+  created_at: string;
+}
+
+/** AD1 "Admin paneli" (`GET /admin/dashboard`). A `null` count means the caller lacks that permission. */
+export interface AdminDashboard {
+  tasks: {
+    verifications_pending: number | null;
+    disputes_open: number | null;
+    orders_stuck: number | null;
+    support_chats: 'soon';
+  };
+  stats: {
+    orders_today: number;
+    new_users_today: number;
+    /** Tiyin; null when the caller lacks `finance.view`. */
+    revenue_today: string | null;
+  };
+  my_permission_requests: PermissionRequest[];
+  permissions: AdminPermission[];
+}
+
+// -------------------------------------------------------- AD2 users
+
+export type AdminUserStatus = 'ACTIVE' | 'BLOCKED';
+
+/** AD2 list row (`GET /admin/users`). */
+export interface AdminUserListItem {
+  id: string;
+  phone_masked: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  active_role: Role | null;
+  status: AdminUserStatus;
+  created_at: string;
+  identity_verified: boolean;
+  tax: { method: TaxMethod; status: TaxStatusValue } | null;
+}
+
+export interface AdminUserListPage {
+  items: AdminUserListItem[];
+  next: string | null;
+}
+
+export interface AdminUserListFilter {
+  search?: string;
+  role?: Role;
+  status?: AdminUserStatus;
+  verification?: 'PENDING';
+}
+
+/** AD2 detail (`GET /admin/users/:id`). */
+export interface AdminUserDetail {
+  id: string;
+  phone: string;
+  email: string;
+  lang: Language;
+  active_role: Role | null;
+  status: AdminUserStatus;
+  created_at: string;
+  identity: {
+    first_name: string;
+    last_name: string;
+    middle_name: string | null;
+    birth_date: string;
+    doc_type: string;
+    verified_at: string;
+  } | null;
+  executor: {
+    free_period_ends_at: string | null;
+    tax_method: TaxMethod | null;
+    tax_status: TaxStatusValue | null;
+    tax_valid_until: string | null;
+  } | null;
+  wallet: { real: string; demo: string; holds: string };
+  orders_count: { as_customer: number; as_executor: number };
+  block: { reason: string; blocked_at: string; blocked_by: string } | null;
+}
+
+// -------------------------------------------------------- AD3 disputes
+
+export type DisputeDecisionValue = 'FULL' | 'PARTIAL' | 'CANCEL';
+export type DisputeApprovalValue = 'NONE' | 'PENDING' | 'APPROVED' | 'REJECTED';
+export type DisputeOpenedBy = 'CUSTOMER' | 'EXECUTOR';
+export type DisputeListFilter = 'OPEN' | 'DECIDED';
+
+/** AD3 list row (`GET /admin/disputes`, `GET /sa/disputes/pending-approval`). */
+export interface DisputeListItem {
+  id: string;
+  number: number;
+  payment_method: PaymentMethod;
+  /** Tiyin. */
+  price: string;
+  disputed_at: string;
+  disputed_by: DisputeOpenedBy;
+  decision: DisputeDecisionValue | null;
+  approval: DisputeApprovalValue;
+}
+
+export interface DisputeListPage {
+  items: DisputeListItem[];
+  next: string | null;
+}
+
+/** AD3 detail (`GET /admin/disputes/:orderId`). */
+export interface DisputeDetail {
+  order: Order;
+  dispute: {
+    opened_by: DisputeOpenedBy;
+    note: string | null;
+    opened_at: string;
+    customer_paid_at: string | null;
+    executor_received_at: string | null;
+    /** "To'lov to'xtatilgan": a pending online QR was rejected once the dispute opened. */
+    payment_hold_active: boolean;
+    decision: DisputeDecisionValue | null;
+    decision_note: string | null;
+    decided_by: string | null;
+    decided_at: string | null;
+    approval: DisputeApprovalValue;
+    approved_by: string | null;
+    rejected_reason: string | null;
+    /** Tiyin: the price before a PARTIAL reduction, for "was X, now Y" display only. */
+    original_price: string | null;
+  };
+}
+
+export interface DisputeTrackPoint {
+  lat: number;
+  lng: number;
+  at: string;
+  accuracy_m: number | null;
+}
+
+/** `GET /admin/disputes/:orderId/track` — the stored route, audited on every read. */
+export interface DisputeTrack {
+  points: DisputeTrackPoint[];
+  trip_started_at: string | null;
+  trip_ended_at: string | null;
+  end_reason: TripEndReason | null;
+}
+
+// -------------------------------------------------------- orders moderation
+
+export interface OrderEvent {
+  from_status: OrderStatus | null;
+  to_status: OrderStatus;
+  actor_id: string | null;
+  at: string;
+}
+
+export interface AdminOrderListFilter {
+  search?: string;
+  status?: OrderStatus;
+  payment_method?: PaymentMethod;
+  stuck?: boolean;
+  from?: string;
+  to?: string;
+}
+
+export interface AdminOrderListPage {
+  items: Order[];
+  next: string | null;
+}
+
+/** `GET /admin/orders/:id`: the order plus its status-change timeline. */
+export interface AdminOrderDetail {
+  order: Order;
+  events: OrderEvent[];
+}
+
+// -------------------------------------------------------- categories (admin)
+
+/** `GET/POST/PUT /admin/categories*`: every category, active or not. */
+export interface AdminCategory {
+  id: string;
+  slug: string;
+  names: Record<Language, string>;
+  icon: string;
+  color: string;
+  sort_order: number;
+  active: boolean;
+  created_at: string;
+}
+
+export interface NewCategoryInput {
+  slug: string;
+  names: Record<Language, string>;
+  icon: string;
+  color: string;
+  sort_order: number;
+}
+
+export type CategoryUpdateInput = Partial<Omit<NewCategoryInput, 'slug'>>;
+
+// -------------------------------------------------------- broadcast
+
+export type BroadcastTarget = 'ALL' | 'CUSTOMER' | 'EXECUTOR';
+export type BroadcastStatus = 'QUEUED' | 'SENDING' | 'DONE';
+
+export interface NewBroadcastInput {
+  target: BroadcastTarget;
+  title: Record<Language, string>;
+  body: Record<Language, string>;
+}
+
+export interface BroadcastCreateResult {
+  id: string;
+  status: BroadcastStatus;
+  estimated_recipients: number;
+}
+
+export interface BroadcastListItem {
+  id: string;
+  target: BroadcastTarget;
+  title: Record<Language, string>;
+  recipients_count: number;
+  status: BroadcastStatus;
+  created_at: string;
+  created_by: string;
+}
+
+export interface BroadcastListPage {
+  items: BroadcastListItem[];
+  next: string | null;
+}
+
+export interface BroadcastDetail extends BroadcastListItem {
+  body: Record<Language, string>;
+}
+
+// -------------------------------------------------------- SA1 / SA4 finance
+
+export type FinancePeriod = 'today' | 'week' | 'month' | 'custom';
+
+/** SA1 "Boshqaruv" and SA4 "Moliya" share this shape (stage7-contract §7/§10). */
+export interface FinanceSummary {
+  period: { from: string; to: string };
+  /** Every field below is tiyin except the two counts at the end. */
+  turnover: string;
+  platform_net: string;
+  commission_real: string;
+  demo_commission: string;
+  referral: { l1: string; l1_budget: string; l2: string; l2_budget: string };
+  marketing_budget_spent: string;
+  payout_provider_fees: string;
+  pros_in_free_period: number;
+  users_total: { customers: number; executors: number };
+}
+
+/** SA4 per-order breakdown row (`GET /sa/finance/orders`). */
+export interface FinanceOrderRow {
+  id: string;
+  number: number;
+  paid_at: string;
+  payment_method: PaymentMethod;
+  price: string;
+  fee: string;
+  fee_demo: string;
+  fee_real: string;
+  ref_l1: string;
+  ref_l2: string;
+  platform_net: string;
+}
+
+export interface FinanceOrdersPage {
+  items: FinanceOrderRow[];
+  next: string | null;
+}
+
+// -------------------------------------------------------- SA2 settings
+
+export interface SaSettingsRates {
+  fee_bps: number;
+  ref_l1_bps: number;
+  ref_l2_bps: number;
+  accept_threshold_bps: number;
+  withdraw_fee_bps: number;
+  dispute_partial_bps: number;
+}
+
+export interface SaSettingsFreePeriod {
+  free_period_days: number;
+  free_period_reminder_days: number;
+  /** Tiyin. */
+  demo_bonus: string;
+}
+
+export interface SaSettingsWallet {
+  /** Tiyin. */
+  topup_min: string;
+}
+
+export interface SaSettingsPayments {
+  payment_methods_enabled: PaymentMethod[];
+  qr_payment_ttl_sec: number;
+}
+
+export interface SaSettingsReferrals {
+  referral_required: boolean;
+  ref_on_demo_fee: boolean;
+}
+
+export interface SaSettingsConfirmations {
+  confirm_reminder_hours: number;
+  confirm_admin_task_hours: number;
+}
+
+export interface SaSettingsModeration {
+  broadcast_min_interval_sec: number;
+}
+
+type SaSettingsEditableGroups = SaSettingsRates &
+  SaSettingsFreePeriod &
+  SaSettingsWallet &
+  SaSettingsPayments &
+  SaSettingsReferrals &
+  SaSettingsConfirmations &
+  SaSettingsModeration;
+
+/** `GET /sa/settings`: every `settings` row, grouped as the SA2 screen lays them out. */
+export interface SaSettings {
+  rates: SaSettingsRates;
+  free_period: SaSettingsFreePeriod;
+  wallet: SaSettingsWallet;
+  payments: SaSettingsPayments;
+  referrals: SaSettingsReferrals;
+  confirmations: SaSettingsConfirmations;
+  moderation: SaSettingsModeration;
+  /** otp_*, login_attempt_*, min_age_years, etc. — not individually editable on SA2. */
+  other: Record<string, string | number | boolean>;
+}
+
+/** `PUT /sa/settings` body: a flat subset of the editable keys above. */
+export type SaSettingsUpdate = Partial<SaSettingsEditableGroups>;
+
+// -------------------------------------------------------- SA3 staff
+
+export type StaffRole = 'ADMIN' | 'SUPER_ADMIN';
+
+/** SA3 "Rollar va ruxsatlar" row (`GET /sa/staff`). */
+export interface StaffMember {
+  id: string;
+  phone_masked: string;
+  first_name: string;
+  last_name: string;
+  role: StaffRole;
+  permissions: AdminPermission[];
+  created_at: string;
+}
+
+/** SA3 inbox row (`GET /sa/permission-requests`). */
+export interface AdminPermissionRequestItem {
+  id: string;
+  requested_by: { id: string; first_name: string; last_name: string };
+  permission: AdminPermission;
+  note: string | null;
+  status: PermissionRequestStatus;
+  created_at: string;
+}

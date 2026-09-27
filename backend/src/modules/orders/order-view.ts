@@ -174,3 +174,25 @@ export function toOrderView(
     viewer_role: isCustomer ? 'CUSTOMER' : isExecutor ? 'EXECUTOR' : 'OTHER',
   };
 }
+
+/**
+ * Stage 7 admin view: same shape as `toOrderView`, but with both phone numbers always
+ * visible — an admin who already reached `orders.moderate`/`disputes.resolve` sees them via
+ * `GET /admin/users/:id` anyway (docs/02 §10), so hiding them here would only be friction.
+ * Photos are omitted (presigned URLs are not needed for the admin list/detail screens).
+ */
+export function toAdminOrderView(order: OrderWithParties) {
+  const view = toOrderView(
+    order,
+    { userId: order.customerId },
+    { photoUrls: [], finishPhotoUrls: [] },
+  );
+  return {
+    ...view,
+    customer: { ...view.customer, phone: order.customer.phone },
+    executor:
+      view.executor && order.executor
+        ? { ...view.executor, phone: order.executor.phone }
+        : view.executor,
+  };
+}

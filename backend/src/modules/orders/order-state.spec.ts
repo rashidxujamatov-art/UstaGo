@@ -1,4 +1,9 @@
-import { canTransition, cancelNeedsReason, ORDER_RULES } from './order-state.js';
+import {
+  ADMIN_CANCELLABLE_STATUSES,
+  canTransition,
+  cancelNeedsReason,
+  ORDER_RULES,
+} from './order-state.js';
 
 describe('order state machine (docs/01-biznes-qoidalar.md §3.3)', () => {
   it('lets only the executor move the job forward, one step at a time', () => {
@@ -54,5 +59,14 @@ describe('order state machine (docs/01-biznes-qoidalar.md §3.3)', () => {
     expect(canTransition('DISPUTE', 'CUSTOMER', 'COMPLETED')).toBe(true);
     expect(canTransition('DISPUTE', 'CUSTOMER', 'IN_PROGRESS')).toBe(false);
     expect(canTransition('DISPUTE', 'SYSTEM', 'COMPLETED')).toBe(false);
+  });
+
+  it('lets orders moderation (stage 7) cancel any live status but not DISPUTED or a terminal one', () => {
+    expect(ADMIN_CANCELLABLE_STATUSES).toContain('PUBLISHED');
+    expect(ADMIN_CANCELLABLE_STATUSES).toContain('DONE_BY_EXECUTOR');
+    expect(ADMIN_CANCELLABLE_STATUSES).toContain('COMPLETED');
+    expect(ADMIN_CANCELLABLE_STATUSES).not.toContain('DISPUTED');
+    expect(ADMIN_CANCELLABLE_STATUSES).not.toContain('PAID');
+    expect(ADMIN_CANCELLABLE_STATUSES).not.toContain('CANCELLED');
   });
 });
